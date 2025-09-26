@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 
 @TeleOp
 public class REVStarterBotTeleOpJava extends LinearOpMode {
@@ -16,6 +17,7 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     private CRServo intake;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
+    private RevBlinkinLedDriver lightsLED;
 
     // Setting our velocity targets. These values are in ticks per second!
     private static final int bankVelocity = 1300;
@@ -25,12 +27,13 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     @Override
     public void runOpMode() {
         flywheel = hardwareMap.get(DcMotor.class, "motor-flywheel");
-        feeder = hardwareMap.get(DcMotor.class, "motor-feeder-A");
+        feeder = hardwareMap.get(DcMotor.class, "motor-feeder");
         leftFrontDrive = hardwareMap.get(DcMotor.class, "left-front-drive");
         leftBackDrive = hardwareMap.get(DcMotor.class, "left-back-drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right-front-drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right-back-drive");
-        intake = hardwareMap.get(CRServo.class, "servo-intake");
+        intake = hardwareMap.get(CRServo.class, "servo-agitator");
+        lightsLED = hardwareMap.get(RevBlinkinLedDriver.class,"pwm-LED");
 
         // Establishing the direction and mode for the motors
         flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -59,8 +62,9 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     }
 
     /**
-     * Controls for the drivetrain. The robot uses a split stick stlye arcade drive.
-     * Forward and back is on the left stick. Turning is on the right stick.
+     * Controls for the drivetrain. The robot uses a mecanum drivetrain.
+     * Forward and back is on the left stick. Strafing is on the left stick.  Turning is on the right stick.
+     *Code and explanation are at: https://gm0.org/en/latest/docs/software/tutorials/mecanum-drive.html
      */
     private void splitStickArcadeDrive() {
         double x;
