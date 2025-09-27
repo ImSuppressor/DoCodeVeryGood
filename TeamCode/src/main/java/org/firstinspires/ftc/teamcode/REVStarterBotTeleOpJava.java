@@ -14,7 +14,7 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     private DcMotor feeder;
     private DcMotor leftFrontDrive;
     private DcMotor leftBackDrive;
-    private CRServo intake;
+    private CRServo agitator;
     private DcMotor rightFrontDrive;
     private DcMotor rightBackDrive;
     private RevBlinkinLedDriver lightsLED;
@@ -32,7 +32,7 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
         leftBackDrive = hardwareMap.get(DcMotor.class, "left-back-drive");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "right-front-drive");
         rightBackDrive = hardwareMap.get(DcMotor.class, "right-back-drive");
-        intake = hardwareMap.get(CRServo.class, "servo-agitator");
+        agitator = hardwareMap.get(CRServo.class, "servo-agitator");
         lightsLED = hardwareMap.get(RevBlinkinLedDriver.class,"pwm-LED");
 
         // Establishing the direction and mode for the motors
@@ -44,8 +44,8 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
-        //Ensures the intake is active and ready
-        intake.setPower(0);
+        //Ensures the agitator is active and ready
+        agitator.setPower(0);
 
         waitForStart();
         if (opModeIsActive()) {
@@ -53,7 +53,7 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
                 // Calling our methods while the OpMode is running
                 splitStickArcadeDrive();
                 setFlywheelVelocity();
-                manualFeederAndIntakeControl();
+                manualFeederAndagitatorControl();
                 telemetry.addData("Flywheel Velocity", ((DcMotorEx) flywheel).getVelocity());
                 telemetry.addData("Flywheel Power", flywheel.getPower());
                 telemetry.update();
@@ -93,8 +93,8 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     /**
      * Manual control for the Core Hex powered feeder and the agitator servo in the hopper
      */
-    private void manualFeederAndIntakeControl() {
-        // Manual control for the Core Hex intake
+    private void manualFeederAndagitatorControl() {
+        // Manual control for the Core Hex agitator
         if (gamepad1.cross) {
             feeder.setPower(0.5);
         } else if (gamepad1.triangle) {
@@ -102,9 +102,9 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
         }
         // Manual control for the hopper's servo
         if (gamepad1.dpad_left) {
-            intake.setPower(1);
+            agitator.setPower(1);
         } else if (gamepad1.dpad_right) {
-            intake.setPower(-1);
+            agitator.setPower(-1);
         }
     }
 
@@ -127,9 +127,9 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
         } else {
             ((DcMotorEx) flywheel).setVelocity(0);
             feeder.setPower(0);
-            // The check below is in place to prevent stuttering with the intake. It checks if the intake is under manual control!
+            // The check below is in place to prevent stuttering with the agitator. It checks if the agitator is under manual control!
             if (!gamepad1.dpad_right && !gamepad1.dpad_left) {
-                intake.setPower(0);
+                agitator.setPower(0);
             }
         }
     }
@@ -137,11 +137,11 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     /**
      * The bank shot or near velocity is intended for launching balls touching or a few inches from the goal.
      * When running this function, the flywheel will spin up and the Core Hex will wait before balls can be fed.
-     * The intake will spin until the bumper is released.
+     * The agitator will spin until the bumper is released.
      */
     private void bankShotAuto() {
         ((DcMotorEx) flywheel).setVelocity(bankVelocity);
-        intake.setPower(-1);
+        agitator.setPower(-1);
         if (((DcMotorEx) flywheel).getVelocity() >= bankVelocity - 50) {
             feeder.setPower(1);
         } else {
@@ -152,11 +152,11 @@ public class REVStarterBotTeleOpJava extends LinearOpMode {
     /**
      * The far power velocity is intended for launching balls a few feet from the goal. It may require adjusting the deflector.
      * When running this function, the flywheel will spin up and the Core Hex will wait before balls can be fed.
-     * The intake will spin until the bumper is released.
+     * The agitator will spin until the bumper is released.
      */
     private void farPowerAuto() {
         ((DcMotorEx) flywheel).setVelocity(farVelocity);
-        intake.setPower(-1);
+        agitator.setPower(-1);
         if (((DcMotorEx) flywheel).getVelocity() >= farVelocity - 100) {
             feeder.setPower(1);
         } else {
