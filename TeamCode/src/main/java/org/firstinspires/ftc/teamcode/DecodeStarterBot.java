@@ -162,8 +162,8 @@ public class DecodeStarterBot extends LinearOpMode {
         IMU imu = hardwareMap.get(IMU.class, "imu");
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.UP,
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT,
+                RevHubOrientationOnRobot.UsbFacingDirection.UP));
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
@@ -193,10 +193,10 @@ public class DecodeStarterBot extends LinearOpMode {
 
 
             double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = (rotY + rotX + rx) / denominator;
-            double backLeftPower = (rotY - rotX + rx) / denominator;
-            double frontRightPower = (rotY - rotX - rx) / denominator;
-            double backRightPower = (rotY + rotX - rx) / denominator;
+            double frontLeftPower = ((rotY + rotX + rx) / denominator);
+            double backLeftPower = ((rotY - rotX + rx) / denominator);
+            double frontRightPower = ((rotY - rotX - rx) / denominator);
+            double backRightPower = ((rotY + rotX - rx) / denominator);
 
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
@@ -206,62 +206,13 @@ public class DecodeStarterBot extends LinearOpMode {
             float leftTrigger = gamepad1.left_trigger;
             double armPower;
 
-            if(gamepad1.a){
-                launcher.setPower(1);
-                leftfeeder.setPower(1);
-                rightfeeder.setPower(1);
-            } else {
-                launcher.setPower(0);
-                leftfeeder.setPower(0);
-                rightfeeder.setPower(0);
 
-            }
-            if(gamepad1.b){
-                launcher.setPower(-0.5);
-                leftfeeder.setPower(0.5);
-                rightfeeder.setPower(-0.5);
-            } else {
-                launcher.setPower(0);
-                leftfeeder.setPower(0);
-                rightfeeder.setPower(0);
 
-            }
-
-            if(gamepad2.a){
-                frontRightMotor.setPower(1);
-            } else {
-                frontRightMotor.setPower(0);
-            }
-
-            if(gamepad2.b){
-                frontLeftMotor.setPower(1);
-            } else {
-                frontLeftMotor.setPower(0);
-            }
-
-            if(gamepad2.x){
-                backLeftMotor.setPower(1);
-            } else {
-                backLeftMotor.setPower(0);
-            }
-
-            if(gamepad2.y){
-                backRightMotor.setPower(1);
-            } else {
-                backRightMotor.setPower(0);
-            }
             //Moving Square
-            if(gamepad1.dpad_right){
-                encoderDrive(57, 0);
-                encoderDrive(0, 57);
-                encoderDrive(-57, 0);
-                encoderDrive(0, -57);
 
 
 
-            if(gamepad1.x){
 
-            }
 
             telemetry.addData("frontLeftMotorPos:", frontLeftMotor.getCurrentPosition());
             telemetry.addData("frontRightMotorPos:", frontRightMotor.getCurrentPosition());
@@ -271,6 +222,7 @@ public class DecodeStarterBot extends LinearOpMode {
 
 
             telemetry.addLine("pressing dpad Right makes robot go in square");
+
 
 
 
@@ -285,6 +237,6 @@ public class DecodeStarterBot extends LinearOpMode {
 
 
     }
-}}
+}
 
 
