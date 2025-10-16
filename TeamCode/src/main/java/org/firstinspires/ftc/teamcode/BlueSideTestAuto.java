@@ -35,8 +35,8 @@ public class BlueSideTestAuto extends LinearOpMode {
                     .lineToYSplineHeading(24.0, Math.PI / 2)
                     .lineToXSplineHeading(24.0, Math.PI / 2)
                     //.strafeTo(new Vector2d(44.5, 30))
-                    .lineToYSplineHeading(24.0, Math.PI / 2)
-                    .lineToXSplineHeading(24.0, Math.PI / 2);
+                    .lineToYSplineHeading(-24.0, Math.PI / 2)
+                    .lineToXSplineHeading(-24.0, Math.PI / 2);
 
 
             Action trajectoryActionChosen = tab1.build();
