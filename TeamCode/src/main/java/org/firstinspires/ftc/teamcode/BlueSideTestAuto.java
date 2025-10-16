@@ -32,19 +32,15 @@ public class BlueSideTestAuto extends LinearOpMode {
 
             TrajectoryActionBuilder tab1 = drive.actionBuilder(currentPos)
                     //.lineToYSplineHeading(24, Math.toRadians(0))
-                    .lineToY(24)
-                    .turn(Math.toRadians(90))
-                    .lineToX(24)
+                    .lineToYSplineHeading(24.0, Math.PI / 2)
+                    .lineToXSplineHeading(24.0, Math.PI / 2)
                     //.strafeTo(new Vector2d(44.5, 30))
-                    .turn(Math.toRadians(90))
-                    .lineToY(-24)
-                    .turn(Math.toRadians(90))
-                    .lineToX(-24)
-                    .turn(Math.toRadians(90));
+                    .lineToYSplineHeading(24.0, Math.PI / 2)
+                    .lineToXSplineHeading(24.0, Math.PI / 2);
+
 
             Action trajectoryActionChosen = tab1.build();
             Actions.runBlocking(trajectoryActionChosen);
-            drive.localizer.update();
 
             if (isStopRequested()) {
                 return;
