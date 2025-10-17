@@ -52,11 +52,40 @@ public class BlueSideTestAuto extends LinearOpMode {
                 .splineToSplineHeading(new Pose2d(48, 48, 0), Math.PI / 2);
 
 */
+
+        //Path 1
+//        -----------------------------------------------
+//        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+//                //.lineToYSplineHeading(24, Math.toRadians(0))
+//                .splineTo(new Vector2d(0, 24), 0)
+//                .splineTo(new Vector2d(24, 24), -Math.PI / 2);
+//
+//        //.strafeTo(new Vector2d(44.5, 30))
+//
+//        Action trajectoryActionChosen = tab1.build();
+//        Actions.runBlocking(trajectoryActionChosen);
+//
+//        // above is the code for first movement, below is the code for the square movement
+//        for (int i = 1; i <= 4; i++) {
+//            Pose2d currentPos = drive.localizer.getPose();
+//
+//            TrajectoryActionBuilder tab2 = drive.actionBuilder(currentPos)
+//                    .splineTo(new Vector2d(24, -24), Math.PI)
+//                    .splineTo(new Vector2d(-24, -24), Math.PI / 2)
+//                    .splineTo(new Vector2d(-24, 24), 0)
+//                    .splineTo(new Vector2d(24, 24), -Math.PI / 2);
+//            Action trajectoryActionChosen2 = tab2.build();
+//            Actions.runBlocking(trajectoryActionChosen2);
+//        }
+//        ---------------------------------------------------------
+        // path 2
+
         TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineTo(new Vector2d(0, 24), 0)
-                .splineTo(new Vector2d(24, 24), -Math.PI / 2);
-        //.strafeTo(new Vector2d(44.5, 30))
+                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(0))
+                // turn is relative to robot check?
+                .turn(Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(24, 24), Math.toRadians(-90))
+                .turn(Math.toRadians(-90));
 
         Action trajectoryActionChosen = tab1.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -66,13 +95,20 @@ public class BlueSideTestAuto extends LinearOpMode {
             Pose2d currentPos = drive.localizer.getPose();
 
             TrajectoryActionBuilder tab2 = drive.actionBuilder(currentPos)
-                    .splineTo(new Vector2d(24, -24), Math.PI)
-                    .splineTo(new Vector2d(-24, -24), Math.PI / 2)
-                    .splineTo(new Vector2d(-24, 24), 0)
-                    .splineTo(new Vector2d(24, 24), -Math.PI / 2);
+
+                    .splineToConstantHeading(new Vector2d(24, -24), Math.toRadians(180))
+                    .turn(Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(-24, -24), Math.toRadians(90))
+                    .turn(Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(-24, 24), Math.toRadians(0))
+                    .turn(Math.toRadians(-90))
+                    .splineToConstantHeading(new Vector2d(24, 24), Math.toRadians(-90))
+                    .turn(Math.toRadians(-90));
             Action trajectoryActionChosen2 = tab2.build();
             Actions.runBlocking(trajectoryActionChosen2);
         }
+
+
 
         if (isStopRequested()) {
             return;
