@@ -136,62 +136,76 @@ public class BlueSideTestAuto extends LinearOpMode {
 //
  // NOTE: below code is optimized for our 4x6 playing field, not the official 6x6 playing field
 
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
+        TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(0, 48), Math.toRadians(0))
-                .turn(Math.toRadians(-45))
-                // launch code here
-                //read april tag code here
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
+                .turn(Math.toRadians(-45));
+        Action trajectoryActionChosen = goToLaunchSpot.build();
+        Actions.runBlocking(trajectoryActionChosen);
 
+        //TODO: launch code here
+
+
+
+        TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(-90))
                 .turn(Math.toRadians(-45))
                 //facing left
                 //intake start code here
-                .splineToConstantHeading(new Vector2d(-24, 0), Math.toRadians(90))
-                .turn(Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(0, -24), Math.toRadians(90))
+                .turn(Math.toRadians(90));
                 //launched, collected 3
                 //conveyer belt code here
+        trajectoryActionChosen = intake3Balls.build();
+        Actions.runBlocking(trajectoryActionChosen);
 
+
+        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
                 .splineToConstantHeading(new Vector2d(0, 48), Math.toRadians(0))
-                .turn(Math.toRadians(-45))
+                .turn(Math.toRadians(-45));
+        trajectoryActionChosen = goToLaunchSpot2.build();
+        Actions.runBlocking(trajectoryActionChosen);
                 //launch code here
-                .splineToConstantHeading(new Vector2d(0, -12), Math.toRadians(0))
+                //.splineToConstantHeading(new Vector2d(0, -12), Math.toRadians(0))
 
                 // ignore this bit below
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(90))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(24, 24), Math.toRadians(0))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
-                .turn(Math.toRadians(-90))
-
-                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(90))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(24, 24), Math.toRadians(0))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
-                .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
-                .turn(Math.toRadians(-90));
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(90))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(24, 24), Math.toRadians(0))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
+//                .turn(Math.toRadians(-90))
+//
+//                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(90))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(24, 24), Math.toRadians(0))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
+//                .turn(Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
+//                .turn(Math.toRadians(-90));
 
 
         //.strafeTo(new Vector2d(44.5, 30))
 
-        Action trajectoryActionChosen = tab1.build();
-        Actions.runBlocking(trajectoryActionChosen);
+
 
         if (isStopRequested()) {
             return;
         }
 
+    }
+
+    private Pose2d getCurrentPos(MecanumDrive drive) {
+        return drive.localizer.getPose();
     }
 
     private void initAprilTag() {
