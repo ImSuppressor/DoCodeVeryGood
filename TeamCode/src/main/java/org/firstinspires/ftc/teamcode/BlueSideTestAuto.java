@@ -141,16 +141,16 @@ public class BlueSideTestAuto extends LinearOpMode {
                 .splineToConstantHeading(new Vector2d(0, 48), Math.toRadians(0))
                 .turn(Math.toRadians(-45))
                 // launch code here
-                //read april tag
+                //read april tag code here
 
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(-90))
                 .turn(Math.toRadians(-45))
                 //facing left
-                //intake start
+                //intake start code here
                 .splineToConstantHeading(new Vector2d(-24, 0), Math.toRadians(90))
                 .turn(Math.toRadians(90))
                 //launched, collected 3
-                //conveyer belt
+                //conveyer belt code here
 
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
                 .splineToConstantHeading(new Vector2d(0, 48), Math.toRadians(0))
@@ -158,7 +158,7 @@ public class BlueSideTestAuto extends LinearOpMode {
                 //launch code here
                 .splineToConstantHeading(new Vector2d(0, -12), Math.toRadians(0))
 
-                // ignore this bit
+                // ignore this bit below
                 .turn(Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
                 .turn(Math.toRadians(-90))
