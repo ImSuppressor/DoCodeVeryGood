@@ -149,12 +149,12 @@ public class BlueSideTestAuto extends LinearOpMode {
 
 
         TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(90))
                 .turn(Math.toRadians(45))
                 //facing left
                 //intake start code here
 
-                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(0, -24), Math.toRadians(0))
                 .turn(Math.toRadians(-90));
                 //launched, collected 3
                 //conveyer belt code here
@@ -164,7 +164,7 @@ public class BlueSideTestAuto extends LinearOpMode {
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(0, 48), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
                 .turn(Math.toRadians(45));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
