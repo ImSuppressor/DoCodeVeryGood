@@ -19,8 +19,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @Config
-@Autonomous(name = "BLUE_TEST_FAR_AUTO_PIXEL", group = "Autonomous")
-public class BlueSideFarTestAuto extends LinearOpMode {
+@Autonomous(name = "BLUE_TEST_CLOSE_AUTO_PIXEL", group = "Autonomous")
+public class BlueSideCloseTestAuto extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
@@ -131,7 +131,7 @@ public class BlueSideFarTestAuto extends LinearOpMode {
 //            Actions.runBlocking(trajectoryActionChosen2);
 //        }
 //
- // NOTE: below code is optimized for our 4x6 playing field, not the official 6x6 playing field
+        // NOTE: below code is optimized for our 4x6 playing field, not the official 6x6 playing field
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
@@ -152,8 +152,8 @@ public class BlueSideFarTestAuto extends LinearOpMode {
 
                 .splineToConstantHeading(new Vector2d(0, -24), Math.toRadians(0))
                 .turn(Math.toRadians(-90));
-                //launched, collected 3
-                //conveyer belt code here
+        //launched, collected 3
+        //conveyer belt code here
         trajectoryActionChosen = intake3Balls.build();
         Actions.runBlocking(trajectoryActionChosen);
 
@@ -166,11 +166,11 @@ public class BlueSideFarTestAuto extends LinearOpMode {
         Actions.runBlocking(trajectoryActionChosen);
 
 
-  
-                //launch code here
-                //.splineToConstantHeading(new Vector2d(0, -12), Math.toRadians(0))
 
-                // ignore this bit below
+        //launch code here
+        //.splineToConstantHeading(new Vector2d(0, -12), Math.toRadians(0))
+
+        // ignore this bit below
 //                .turn(Math.toRadians(-90))
 //                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
 //                .turn(Math.toRadians(-90))
