@@ -22,14 +22,13 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.Pose2d;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 @Config
 @Autonomous(name = "AyoAuto", group = "Autonomous")
 public abstract class Auto extends LinearOpMode {
 
-    private static final Logger log = LoggerFactory.getLogger(Auto.class);
+
     DcMotor lf = null;
     DcMotor lb = null;
     DcMotor rf = null;
@@ -70,7 +69,7 @@ public abstract class Auto extends LinearOpMode {
 
         // within the Lift class
 
-            private boolean initialized = false;
+            private boolean initialized = true;
 
 
 
@@ -113,6 +112,8 @@ public abstract class Auto extends LinearOpMode {
             Pose2d beginPose = new Pose2d(new Vector2d(72,-16), Math.toRadians(270));
 
             MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+
+            new Drivetrain();
 
             waitForStart();
 
