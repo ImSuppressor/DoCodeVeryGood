@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -139,7 +140,7 @@ public class BlueSideTestAuto extends LinearOpMode {
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
-                .turn(Math.toRadians(-45));
+                .turn(Math.toRadians(45));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
@@ -149,11 +150,12 @@ public class BlueSideTestAuto extends LinearOpMode {
 
         TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(-90))
-                .turn(Math.toRadians(-45))
+                .turn(Math.toRadians(45))
                 //facing left
                 //intake start code here
-                .splineToConstantHeading(new Vector2d(0, -24), Math.toRadians(90))
-                .turn(Math.toRadians(90));
+
+                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(90))
+                .turn(Math.toRadians(-90));
                 //launched, collected 3
                 //conveyer belt code here
         trajectoryActionChosen = intake3Balls.build();
@@ -163,9 +165,12 @@ public class BlueSideTestAuto extends LinearOpMode {
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
                 .splineToConstantHeading(new Vector2d(0, 48), Math.toRadians(0))
-                .turn(Math.toRadians(-45));
+                .turn(Math.toRadians(45));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
+
+
+  
                 //launch code here
                 //.splineToConstantHeading(new Vector2d(0, -12), Math.toRadians(0))
 
