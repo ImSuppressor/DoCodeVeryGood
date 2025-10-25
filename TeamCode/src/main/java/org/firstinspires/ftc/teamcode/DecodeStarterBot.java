@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
@@ -228,7 +229,10 @@ public class DecodeStarterBot extends LinearOpMode {
             telemetry.addData("frontRightMotorPos:", frontRightMotor.getCurrentPosition());
             telemetry.addData("backLeftMotorPos", backLeftMotor.getCurrentPosition());
             telemetry.addData("backRightMotorPos", backRightMotor.getCurrentPosition());
+
             telemetry.addLine("I have made change");
+
+
 
 
 
