@@ -3,6 +3,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -17,8 +18,8 @@ public class DecodeStarterBot extends LinearOpMode {
     DcMotor frontRightMotor = null;
     DcMotor backRightMotor = null;
 
-    CRServo leftfeeder = null;
-    CRServo rightfeeder = null;
+    Servo leftfeeder = null;
+    Servo rightfeeder = null;
     DcMotor launcher = null;
 
 
@@ -83,37 +84,37 @@ public class DecodeStarterBot extends LinearOpMode {
         //dy
         frontLeftMotor.setTargetPosition((int) frontLeftMotorTarget);
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeftMotor.setPower(0.5);
+        frontLeftMotor.setPower(0.2);
 
         backLeftMotor.setTargetPosition((int) backLeftMotorTarget);
         backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftMotor.setPower(0.5);
+        backLeftMotor.setPower(0.2);
 
         frontRightMotor.setTargetPosition((int) frontRightMotorTarget);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightMotor.setPower(0.5);
+        frontRightMotor.setPower(0.2);
 
         backRightMotor.setTargetPosition((int) backRightMotorTarget);
         backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightMotor.setPower(0.5);
+        backRightMotor.setPower(0.2);
 
 
         //dx
         frontLeftMotor.setTargetPosition((int) frontLeftMotorTarget);
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeftMotor.setPower(0.5);
+        frontLeftMotor.setPower(0.2);
 
         backLeftMotor.setTargetPosition((int) backLeftMotorTarget);
         backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backLeftMotor.setPower(0.5);
+        backLeftMotor.setPower(0.2);
 
         frontRightMotor.setTargetPosition((int) frontRightMotorTarget);
         frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightMotor.setPower(0.5);
+        frontRightMotor.setPower(0.2);
 
         backRightMotor.setTargetPosition((int) backRightMotorTarget);
         backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightMotor.setPower(0.5);
+        backRightMotor.setPower(0.2);
 
         //dy & dx
         while ((Math.abs(backLeftMotor.getCurrentPosition() - backLeftMotor.getTargetPosition()) > 5)
@@ -143,8 +144,8 @@ public class DecodeStarterBot extends LinearOpMode {
         backLeftMotor = hardwareMap.dcMotor.get("left_back_drive");
         frontRightMotor = hardwareMap.dcMotor.get("right_front_drive");
         backRightMotor = hardwareMap.dcMotor.get("right_back_drive");
-        leftfeeder = hardwareMap.crservo.get("leftfeeder");
-        rightfeeder = hardwareMap.crservo.get("rightfeeder");
+        leftfeeder = hardwareMap.servo.get("leftfeeder");
+        rightfeeder = hardwareMap.servo.get("rightfeeder");
         launcher = hardwareMap.dcMotor.get("launcher");
 
         frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -193,10 +194,10 @@ public class DecodeStarterBot extends LinearOpMode {
 
 
             double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = ((rotY + rotX + rx) / denominator);
-            double backLeftPower = ((rotY - rotX + rx) / denominator);
-            double frontRightPower = ((rotY - rotX - rx) / denominator);
-            double backRightPower = ((rotY + rotX - rx) / denominator);
+            double frontLeftPower = ((rotY + rotX + rx) / denominator)*0.5;
+            double backLeftPower = ((rotY - rotX + rx) / denominator)*0.5;
+            double frontRightPower = ((rotY - rotX - rx) / denominator)*0.5;
+            double backRightPower = ((rotY + rotX - rx) / denominator)*0.5;
 
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
@@ -211,6 +212,15 @@ public class DecodeStarterBot extends LinearOpMode {
             //Moving Square
 
 
+            if ((gamepad1.b)){
+                leftfeeder.setPosition(0.2);
+                rightfeeder.setPosition(-0.2);
+            } else if(gamepad1.y){
+                leftfeeder.setPosition(-1);
+                rightfeeder.setPosition(-1);
+            }
+
+
 
 
 
@@ -218,6 +228,7 @@ public class DecodeStarterBot extends LinearOpMode {
             telemetry.addData("frontRightMotorPos:", frontRightMotor.getCurrentPosition());
             telemetry.addData("backLeftMotorPos", backLeftMotor.getCurrentPosition());
             telemetry.addData("backRightMotorPos", backRightMotor.getCurrentPosition());
+            telemetry.addLine("I have made change");
 
 
 
