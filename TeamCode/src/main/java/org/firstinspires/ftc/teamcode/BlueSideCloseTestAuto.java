@@ -29,7 +29,7 @@ public class BlueSideCloseTestAuto extends LinearOpMode {
     @Override
     public void runOpMode() {
         //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(45));
+        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         initAprilTag();
@@ -136,8 +136,8 @@ public class BlueSideCloseTestAuto extends LinearOpMode {
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .turn(Math.toRadians(45))
-                .splineToConstantHeading(new Vector2d(-12, 24), Math.toRadians(-90));
+                .turn(Math.toRadians(60))
+                .splineToConstantHeading(new Vector2d(-12, -12), Math.toRadians(0));
 
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -147,13 +147,15 @@ public class BlueSideCloseTestAuto extends LinearOpMode {
 
 
         TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(-48, 24), Math.toRadians(90))
-                .turn(Math.toRadians(45))
+                .splineToConstantHeading(new Vector2d(-48, -12), Math.toRadians(-90))
+                .turn(Math.toRadians(30))
                 //facing left
                 //intake start code here
 
-                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(90))
-                .turn(Math.toRadians(-45));
+                .splineToConstantHeading(new Vector2d(-48, 12), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(180))
+
+                .turn(Math.toRadians(-30));
 
         //launched, collected 3
         //conveyer belt code here
@@ -162,8 +164,7 @@ public class BlueSideCloseTestAuto extends LinearOpMode {
 
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(-48, 24), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(0, 24), Math.toRadians(0));
+                .splineToConstantHeading(new Vector2d(-12, -12), Math.toRadians(0));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
 
