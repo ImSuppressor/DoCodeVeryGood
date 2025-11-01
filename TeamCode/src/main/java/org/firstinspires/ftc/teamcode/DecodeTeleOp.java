@@ -303,7 +303,7 @@ public class DecodeTeleOp extends LinearOpMode {
             float leftTrigger = gamepad1.left_trigger;
 
             if(leftTrigger>0){
-                launcher.setPower(1);
+                launcher.setPower(-1);
             } else if(leftTrigger == 0){
                 launcher.setPower(0);
             }

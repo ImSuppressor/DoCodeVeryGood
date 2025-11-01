@@ -168,7 +168,6 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
 
             rotX = rotX * 1.1;  // Counteract imperfect strafing
 
-
             double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
             double frontLeftPower = ((rotY + rotX + rx) / denominator)*0.5;
             double backLeftPower = ((rotY - rotX + rx) / denominator)*0.5;
