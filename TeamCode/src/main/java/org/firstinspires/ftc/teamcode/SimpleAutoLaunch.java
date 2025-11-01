@@ -206,12 +206,13 @@ public class SimpleAutoLaunch extends LinearOpMode {
         runtime.reset();
         while (opModeIsActive() &&
                 (runtime.seconds() < timeoutSec) &&
-                (leftDrive.isBusy() || rightDrive.isBusy())) {
+                (rb.isBusy() || lb.isBusy() || rf.isBusy() || lf.isBusy())) {
             // Optionally add telemetry
 
             // allow the loop to be interrupted
             idle();
         }
+
 
         // Stop motors
         lb.setPower(0);
