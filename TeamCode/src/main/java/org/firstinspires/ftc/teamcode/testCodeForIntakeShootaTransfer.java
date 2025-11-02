@@ -28,6 +28,9 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
     DcMotor transfer = null;
     DcMotor leftintake = null;
     DcMotor rightintake = null;
+
+    Servo leftfeeder = null;
+    Servo rightfeeder = null;
     DcMotor launcher = null;
 //    Servo deciderofdoom = null;
     ColorSensor csensor = null;
@@ -108,8 +111,13 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
 
         //Expansion Hub
         transfer = hardwareMap.dcMotor.get(("transfer"));
-         leftintake = hardwareMap.dcMotor.get("leftintake");
-         rightintake = hardwareMap.dcMotor.get("rightintake");
+
+        leftfeeder = hardwareMap.servo.get("leftfeeder");
+        rightfeeder = hardwareMap.servo.get("rightfeeder");
+
+        leftintake = hardwareMap.dcMotor.get("leftintake");
+        rightintake = hardwareMap.dcMotor.get("rightintake");
+
 //        intake = hardwareMap.dcMotor.get(("intake"));
         launcher = hardwareMap.dcMotor.get("launcher");
         csensor = hardwareMap.colorSensor.get("colorsensor");
@@ -195,7 +203,9 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
             float rightTrigger = gamepad1.right_trigger;
 
 
+/*
 
+ */
 
              if(gamepad1.x){
                  //ts works
@@ -209,29 +219,26 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
                 transfer.setPower(0);
             }
 
+             if(gamepad1.right_bumper){
+                 rightfeeder.setPosition(0.3);
+             } else if(gamepad1.left_bumper){
+                 leftfeeder.setPosition(0.3);
+             } else if(gamepad2.left_bumper){
+                 leftfeeder.setPosition(-0.3);
+             } else if(gamepad2.right_bumper){
+                 rightfeeder.setPosition(-0.3);
+             }
 
 
 
-//             if(leftTrigger > 0){
-//                 launcher.setPower(1);
-//             } else if(leftTrigger == 0){
-//                 launcher.setPower(0);
-//             }
+
+
 //
-//            if(rightTrigger > 0){
-//                launcher.setPower(-1);
-//            } else if(rightTrigger == 0){
-//                launcher.setPower(0);
-//            }
-
-//            if(gamepad1.left_bumper){
-//                launcher.setPower(0.5);
-//            } else
 //
-           if(gamepad1.right_bumper){
+           if(leftTrigger > 0){
                 //ts correct
-                launcher.setPower(-0.5);
-            } else {
+                launcher.setPower(-1);
+            } else if(leftTrigger == 0){
                 launcher.setPower(0);
             }
 

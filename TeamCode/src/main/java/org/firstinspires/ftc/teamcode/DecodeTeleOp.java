@@ -37,33 +37,9 @@ public class DecodeTeleOp extends LinearOpMode {
     DcMotor transfer = null;
     DcMotor intake = null;
     DcMotor launcher = null;
-    Servo deciderofdoom = null;
+//    Servo deciderofdoom = null;
     ColorSensor csensor = null;
 
-//    public String detectColor() {
-//        // Get raw color values
-//        int red = csensor.red();
-//        int green = csensor.green();
-//        int blue = csensor.blue();
-//
-//        // Normalize for lighting
-//        double total = red + green + blue;
-//        double r = red / total;
-//        double g = green / total;
-//        double b = blue / total;
-//
-//        // Detect GREEN (high green value, low red/blue)
-//        if (g > 0.45 && r < 0.35 && b < 0.35) {
-//            return "Green";
-//        }
-//        // Detect PURPLE (high red & blue mix, low green)
-//        else if (r > 0.35 && b > 0.35 && g < 0.3) {
-//            return "Purple";
-//        }
-//        else {
-//            return "Unknown";
-//        }
-//    }
 
     public String detectColor() {
         int r = csensor.red();
@@ -96,88 +72,6 @@ public class DecodeTeleOp extends LinearOpMode {
     double TPR = 537.7;
     //Centimeters Per Tick
     double CENTIMETERS_PER_TICK = 0.0607;
-
-
-    // Gradually ramps motor power towards a target
-    public void rampMotorPower(DcMotor motor, double targetPower, double rampRate) {
-        double currentPower = motor.getPower();
-
-        if (currentPower < targetPower) {
-            currentPower += rampRate;
-            if (currentPower > targetPower) {
-                currentPower = targetPower;
-            }
-        } else if (currentPower > targetPower) {
-            currentPower -= rampRate;
-            if (currentPower < targetPower) {
-                currentPower = targetPower;
-            }
-        }
-
-        motor.setPower(currentPower);
-    }
-
-
-
-    private void encoderDrive( double xcentimeters, double ycentimeters, double timeoutSec) {
-        GoBildaPinpointDriver pinpoint= hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-
-
-
-        // Calculate target ticks
-        int xmoveCounts = (int) Math.round(xcentimeters * CENTIMETERS_PER_TICK);
-        int ymoveCounts = (int) Math.round(ycentimeters * CENTIMETERS_PER_TICK);
-
-        //Get position values of pinpoint odometry computer
-        int FowardCurrent = pinpoint.getEncoderY();
-        int StrafeCurrent = pinpoint.getEncoderX();
-        //Target Positions
-        int newLt = FowardCurrent + xmoveCounts;
-        int newSt = StrafeCurrent + ymoveCounts;
-
-        //Add settings for Motors
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        // Set target and run to position for going forward/backward
-        frontLeftMotor.setTargetPosition(newLt);
-        frontRightMotor.setTargetPosition(newLt);
-        backRightMotor.setTargetPosition(newLt);
-        backLeftMotor.setTargetPosition(newLt);
-        // Set target and run to position for strafing left/right
-        frontLeftMotor.setTargetPosition(newSt);
-        frontRightMotor.setTargetPosition(newSt);
-        backRightMotor.setTargetPosition(newSt);
-        backLeftMotor.setTargetPosition(newSt);
-        //Set Motor Power for movement. Placed at half-power to preserve Bevel Gears
-        frontLeftMotor.setPower(0.5);
-        frontRightMotor.setPower(0.5);
-        backRightMotor.setPower(0.5);
-        backLeftMotor.setPower(0.5);
-        //Timeout timer
-        runtime.reset();
-        while (opModeIsActive() &&
-                (runtime.seconds() < timeoutSec) &&
-                (frontRightMotor.isBusy() || frontLeftMotor.isBusy() || backRightMotor.isBusy() || backLeftMotor.isBusy())) {
-            // Optionally add telemetry
-
-            // allow the loop to be interrupted
-            idle();
-        }
-
-
-
-
-
-
-        // Set power
-
-
-
-    }
-
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private int lastSeenTag = -1;
@@ -221,7 +115,7 @@ public class DecodeTeleOp extends LinearOpMode {
         intake = hardwareMap.dcMotor.get(("intake"));
         launcher = hardwareMap.dcMotor.get("launcher");
         csensor = hardwareMap.colorSensor.get("colorsensor");
-        deciderofdoom = hardwareMap.servo.get(("deciderservo"));
+        //deciderofdoom = hardwareMap.servo.get(("deciderservo"));
 
 
         // Set motor settings
@@ -324,9 +218,9 @@ public class DecodeTeleOp extends LinearOpMode {
             //Color Sensor Code
 
             if (detectColor().equals("Green")){
-                deciderofdoom.setPosition(1);
+                //deciderofdoom.setPosition(1);
             }else if (detectColor().equals("Purple")){
-                deciderofdoom.setPosition(-1);
+                //deciderofdoom.setPosition(-1);
             }
 
             if (gamepad1.left_bumper) {
