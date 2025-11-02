@@ -10,7 +10,6 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -21,8 +20,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @Config
-@Autonomous(name = "FULL_AUTO_BLUE_PIXEL", group = "Autonomous")
-public class FullAutoBlueSide extends LinearOpMode {
+@Autonomous(name = "FULL_AUTO_BLUE_FAR_PIXEL", group = "Autonomous")
+public class FullAutoBlueSideFar extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
@@ -53,7 +52,7 @@ public class FullAutoBlueSide extends LinearOpMode {
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-96, 0), Math.toRadians(0))
                 .turn(Math.toRadians(45));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -63,16 +62,16 @@ public class FullAutoBlueSide extends LinearOpMode {
 
 
         TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(90))
                 .turn(Math.toRadians(45))
                 //facing left
                 //intake start code here
 
-                .splineToConstantHeading(new Vector2d(0, -24), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-48, -24), Math.toRadians(-90))
                 .turn(Math.toRadians(-90));
 
-        intake.setPower(1);// double type
-        intake.setVelocity(10);// double type. ENCODER wire must be connected.
+//        intake.setPower(1);// double type
+//        intake.setVelocity(10);// double type. ENCODER wire must be connected.
         //launched, collected 3
         //conveyer belt code here
         trajectoryActionChosen = intake3Balls.build();
@@ -80,8 +79,8 @@ public class FullAutoBlueSide extends LinearOpMode {
 
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-96, 0), Math.toRadians(0))
                 .turn(Math.toRadians(45));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
