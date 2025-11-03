@@ -20,7 +20,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp
 public class testCodeForIntakeShootaTransfer extends LinearOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
+
 //    DcMotor frontLeftMotor = null;
 //    DcMotor backLeftMotor = null;
 //    DcMotor frontRightMotor = null;
@@ -32,32 +33,30 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
     Servo leftfeeder = null;
     Servo rightfeeder = null;
     DcMotor launcher = null;
-//    Servo deciderofdoom = null;
+  Servo deciderofdoom = null;
     ColorSensor csensor = null;
 
     public String detectColor() {
-        // Get raw color values
-        int red = csensor.red();
-        int green = csensor.green();
-        int blue = csensor.blue();
+        int r = csensor.red();
+        int g = csensor.green();
+        int b = csensor.blue();
 
-        // Normalize for lighting
-        double total = red + green + blue;
-        double r = red / total;
-        double g = green / total;
-        double b = blue / total;
+        // Normalize by total brightness to make detection more consistent
+        int total = r + g + b;
+        if (total == 0) return "UNKNOWN";
 
-        // Detect GREEN (high green value, low red/blue)
-        if (g > 0.45 && r < 0.35 && b < 0.35) {
-            return "Green";
-        }
-        // Detect PURPLE (high red & blue mix, low green)
-        else if (r > 0.35 && b > 0.35 && g < 0.3) {
-            return "Purple";
-        }
-        else {
-            return "Unknown";
-        }
+        double rn = (double)r / total;
+        double gn = (double)g / total;
+        double bn = (double)b / total;
+
+        // Color conditions
+        if (rn > 0.45 && gn < 0.3 && bn < 0.3) return "RED";
+        if (gn > 0.45 && rn < 0.3 && bn < 0.3) return "GREEN";
+        if (bn > 0.45 && rn < 0.3 && gn < 0.3) return "BLUE";
+        if (rn > 0.35 && gn > 0.35 && bn < 0.25) return "YELLOW";
+        if (bn > 0.35 && rn > 0.35 && gn < 0.3) return "PURPLE";
+
+        return "UNKNOWN";
     }
 
 
@@ -121,7 +120,7 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
 //        intake = hardwareMap.dcMotor.get(("intake"));
         launcher = hardwareMap.dcMotor.get("launcher");
         csensor = hardwareMap.colorSensor.get("colorsensor");
-//        deciderofdoom = hardwareMap.servo.get(("deciderservo"));
+       deciderofdoom = hardwareMap.servo.get(("deciderservo"));
 
 
         // Set motor settings
@@ -129,6 +128,8 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
 //        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 //        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         //intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+    rightintake.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
@@ -202,11 +203,6 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
             float leftTrigger = gamepad1.left_trigger;
             float rightTrigger = gamepad1.right_trigger;
 
-
-/*
-
- */
-
              if(gamepad1.x){
                  //ts works
                 leftintake.setPower(1);
@@ -229,45 +225,18 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
                  rightfeeder.setPosition(-0.3);
              }
 
-
-
-
-
-//
-//
-           if(leftTrigger > 0){
-                //ts correct
-                launcher.setPower(-1);
-            } else if(leftTrigger == 0){
-                launcher.setPower(0);
+             if(detectColor().equals("GREEN")){
+                 deciderofdoom.setPosition(0.3);
+             } if(detectColor().equals("PURPLE")){
+                 deciderofdoom.setPosition(-0.3);
             }
 
+           launcher.setPower(leftTrigger);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//            telemetry.addData("frontLeftMotorPos:", frontLeftMotor.getCurrentPosition());
-//            telemetry.addData("frontRightMotorPos:", frontRightMotor.getCurrentPosition());
-//            telemetry.addData("backLeftMotorPos", backLeftMotor.getCurrentPosition());
-//            telemetry.addData("backRightMotorPos", backRightMotor.getCurrentPosition());
 
             telemetry.addLine("I have made change");
 
             telemetry.addData("Color Sensor Values", detectColor());
-
-
-
 
             telemetry.addLine("pressing dpad Right makes robot go in square");
 

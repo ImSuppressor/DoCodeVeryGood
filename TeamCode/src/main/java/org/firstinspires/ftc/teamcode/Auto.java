@@ -76,6 +76,26 @@ public class Auto extends LinearOpMode {
                 return false;
             }
         }
+
+        int apriltag;
+
+    public Action PositionAprilTag() {
+        return new StopLaunch();
+    }
+
+    public class Position implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if(apriltag == 43){
+                return true;
+            } else if(apriltag > 43){
+                //move forward
+            } else if(apriltag < 43){
+                //move backward
+            }
+            return false;
+        }
+    }
         public Action TransferArtifact() {
             return new TransferArtifact();
         }
@@ -110,6 +130,7 @@ public class Auto extends LinearOpMode {
                     .waitSeconds(5)
                     .stopAndAdd(TransferArtifact())
                     .waitSeconds(1)
+                    .stopAndAdd(PositionAprilTag())
                     .stopAndAdd(StopLaunch())
                     .build();
 
