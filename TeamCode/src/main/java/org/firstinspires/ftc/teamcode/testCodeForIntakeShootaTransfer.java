@@ -33,7 +33,7 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
     Servo leftfeeder = null;
     Servo rightfeeder = null;
     DcMotor launcher = null;
-  Servo deciderofdoom = null;
+    Servo deciderofdoom = null;
     ColorSensor csensor = null;
 
     public String detectColor() {
@@ -44,6 +44,7 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
         // Normalize by total brightness to make detection more consistent
         int total = r + g + b;
         if (total == 0) return "UNKNOWN";
+
 
         double rn = (double)r / total;
         double gn = (double)g / total;
@@ -226,15 +227,15 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
              }
 
              if(detectColor().equals("GREEN")){
-                 deciderofdoom.setPosition(0.3);
+                 deciderofdoom.setPosition(0.6);
              } if(detectColor().equals("PURPLE")){
-                 deciderofdoom.setPosition(-0.3);
+                 deciderofdoom.setPosition(-0.6);
             }
 
            launcher.setPower(leftTrigger);
 
 
-            telemetry.addLine("I have made change");
+            telemetry.addLine("I have made change and bombaclap");
 
             telemetry.addData("Color Sensor Values", detectColor());
 
