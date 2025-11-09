@@ -37,6 +37,8 @@ public class BrainSTEMRobot {
     public Collector collector;
     public Shooter shooter;
 
+    public Finger finger;
+
 
 
 

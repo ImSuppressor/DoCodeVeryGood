@@ -19,12 +19,16 @@ public class Finger implements Component {
     public HardwareMap map;
     public enum FingerState {
         DOWN,
-        UP
+        UP;
+
+        public void setPosition(int i) {
+        }
     }
 
     public Finger(HardwareMap hardwareMap, Telemetry telemetry) {
         this.map = hardwareMap;
         this.telemetry = telemetry;
+        this.fingerState = FingerState.DOWN;
 
         fingerServo = map.get(Servo.class, "fingerServo");
 
@@ -51,7 +55,6 @@ public class Finger implements Component {
     public String test() {
         return null;
     }
-
 
 }
 
