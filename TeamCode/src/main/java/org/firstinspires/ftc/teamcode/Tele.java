@@ -39,11 +39,11 @@ public class Tele extends LinearOpMode {
         while (opModeIsActive()) {
             telemetry.update();
 
-//            robot.update();
+            robot.update();
 
             boolean a_Button_Is_Pressed_This_Loop = gamepad1.a;
             if(a_Button_Is_Pressed_This_Loop && !a_Button_Was_Pressed_Last_Loop) {
-               robot.spindexer.rotateDegrees(90);
+               robot.spindexer.rotateDegrees(120);
             }
 
             a_Button_Was_Pressed_Last_Loop = a_Button_Is_Pressed_This_Loop;

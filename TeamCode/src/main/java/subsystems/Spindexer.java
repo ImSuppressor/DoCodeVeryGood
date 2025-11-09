@@ -77,18 +77,26 @@ public class Spindexer implements Component {
     public void update() {
         switch (spindexerState) {
             case OFF:
-                spindexerMotor.setPower(0);
                 break;
             case ON:
-                spindexerMotor.setPower(0.1);
+                if (!spindexerMotor.isBusy()) {
+
+                    spindexerMotor.setPower(0);
+
+                    spindexerState = SpindexerState.OFF;
+
+                    spindexerMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+                }
                 break;
         }
     }
 
-    @Override
-    public String test() {
-        return null;
-    }
+
+@Override
+public String test() {
+    return null;
+}
 
 
 }
+
