@@ -4,23 +4,20 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.vision.VisionPortal;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-
-
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 
 @TeleOp
-public class testCodeForIntakeShootaTransfer extends LinearOpMode {
+public class AdecodeTeleOpTwoControllers extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
 
     DcMotor frontLeftMotor = null;
@@ -37,8 +34,6 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
     Servo deciderofdoom = null;
     NormalizedColorSensor csensor = null;
 
-
-
     private String detectGreen() {
         if (csensor == null) {
             return "ERROR: Sensor not initialized";
@@ -51,7 +46,7 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
         float b = colors.blue;
         float a = colors.alpha;
 
-        // Normalize color values
+
         if (a != 0) {
             r /= a;
             g /= a;
@@ -60,59 +55,20 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
 
         telemetry.addData("Raw RGB", "R: %.3f  G: %.3f  B: %.3f", r, g, b);
 
-        // Convert to relative color ratios (helps ignore brightness)
+
         float total = r + g + b;
         if (total == 0) return "UNKNOWN";
         float redRatio = r / total;
         float greenRatio = g / total;
         float blueRatio = b / total;
 
-        // More robust green detection:
-        // - Green ratio should dominate (at least 45%)
-        // - Red and blue should be clearly lower
-        // - Minimum brightness (g > 0.2) to ignore dark shadows
+
         if (greenRatio > 0.45 && greenRatio > redRatio + 0.10 && greenRatio > blueRatio + 0.10 && g > 0.2) {
             return "GREEN";
         }
 
         return "UNKNOWN";
     }
-
-
-
-
-
-    double wheelCircumfrence = 326.56;
-    //Ticks Per Revolution
-    double TPR = 537.7;
-    //Centimeters Per Tick
-    double CENTIMETERS_PER_TICK = 0.0607;
-
-
-    // Gradually ramps motor power towards a target
-
-    public void rampMotorPower(DcMotor motor, double targetPower, double rampRate) {
-        double currentPower = motor.getPower();
-
-        if (currentPower < targetPower) {
-            currentPower += rampRate;
-            if (currentPower > targetPower) {
-                currentPower = targetPower;
-            }
-        } else if (currentPower > targetPower) {
-            currentPower -= rampRate;
-            if (currentPower < targetPower) {
-                currentPower = targetPower;
-            }
-        }
-
-        motor.setPower(currentPower);
-    }
-
-
-
-
-
 
 
     @Override
@@ -149,14 +105,7 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
         backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-    rightintake.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
-
-
-
-
-
+        rightintake.setDirection(DcMotorSimple.Direction.REVERSE);
         // Sets IMU
 
         // Retrieve the IMU from the hardware map
@@ -172,11 +121,6 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
         waitForStart();
 
         if (isStopRequested()) return;
-
-        /*IMPORTANT!!!!!!!!!!!
-
-         */
-
 
         while (opModeIsActive()) {
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
@@ -204,98 +148,95 @@ public class testCodeForIntakeShootaTransfer extends LinearOpMode {
             double frontRightPower = ((rotY - rotX - rx) / denominator)*0.5;
             double backRightPower = ((rotY + rotX - rx) / denominator)*0.5;
 
+            /*
+            NOTE:
+            This is the code to-be finalized for the TeleOp
+            There are Two Controllers
+            Gamepad 1 is for movement
+            Gamepad 2 is for Inner Mechanisms(Intake, Transfer, Shooter, Gate Servo, Feeder Servos)
+             */
+
+            //Movement
+
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
 
-            //Code for Actions
-            /*
-            IMPORTANT!!!!!
-            using the left trigger warmups launcher
-            pressing a makes the intake spin for 2.5 seconds
-            and makes the color sensor sense the artifacts color, which the servo will move
-            and load the artifact into the transfer
-            pressing b triggers the transfer to run for 2.5 secs
+            //Triggers
+            float leftTrigger = gamepad2.left_trigger;
+            float rightTrigger = gamepad2.right_trigger;
 
-             */
-
-            //Trigger
-            float leftTrigger = gamepad1.left_trigger;
-            float rightTrigger = gamepad1.right_trigger;
-
-             //For Intake
-             if(gamepad1.x){
-                 //ts works
-                leftintake.setPower(1);
-                rightintake.setPower(1);
-            } else{
-                leftintake.setPower(0);
-                rightintake.setPower(0);
-            }
-
-
-            if(gamepad1.y){
-                deciderofdoom.setPosition(-0.3);
-            } if(gamepad1.a){
-                deciderofdoom.setPosition(0.3);
-            }
-
+            //Gate Servo Movement
             if(detectGreen().equals("GREEN")){
-                sleep(250);
+                sleep(150);
                 deciderofdoom.setPosition(-0.6);
             } else if(detectGreen().equals("UNKNOWN")){
                 deciderofdoom.setPosition(0.3);
             }
 
+            //Transfer Code(Foward and Inverse Code)
 
-            if(gamepad1.b){
+            //Forward Commands
+            if(gamepad2.b){
                 transfer.setPower(1);
             } else {
                 transfer.setPower(0);
             }
 
-
-            // Feeder Commands
-
-            if(gamepad1.dpad_left){
-
-                rightfeeder.setPosition(1);
-
-            } else if(gamepad1.dpad_right){
-
-                leftfeeder.setPosition(0.75);
-
-            } else if(gamepad1.dpad_up){
-
-                rightfeeder.setPosition(-1);
-
-            } else if(gamepad1.dpad_down){
-
-                leftfeeder.setPosition(-0.75);
-
+            //Inverse Commands
+            if(gamepad2.x){
+                transfer.setPower(-1);
+            } else {
+                transfer.setPower(0);
             }
 
-             leftintake.setPower(rightTrigger);
-             rightintake.setPower(rightTrigger);
 
+            //Launcher + Intake Trigger Code
+            launcher.setPower(leftTrigger);
+            rightintake.setPower(rightTrigger);
+            leftintake.setPower(rightTrigger);
 
-            //Launcher Code
-           launcher.setPower(leftTrigger);
+            //Feeder Commands(Retractable)
+            if(gamepad2.right_bumper){
+                rightfeeder.setPosition(-1);
+                sleep(100);
+                rightfeeder.setPosition(1);
+            }
 
+            if(gamepad2.left_bumper){
+                leftfeeder.setPosition(0.75);
+                sleep(100);
+                leftfeeder.setPosition(-0.75);
+            }
 
-
-           telemetry.addData("If gr  een is detected",detectGreen());
-
-
-
-
+            //Telemetry
+            telemetry.addData("color detected",detectGreen());
             telemetry.update();
 
 
 
-
-
+            //Leftover Code
+//
+//            if(gamepad1.dpad_left){
+//
+//                rightfeeder.setPosition(1);
+//
+//            } else if(gamepad1.dpad_right){
+//                //extends
+//
+//                leftfeeder.setPosition(0.75);
+//
+//            } else if(gamepad1.dpad_up){
+//                //extends
+//
+//                rightfeeder.setPosition(-1);
+//
+//            } else if(gamepad1.dpad_down){
+//
+//                leftfeeder.setPosition(-0.75);
+//
+//            }
 
         }
 
