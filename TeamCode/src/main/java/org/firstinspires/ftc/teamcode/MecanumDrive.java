@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -59,21 +60,21 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
+                RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
-        public double inPerTick =0.0019727067284282;
+        public double inPerTick =0.0020003333888981 ;
         //0.0019789560022638 theoretical inpertick value
-        public double lateralInPerTick = inPerTick;
+        public double lateralInPerTick = 0.0015976545557677016;
         //0.0015858177873690179 is lateral inpertick
-        public double trackWidthTicks = 7467.329316284445;
+        public double trackWidthTicks = 7209.569860045679;
 
         // feedforward parameters (in tick units)
-        public double kS = 0.7995480637887886;
-        public double kV = 0.00036999586074826604;
-        public double kA = 0.000055;
+        public double kS = 1.1842503508687914;
+        public double kV = 0.00037094840078040394;
+        public double kA = 0.00001;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -85,11 +86,11 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.3;
-        public double lateralGain = 1.0;
-        public double headingGain = 0.7; // shared with turn
+        public double axialGain = 0;
+        public double lateralGain = 0;
+        public double headingGain = 0; // shared with turn
 
-        public double axialVelGain = 1;
+        public double axialVelGain = 0;
         public double lateralVelGain = 0.0;
         public double headingVelGain = 0.0; // shared with turn
     }
@@ -109,7 +110,9 @@ public final class MecanumDrive {
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
-    public final DcMotorEx leftFront, leftBack, rightBack, rightFront;
+    public final DcMotorEx leftFront, leftBack, rightBack, rightFront, intakemotortwo, outtakemotorright, outtakemotorleft, intakemotor;
+    public final Servo outtakeservo;
+
 
     public final VoltageSensor voltageSensor;
 
@@ -232,6 +235,11 @@ public final class MecanumDrive {
         leftBack = hardwareMap.get(DcMotorEx.class, "backleft");
         rightBack = hardwareMap.get(DcMotorEx.class, "backright");
         rightFront = hardwareMap.get(DcMotorEx.class, "frontright");
+        outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
+        outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
+        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
+        outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
+        intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

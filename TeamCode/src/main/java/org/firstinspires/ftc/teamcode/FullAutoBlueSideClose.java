@@ -1,3 +1,5 @@
+
+
 package org.firstinspires.ftc.teamcode;
 
 
@@ -20,8 +22,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @Config
-@Autonomous(name = "FULL_AUTO_BLUE_FAR_PIXEL", group = "Autonomous")
-public class FullAutoBlueSideFar extends LinearOpMode {
+@Autonomous(name = "FULL_AUTO_BLUE_ClOSE_PIXEL", group = "Autonomous")
+public class FullAutoBlueSideClose extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
@@ -54,7 +56,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(-96, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(180))
                 .turn(Math.toRadians(45));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -66,7 +68,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
 
         TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
                 .turn(Math.toRadians(45));
                 //facing left
                 //intake start code here
@@ -82,10 +84,10 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(-48, -24), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(48, 24), Math.toRadians(-90))
                 .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-96, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(0))
                 .turn(Math.toRadians(45));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
