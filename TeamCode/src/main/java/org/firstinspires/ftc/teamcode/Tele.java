@@ -14,6 +14,8 @@ public class Tele extends LinearOpMode {
 
     private BrainSTEMRobot robot;
 
+    private boolean a_Button_Was_Pressed_Last_Loop = false;
+
 
 
     @Override
@@ -39,13 +41,12 @@ public class Tele extends LinearOpMode {
 
 //            robot.update();
 
-            if(gamepad1.a) {
-//               robot.spindexer.spindexerState = Spindexer.SpindexerState.ON;
-                robot.spindexer.spindexerMotor.setPower(0.2);
-            } else {
-//                robot.spindexer.spindexerState = Spindexer.SpindexerState.OFF;
-                robot.spindexer.spindexerMotor.setPower(0);
+            boolean a_Button_Is_Pressed_This_Loop = gamepad1.a;
+            if(a_Button_Is_Pressed_This_Loop && !a_Button_Was_Pressed_Last_Loop) {
+               robot.spindexer.rotateDegrees(90);
             }
+
+            a_Button_Was_Pressed_Last_Loop = a_Button_Is_Pressed_This_Loop;
 
             if(gamepad1.b){
 //                robot.collector.collectorState = Collector.CollectorState.ON;

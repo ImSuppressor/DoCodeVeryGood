@@ -19,6 +19,7 @@ public class Collector implements Component {
     public DcMotorEx collectorMotor;
     public CollectorState collectorState;
     public enum CollectorState {
+
         OFF,
         ON
     }
@@ -38,7 +39,7 @@ public class Collector implements Component {
 
     @Override
     public void update() {
-        switch (collectionState) {
+        switch (collectorState) {
             case OFF:
                 collectorMotor.setPower(0);
                 break;
