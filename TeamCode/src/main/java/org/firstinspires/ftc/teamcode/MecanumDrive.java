@@ -111,7 +111,7 @@ public final class MecanumDrive {
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
     public final DcMotorEx leftFront, leftBack, rightBack, rightFront, intakemotortwo, outtakemotorright, outtakemotorleft, intakemotor;
-    public final Servo outtakeservo;
+    public final Servo outtakeservo, kicker;
 
 
     public final VoltageSensor voltageSensor;
@@ -240,6 +240,7 @@ public final class MecanumDrive {
         intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
+        kicker = hardwareMap.get(Servo.class,"kicker");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

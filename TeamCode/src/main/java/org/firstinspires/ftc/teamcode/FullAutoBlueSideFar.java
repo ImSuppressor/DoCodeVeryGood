@@ -10,6 +10,8 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -27,9 +29,13 @@ public class FullAutoBlueSideFar extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private DcMotorEx intakemotor = null;
-
+    private ElapsedTime kickTimer = new ElapsedTime();
+    private double kickCycleTime = 5;
+    private Servo kicker;
     private DcMotorEx outtakemotorright = null;
     private DcMotorEx outtakemotorleft = null;
+    private Servo outtakeservo = null;
+    private double home = 0;
 
 
 
@@ -48,8 +54,12 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         telemetry.update();
 
 
+
+
         waitForStart();
         visionPortal.close();
+        outtakeservo.setPosition(0.4);
+
 
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
@@ -60,14 +70,16 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         Actions.runBlocking(trajectoryActionChosen);
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.7);
-        outtakemotorleft.setPower(0.7);
+        outtakemotorright.setPower(-0.45);
+        outtakemotorleft.setPower(0.45);
+        kickAuto();
+
 
 
 
         TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(90))
-                .turn(Math.toRadians(45));
+                .turn(Math.toRadians(-135));
                 //facing left
                 //intake start code here
 
@@ -83,14 +95,14 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(-48, -24), Math.toRadians(-90))
-                .turn(Math.toRadians(-90))
+                .turn(Math.toRadians(135))
                 .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-96, 0), Math.toRadians(0))
-                .turn(Math.toRadians(45));
+                .splineToConstantHeading(new Vector2d(-96, 0), Math.toRadians(0));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
-        outtakemotorright.setPower(-0.7);
-        outtakemotorleft.setPower(0.7);
+        outtakemotorright.setPower(-0.45);
+        outtakemotorleft.setPower(0.45);
+        kickAuto();
 
 
 
@@ -99,6 +111,18 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         if (isStopRequested()) {
             return;
         }
+
+    }
+
+
+    private void kickAuto(){
+        kicker.setPosition(0.9);
+        kickTimer.reset();
+        if (kickTimer.time()>kickCycleTime){
+            kicker.setPosition(home);
+        }
+
+
 
     }
 

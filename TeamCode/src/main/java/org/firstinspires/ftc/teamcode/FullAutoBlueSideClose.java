@@ -12,6 +12,8 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -29,12 +31,13 @@ public class FullAutoBlueSideClose extends LinearOpMode {
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
     private DcMotorEx intakemotor = null;
-
+    private ElapsedTime kickTimer = new ElapsedTime();
+    private double kickCycleTime = 5;
+    private Servo kicker;
     private DcMotorEx outtakemotorright = null;
     private DcMotorEx outtakemotorleft = null;
-
-
-
+    private Servo outtakeservo = null;
+    private double home = 0;
     @Override
     public void runOpMode() {
 
@@ -62,8 +65,9 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         Actions.runBlocking(trajectoryActionChosen);
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.7);
-        outtakemotorleft.setPower(0.7);
+        outtakemotorright.setPower(-0.45);
+        outtakemotorleft.setPower(0.45);
+        kickAuto();
 
 
 
@@ -91,8 +95,9 @@ public class FullAutoBlueSideClose extends LinearOpMode {
                 .turn(Math.toRadians(45));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
-        outtakemotorright.setPower(-0.7);
-        outtakemotorleft.setPower(0.7);
+        outtakemotorright.setPower(-0.45);
+        outtakemotorleft.setPower(0.45);
+        kickAuto();
 
 
 
@@ -102,6 +107,13 @@ public class FullAutoBlueSideClose extends LinearOpMode {
             return;
         }
 
+    }
+    private void kickAuto() {
+        kicker.setPosition(0.9);
+        kickTimer.reset();
+        if (kickTimer.time() > kickCycleTime) {
+            kicker.setPosition(home);
+        }
     }
 
     private Pose2d getCurrentPos(MecanumDrive drive) {
@@ -132,6 +144,9 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         }
 
     }
+
+
+
     private void telemetryAprilTag () {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
