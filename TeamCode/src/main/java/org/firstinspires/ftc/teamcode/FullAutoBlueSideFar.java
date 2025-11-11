@@ -73,6 +73,8 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         outtakemotorright.setPower(-0.45);
         outtakemotorleft.setPower(0.45);
         kickAuto();
+        intakemotor.setPower(1);// double type
+        kickAuto();
 
 
 
@@ -85,8 +87,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
 
 
-        intakemotor.setPower(1);// double type
-        intakemotor.setVelocity(10);// double type. ENCODER wire must be connected.
+ //        intakemotor.setVelocity(10);// double type. ENCODER wire must be connected.
         //launched, collected 3
         //conveyer belt code here
         trajectoryActionChosen = intake3Balls.build();
