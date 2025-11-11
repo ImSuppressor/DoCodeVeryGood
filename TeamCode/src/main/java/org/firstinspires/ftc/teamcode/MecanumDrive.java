@@ -69,12 +69,12 @@ public final class MecanumDrive {
         //0.0019789560022638 theoretical inpertick value
         public double lateralInPerTick = 0.0015976545557677016;
         //0.0015858177873690179 is lateral inpertick
-        public double trackWidthTicks = 7209.569860045679;
+        public double trackWidthTicks = 7112.013245133958;
 
         // feedforward parameters (in tick units)
         public double kS = 1.1842503508687914;
         public double kV = 0.00037094840078040394;
-        public double kA = 0.00001;
+        public double kA = 0.00005;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -110,7 +110,7 @@ public final class MecanumDrive {
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
-    public final DcMotorEx leftFront, leftBack, rightBack, rightFront, intakemotortwo, outtakemotorright, outtakemotorleft, intakemotor;
+    public final DcMotorEx leftFront, leftBack, rightBack, rightFront, outtakemotorright, outtakemotorleft, intakemotor;
     public final Servo outtakeservo, kicker;
 
 
@@ -237,10 +237,10 @@ public final class MecanumDrive {
         rightFront = hardwareMap.get(DcMotorEx.class, "frontright");
         outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
         outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
-        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
+//        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
-        kicker = hardwareMap.get(Servo.class,"kicker");
+        kicker = hardwareMap.get(Servo.class,"kickservo");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
