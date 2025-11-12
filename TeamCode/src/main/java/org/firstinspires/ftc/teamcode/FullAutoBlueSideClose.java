@@ -32,14 +32,21 @@ public class FullAutoBlueSideClose extends LinearOpMode {
     private VisionPortal visionPortal;
     private DcMotorEx intakemotor = null;
     private ElapsedTime kickTimer = new ElapsedTime();
-    private double kickCycleTime = 5;
+    private double kickCycleTime = 2.5;
     private Servo kicker;
     private DcMotorEx outtakemotorright = null;
     private DcMotorEx outtakemotorleft = null;
     private Servo outtakeservo = null;
-    private double home = 0;
+    private double home = 0, kick = 0.8;
+
     @Override
     public void runOpMode() {
+        outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
+        outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
+//        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
+        outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
+        intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
+        kicker = hardwareMap.get(Servo.class,"kickservo");
 
         //TODO: instantiate your MecanumDrive at a particular pose.
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(180));
@@ -53,72 +60,76 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         telemetry.update();
 
 
+        kicker.setPosition(0);
+
+        kickTimer.reset();
         waitForStart();
         visionPortal.close();
 
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-24, 0), Math.toRadians(180))
                 .turn(Math.toRadians(45));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.45);
-        outtakemotorleft.setPower(0.45);
-        kickAuto();
-        intakemotor.setPower(1);// double type
-        kickAuto();
+        outtakemotorright.setPower(-0.37);
+        outtakemotorleft.setPower(0.37);
+        kickAuto(1); // 1st ball
+        intakemotor.setPower(1);// Push 2nd ball forward
+        kickAuto(2); // 2nd ball
 
-
-
-
-
-        TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
+        //2nd run
+        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(90))
                 .turn(Math.toRadians(45));
-                //facing left
-                //intake start code here
-
-
-
-//        intakemotor.setVelocity(10);// double type. ENCODER wire must be connected.
-        //launched, collected 3
-        //conveyer belt code here
-        trajectoryActionChosen = intake3Balls.build();
+        trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
 
+        intakemotor.setPower(0.75);
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(48, 24), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(-48, 24), Math.toRadians(-90))
                 .turn(Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(-24, 0), Math.toRadians(0))
                 .turn(Math.toRadians(45));
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
-        outtakemotorright.setPower(-0.45);
-        outtakemotorleft.setPower(0.45);
-        kickAuto();
+        intakemotor.setPower(0);
+        outtakemotorright.setPower(-0.37);
+        outtakemotorleft.setPower(0.37);
 
-
-
-
+        kickAuto(1); //Kick 1st ball
+        intakemotor.setPower(0.75);// load 2nd ball
+        kickAuto(2); //kick 2nd ball
 
         if (isStopRequested()) {
             return;
         }
 
     }
-    private void kickAuto() {
-        kicker.setPosition(0.9);
-        kickTimer.reset();
-        if (kickTimer.time() > kickCycleTime) {
-            kicker.setPosition(home);
+    private void kickAuto(int ballNumber) {
+        kicker.setPosition(kick);
+        outtakeservo.setPosition(0.475);
+        waitForTime(kickCycleTime);
+        kicker.setPosition(0);
+
+        if (1 == ballNumber) {
+            //So kicker has time to go back to position 0
+            waitForTime(kickCycleTime);
         }
     }
+    private void waitForTime(double waitTime) {
+        kickTimer.reset();
+        while (kickTimer.seconds() < waitTime) {
+            //do nothing, just wait
 
+            //telemetry.addData("waiting to kick: ", kickTimer.time());
+        }
+    }
     private Pose2d getCurrentPos(MecanumDrive drive) {
         return drive.localizer.getPose();
     }

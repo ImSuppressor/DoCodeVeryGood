@@ -156,55 +156,44 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
-        waitForTime(kickCycleTime);
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.45);
-        outtakemotorleft.setPower(0.45);
-
-        waitForTime(kickCycleTime);
+        outtakemotorright.setPower(-0.37);
+        outtakemotorleft.setPower(0.37);
 
         kickAuto(1); // 1st ball
-
-        waitForTime(kickCycleTime);
-        intakemotor.setPower(1);// double type
-
+        intakemotor.setPower(1);// Push 2nd ball forward
         kickAuto(2); // 2nd ball
-        kicker.setPosition(0);
-
 
         //2nd run
-        TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
+        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
                 .turn(Math.toRadians(-135));
-        trajectoryActionChosen = intake3Balls.build();
+        trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
 
         intakemotor.setPower(0.75);
 
-        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
+        TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(-90))
                 .turn(Math.toRadians(135))
                 .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(180));
-        trajectoryActionChosen = goToLaunchSpot2.build();
+        trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
         intakemotor.setPower(0);
-        TrajectoryActionBuilder goToLaunchSpot3 = drive.actionBuilder(getCurrentPos(drive))
 
+
+        TrajectoryActionBuilder goToLaunchSpot2ndTime = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(96, 0), Math.toRadians(0));
-        trajectoryActionChosen = goToLaunchSpot3.build();
+        trajectoryActionChosen = goToLaunchSpot2ndTime.build();
         Actions.runBlocking(trajectoryActionChosen);
-        waitForTime(kickCycleTime);
 
-        outtakemotorright.setPower(-0.45);
-        outtakemotorleft.setPower(0.45);
+        outtakemotorright.setPower(-0.37);
+        outtakemotorleft.setPower(0.37);
 
         kickAuto(1); //Kick 1st ball
-
         intakemotor.setPower(0.75);// load 2nd ball
-
         kickAuto(2); //kick 2nd ball
-
 
         if (isStopRequested()) {
             return;
