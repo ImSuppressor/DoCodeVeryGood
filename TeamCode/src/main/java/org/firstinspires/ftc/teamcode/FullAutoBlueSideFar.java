@@ -38,87 +38,6 @@ public class FullAutoBlueSideFar extends LinearOpMode {
     private double home = 0, kick = 0.8;
 
 
-    public void runOpMode2() {
-
-        outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
-        outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
-//        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
-        outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
-        intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
-        kicker = hardwareMap.get(Servo.class,"kickservo");
-
-
-        //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(180));
-        MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
-        initAprilTag();
-
-
-        // Wait for the DS start button to be touched.
-        telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-        telemetry.addData(">", "Touch START to start OpMode");
-        telemetry.update();
-
-
-
-
-        waitForStart();
-        visionPortal.close();
-
-
-
-        TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
-                //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(96, 0), Math.toRadians(0))
-                .turn(Math.toRadians(45));
-        Action trajectoryActionChosen = goToLaunchSpot.build();
-        Actions.runBlocking(trajectoryActionChosen);
-
-        //TODO: launch code here
-        outtakemotorright.setPower(-0.45);
-        outtakemotorleft.setPower(0.45);
-        kickAuto(1);
-        intakemotor.setPower(1);// double type
-        kickAuto(2);
-
-
-
-
-        TrajectoryActionBuilder intake3Balls = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
-                .turn(Math.toRadians(-135));
-        //facing left
-        //intake start code here
-
-
-
-        //        intakemotor.setVelocity(10);// double type. ENCODER wire must be connected.
-        //launched, collected 3
-        //conveyer belt code here
-        trajectoryActionChosen = intake3Balls.build();
-        Actions.runBlocking(trajectoryActionChosen);
-
-
-        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(-90))
-                .turn(Math.toRadians(135))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(96, 0), Math.toRadians(0));
-        trajectoryActionChosen = goToLaunchSpot2.build();
-        Actions.runBlocking(trajectoryActionChosen);
-        outtakemotorright.setPower(-0.45);
-        outtakemotorleft.setPower(0.45);
-        kickAuto(1);
-
-
-
-
-
-        if (isStopRequested()) {
-            return;
-        }
-
-    }
 
     @Override
     public void runOpMode() {
@@ -132,7 +51,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
 
         //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         initAprilTag();
 
@@ -143,7 +62,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         telemetry.update();
 
         kicker.setPosition(0);
-
+        outtakeservo.setPosition(0.475);
         kickTimer.reset();
         waitForStart();
         visionPortal.close();
@@ -151,45 +70,42 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(96, 0), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(72, 0), Math.toRadians(-90))
                 .turn(Math.toRadians(45));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.37);
-        outtakemotorleft.setPower(0.37);
+        outtakemotorright.setPower(-0.4);
+        outtakemotorleft.setPower(0.4);
 
         kickAuto(1); // 1st ball
         intakemotor.setPower(1);// Push 2nd ball forward
         kickAuto(2); // 2nd ball
 
         //2nd run
-        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
-                .turn(Math.toRadians(-135));
-        trajectoryActionChosen = goToIntake.build();
-        Actions.runBlocking(trajectoryActionChosen);
+//        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
+//                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
+//                .turn(Math.toRadians(-135));
+//        trajectoryActionChosen = goToIntake.build();
+//        Actions.runBlocking(trajectoryActionChosen);
 
         intakemotor.setPower(0.75);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(-90))
-                .turn(Math.toRadians(135))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(180));
+                .turn(Math.toRadians(-135))
+
+                .splineToConstantHeading(new Vector2d(72, -24), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(72, 0), Math.toRadians(0))
+                .turn(135);
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
         intakemotor.setPower(0);
 
 
-        TrajectoryActionBuilder goToLaunchSpot2ndTime = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(96, 0), Math.toRadians(0));
-        trajectoryActionChosen = goToLaunchSpot2ndTime.build();
-        Actions.runBlocking(trajectoryActionChosen);
-
-        outtakemotorright.setPower(-0.37);
-        outtakemotorleft.setPower(0.37);
+        outtakemotorright.setPower(-0.4);
+        outtakemotorleft.setPower(0.4);
 
         kickAuto(1); //Kick 1st ball
         intakemotor.setPower(0.75);// load 2nd ball

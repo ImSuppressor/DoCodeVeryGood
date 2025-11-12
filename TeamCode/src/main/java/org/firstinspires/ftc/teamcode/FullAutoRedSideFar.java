@@ -1,5 +1,3 @@
-
-
 package org.firstinspires.ftc.teamcode;
 
 
@@ -24,8 +22,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 
 @Config
-@Autonomous(name = "FULL_AUTO_BLUE_ClOSE_PIXEL", group = "Autonomous")
-public class FullAutoBlueSideClose extends LinearOpMode {
+@Autonomous(name = "FULL_AUTO_RED_FAR_PIXEL", group = "Autonomous")
+public class FullAutoRedSideFar extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
     private AprilTagProcessor aprilTag;
@@ -39,14 +37,18 @@ public class FullAutoBlueSideClose extends LinearOpMode {
     private Servo outtakeservo = null;
     private double home = 0, kick = 0.8;
 
+
+
     @Override
     public void runOpMode() {
+
         outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
         outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
 //        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
         kicker = hardwareMap.get(Servo.class,"kickservo");
+
 
         //TODO: instantiate your MecanumDrive at a particular pose.
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
@@ -59,7 +61,6 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         telemetry.addData(">", "Touch START to start OpMode");
         telemetry.update();
 
-
         kicker.setPosition(0);
         outtakeservo.setPosition(0.475);
         kickTimer.reset();
@@ -69,14 +70,16 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(-90))
-                .turn(Math.toRadians(45));
+                .splineToConstantHeading(new Vector2d(72, 0), Math.toRadians(90))
+                .turn(Math.toRadians(-45));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
+
 
         //TODO: launch code here
         outtakemotorright.setPower(-0.4);
         outtakemotorleft.setPower(0.4);
+
         kickAuto(1); // 1st ball
         intakemotor.setPower(1);// Push 2nd ball forward
         kickAuto(2); // 2nd ball
@@ -84,22 +87,23 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         //2nd run
 //        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
 //                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
-//                .turn(Math.toRadians(135));
+//                .turn(Math.toRadians(-135));
 //        trajectoryActionChosen = goToIntake.build();
 //        Actions.runBlocking(trajectoryActionChosen);
 
         intakemotor.setPower(0.75);
 
-        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .turn(Math.toRadians(-135))
-                .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(0))
-                .turn(Math.toRadians(135));
-        trajectoryActionChosen = goToLaunchSpot2.build();
+        TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
+                .turn(Math.toRadians(135))
+
+                .splineToConstantHeading(new Vector2d(72, 24), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(72, 0), Math.toRadians(0))
+                .turn(-135);
+        trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
-
-
         intakemotor.setPower(0);
+
+
         outtakemotorright.setPower(-0.4);
         outtakemotorleft.setPower(0.4);
 
@@ -112,6 +116,8 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         }
 
     }
+
+
     private void kickAuto(int ballNumber) {
         kicker.setPosition(kick);
         outtakeservo.setPosition(0.475);
@@ -123,6 +129,7 @@ public class FullAutoBlueSideClose extends LinearOpMode {
             waitForTime(kickCycleTime);
         }
     }
+
     private void waitForTime(double waitTime) {
         kickTimer.reset();
         while (kickTimer.seconds() < waitTime) {
@@ -131,6 +138,7 @@ public class FullAutoBlueSideClose extends LinearOpMode {
             //telemetry.addData("waiting to kick: ", kickTimer.time());
         }
     }
+
     private Pose2d getCurrentPos(MecanumDrive drive) {
         return drive.localizer.getPose();
     }
@@ -159,9 +167,6 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         }
 
     }
-
-
-
     private void telemetryAprilTag () {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
