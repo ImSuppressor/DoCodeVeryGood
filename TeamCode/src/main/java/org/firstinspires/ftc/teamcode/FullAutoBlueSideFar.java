@@ -103,13 +103,13 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         Actions.runBlocking(trajectoryActionChosen);
         intakemotor.setPower(0);
 
-
-        outtakemotorright.setPower(-0.4);
-        outtakemotorleft.setPower(0.4);
-
-        kickAuto(1); //Kick 1st ball
-        intakemotor.setPower(0.75);// load 2nd ball
-        kickAuto(2); //kick 2nd ball
+//
+//        outtakemotorright.setPower(-0.4);
+//        outtakemotorleft.setPower(0.4);
+//
+//        kickAuto(1); //Kick 1st ball
+//        intakemotor.setPower(0.75);// load 2nd ball
+//        kickAuto(2); //kick 2nd ball
 
         if (isStopRequested()) {
             return;
