@@ -55,6 +55,7 @@ public class BrainSTEMRobot {
         subsystems.add(spindexer);
         subsystems.add(collector);
         subsystems.add(shooter);
+        subsystems.add(finger);
 
         // Defining the Motors
         frontLeft =  (DcMotorEx)hwMap.dcMotor.get("FL");
