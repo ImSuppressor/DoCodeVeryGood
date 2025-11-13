@@ -51,7 +51,7 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
 
         //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
+        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(180));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         initAprilTag();
 
@@ -69,16 +69,15 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
-                //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(72, 0), Math.toRadians(90))
-                .turn(Math.toRadians(-45));
+                .splineToConstantHeading(new Vector2d(10, 0), Math.toRadians(0))
+                .turn(Math.toRadians(-20));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.4);
-        outtakemotorleft.setPower(0.4);
+        outtakemotorright.setPower(-0.50);
+        outtakemotorleft.setPower(0.50);
 
         kickAuto(1); // 1st ball
         intakemotor.setPower(1);// Push 2nd ball forward
@@ -90,22 +89,29 @@ public class FullAutoRedSideFar extends LinearOpMode {
 //                .turn(Math.toRadians(-135));
 //        trajectoryActionChosen = goToIntake.build();
 //        Actions.runBlocking(trajectoryActionChosen);
+//
+//        intakemotor.setPower(0.75);
+//
+//        TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
+//                .turn(Math.toRadians(-70))
+//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
+//                .splineToConstantHeading(new Vector2d(24, -24), Math.toRadians(90));
+//        trajectoryActionChosen = adjustIntakePos.build();
+//        Actions.runBlocking(trajectoryActionChosen);
+//        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
+////                .turn(Math.toRadians(80))
+//
+//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(90))
+//                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(0))
+//                .turn(Math.toRadians(70));
+//
+//        trajectoryActionChosen = goToLaunchSpot2.build();
+//        Actions.runBlocking(trajectoryActionChosen);
+//        intakemotor.setPower(0);
 
-        intakemotor.setPower(0.75);
 
-        TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .turn(Math.toRadians(135))
-
-                .splineToConstantHeading(new Vector2d(72, 24), Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(72, 0), Math.toRadians(0))
-                .turn(-135);
-        trajectoryActionChosen = adjustIntakePos.build();
-        Actions.runBlocking(trajectoryActionChosen);
-        intakemotor.setPower(0);
-
-
-//        outtakemotorright.setPower(-0.4);
-//        outtakemotorleft.setPower(0.4);
+//        outtakemotorright.setPower(-0.5);
+//        outtakemotorleft.setPower(0.5);
 //
 //        kickAuto(1); //Kick 1st ball
 //        intakemotor.setPower(0.75);// load 2nd ball

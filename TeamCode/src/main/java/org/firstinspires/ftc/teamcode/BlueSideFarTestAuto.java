@@ -134,7 +134,6 @@ public class BlueSideFarTestAuto extends LinearOpMode {
  // NOTE: below code is optimized for our 4x6 playing field, not the official 6x6 playing field
 
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
-                //.lineToYSplineHeading(24, Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(-48, 0), Math.toRadians(0))
                 .turn(Math.toRadians(45));
         Action trajectoryActionChosen = goToLaunchSpot.build();

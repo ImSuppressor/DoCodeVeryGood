@@ -49,7 +49,8 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         kicker = hardwareMap.get(Servo.class,"kickservo");
 
         //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
+        Pose2d initialPose = new Pose2d(-48, -48, Math.toRadians(45));
+        //0,0 is center of map heading facing left
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         initAprilTag();
 
@@ -68,9 +69,7 @@ public class FullAutoBlueSideClose extends LinearOpMode {
 
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
-                //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(-90))
-                .turn(Math.toRadians(45));
+                .splineToConstantHeading(new Vector2d(-12, -20), Math.toRadians(0));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
@@ -87,19 +86,19 @@ public class FullAutoBlueSideClose extends LinearOpMode {
 //                .turn(Math.toRadians(135));
 //        trajectoryActionChosen = goToIntake.build();
 //        Actions.runBlocking(trajectoryActionChosen);
-
-        intakemotor.setPower(0.75);
-
-        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .turn(Math.toRadians(-135))
-                .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(0))
-                .turn(Math.toRadians(135));
-        trajectoryActionChosen = goToLaunchSpot2.build();
-        Actions.runBlocking(trajectoryActionChosen);
-
-
-        intakemotor.setPower(0);
+//
+//        intakemotor.setPower(0.75);
+//
+//        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
+//                .turn(Math.toRadians(-135))
+//                .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(90))
+//                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(0))
+//                .turn(Math.toRadians(135));
+//        trajectoryActionChosen = goToLaunchSpot2.build();
+//        Actions.runBlocking(trajectoryActionChosen);
+//
+//
+//        intakemotor.setPower(0);
 //        outtakemotorright.setPower(-0.4);
 //        outtakemotorleft.setPower(0.4);
 //
