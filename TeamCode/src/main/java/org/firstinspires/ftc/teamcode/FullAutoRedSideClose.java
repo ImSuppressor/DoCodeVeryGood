@@ -49,7 +49,7 @@ public class FullAutoRedSideClose extends LinearOpMode {
         kicker = hardwareMap.get(Servo.class,"kickservo");
 
         //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(45));
+        Pose2d initialPose = new Pose2d(-48, 48, Math.toRadians(-45));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         initAprilTag();
 
@@ -69,7 +69,7 @@ public class FullAutoRedSideClose extends LinearOpMode {
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(48, -48), Math.toRadians(90));
+                .splineToConstantHeading(new Vector2d(-12, 20), Math.toRadians(0));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
