@@ -51,7 +51,7 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
 
         //TODO: instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(180));
+        Pose2d initialPose = new Pose2d(63, 15, Math.toRadians(0));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         initAprilTag();
 
@@ -69,7 +69,8 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
-                .splineToConstantHeading(new Vector2d(10, 0), Math.toRadians(0))
+                .setTangent(Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(180))
                 .turn(Math.toRadians(-20));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -84,30 +85,27 @@ public class FullAutoRedSideFar extends LinearOpMode {
         kickAuto(2); // 2nd ball
 
         //2nd run
-//        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
-//                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
-//                .turn(Math.toRadians(-135));
-//        trajectoryActionChosen = goToIntake.build();
-//        Actions.runBlocking(trajectoryActionChosen);
-//
-//        intakemotor.setPower(0.75);
-//
-//        TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-//                .turn(Math.toRadians(-70))
-//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(-90))
-//                .splineToConstantHeading(new Vector2d(24, -24), Math.toRadians(90));
-//        trajectoryActionChosen = adjustIntakePos.build();
-//        Actions.runBlocking(trajectoryActionChosen);
-//        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-////                .turn(Math.toRadians(80))
-//
-//                .splineToConstantHeading(new Vector2d(24, 0), Math.toRadians(90))
-//                .splineToConstantHeading(new Vector2d(0, 0), Math.toRadians(0))
-//                .turn(Math.toRadians(70));
-//
-//        trajectoryActionChosen = goToLaunchSpot2.build();
-//        Actions.runBlocking(trajectoryActionChosen);
-//        intakemotor.setPower(0);
+        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(90))
+                .turn(Math.toRadians(110));
+        trajectoryActionChosen = goToIntake.build();
+        Actions.runBlocking(trajectoryActionChosen);
+
+        intakemotor.setPower(0.75);
+
+        TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(36, 48), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(0));
+        trajectoryActionChosen = adjustIntakePos.build();
+        Actions.runBlocking(trajectoryActionChosen);
+        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
+                .turn(Math.toRadians(-110))
+
+                .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(180));
+
+        trajectoryActionChosen = goToLaunchSpot2.build();
+        Actions.runBlocking(trajectoryActionChosen);
+        intakemotor.setPower(0);
 
 
 //        outtakemotorright.setPower(-0.5);
