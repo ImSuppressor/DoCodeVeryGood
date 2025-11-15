@@ -69,8 +69,7 @@ public class FullAutoRedSideClose extends LinearOpMode {
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 //.lineToYSplineHeading(24, Math.toRadians(0))
-                .strafeToConstantHeading(new Vector2d(-9, 23))
-                .turn(Math.toRadians(-7));
+                .strafeToConstantHeading(new Vector2d(-9, 23));
 
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
