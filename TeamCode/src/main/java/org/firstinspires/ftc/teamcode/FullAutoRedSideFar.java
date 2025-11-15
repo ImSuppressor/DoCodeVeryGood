@@ -77,8 +77,8 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.50);
-        outtakemotorleft.setPower(0.50);
+        outtakemotorright.setPower(-0.42);
+        outtakemotorleft.setPower(0.42);
 
         kickAuto(1); // 1st ball
         intakemotor.setPower(1);// Push 2nd ball forward
@@ -94,7 +94,7 @@ public class FullAutoRedSideFar extends LinearOpMode {
         intakemotor.setPower(0.75);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, 40), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(36, 45), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(0));
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);

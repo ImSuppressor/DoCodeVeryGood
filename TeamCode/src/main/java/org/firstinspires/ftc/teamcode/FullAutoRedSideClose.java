@@ -75,8 +75,8 @@ public class FullAutoRedSideClose extends LinearOpMode {
         Actions.runBlocking(trajectoryActionChosen);
 
         //TODO: launch code here
-        outtakemotorright.setPower(-0.4);
-        outtakemotorleft.setPower(0.4);
+        outtakemotorright.setPower(-0.36);
+        outtakemotorleft.setPower(0.36);
         kickAuto(1); // 1st ball
         intakemotor.setPower(1);// Push 2nd ball forward
         kickAuto(2); // 2nd ball
