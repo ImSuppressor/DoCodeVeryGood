@@ -71,7 +71,7 @@ public class FullAutoRedSideFar extends LinearOpMode {
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 .setTangent(Math.toRadians(180))
                 .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(180))
-                .turn(Math.toRadians(-20));
+                .turn(Math.toRadians(-22));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
@@ -86,7 +86,7 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
         //2nd run
         TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(90))
+                .strafeToConstantHeading(new Vector2d(36, 20))
                 .turn(Math.toRadians(110));
         trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -94,7 +94,7 @@ public class FullAutoRedSideFar extends LinearOpMode {
         intakemotor.setPower(0.75);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, 48), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(36, 40), Math.toRadians(-90))
                 .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(0));
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -105,6 +105,8 @@ public class FullAutoRedSideFar extends LinearOpMode {
 
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
+
+        waitForTime(2);
         intakemotor.setPower(0);
 
 

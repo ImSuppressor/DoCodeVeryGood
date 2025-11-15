@@ -96,7 +96,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
         intakemotor.setPower(0.75);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, -48), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(36, -40), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(36, -15), Math.toRadians(0));
 //                .turn(135);
         trajectoryActionChosen = adjustIntakePos.build();
@@ -109,6 +109,7 @@ public class FullAutoBlueSideFar extends LinearOpMode {
 
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
+        waitForTime(2);
         intakemotor.setPower(0);
 
 

@@ -69,7 +69,11 @@ public class FullAutoBlueSideClose extends LinearOpMode {
 
         // First run
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
-                .splineToConstantHeading(new Vector2d(-12, -20), Math.toRadians(0));
+                .setTangent(Math.toRadians(35))
+                .strafeToConstantHeading(new Vector2d(-9, -23))
+                .turn(Math.toRadians(-7));
+
+//                .splineToConstantHeading(new Vector2d(-9, -23), Math.toRadians(-90));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
 
@@ -79,26 +83,25 @@ public class FullAutoBlueSideClose extends LinearOpMode {
         kickAuto(1); // 1st ball
         intakemotor.setPower(1);// Push 2nd ball forward
         kickAuto(2); // 2nd ball
-
+        intakemotor.setPower(0.75);
         //2nd run
-//        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
-//                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(90))
-//                .turn(Math.toRadians(135));
-//        trajectoryActionChosen = goToIntake.build();
-//        Actions.runBlocking(trajectoryActionChosen);
-//
-//        intakemotor.setPower(0.75);
-//
-//        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-//                .turn(Math.toRadians(-135))
-//                .splineToConstantHeading(new Vector2d(48, -24), Math.toRadians(90))
-//                .splineToConstantHeading(new Vector2d(48, 0), Math.toRadians(0))
-//                .turn(Math.toRadians(135));
-//        trajectoryActionChosen = goToLaunchSpot2.build();
-//        Actions.runBlocking(trajectoryActionChosen);
-//
-//
-//        intakemotor.setPower(0);
+        TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
+                .turn(Math.toRadians(-135))
+                .splineToConstantHeading(new Vector2d(-12, -48), Math.toRadians(90));
+        trajectoryActionChosen = goToIntake.build();
+        Actions.runBlocking(trajectoryActionChosen);
+
+
+
+        TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
+                .turn(Math.toRadians(135))
+                .splineToConstantHeading(new Vector2d(-12, -23), Math.toRadians(0));
+
+        trajectoryActionChosen = goToLaunchSpot2.build();
+        Actions.runBlocking(trajectoryActionChosen);
+
+
+        intakemotor.setPower(0);
 //        outtakemotorright.setPower(-0.4);
 //        outtakemotorleft.setPower(0.4);
 //
