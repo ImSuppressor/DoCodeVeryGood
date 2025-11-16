@@ -135,7 +135,7 @@ public final class TuningOpModes {
                 MecanumDrive md = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
                 LazyImu lazyImu = md.lazyImu;
 
-               
+
 
                 List<EncoderGroup> encoderGroups = new ArrayList<>();
                 List<EncoderRef> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
