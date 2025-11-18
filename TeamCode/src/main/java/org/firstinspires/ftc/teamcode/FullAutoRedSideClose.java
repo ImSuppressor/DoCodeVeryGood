@@ -36,6 +36,8 @@ public class FullAutoRedSideClose extends LinearOpMode {
     private Servo kicker;
     private DcMotorEx outtakemotorright = null;
     private DcMotorEx outtakemotorleft = null;
+    private DcMotorEx intakemotortwo = null;
+
     private Servo outtakeservo = null;
     private double home = 0, kick = 0.8;
 
@@ -43,7 +45,7 @@ public class FullAutoRedSideClose extends LinearOpMode {
     public void runOpMode() {
         outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
         outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
-//        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
+        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
         kicker = hardwareMap.get(Servo.class,"kickservo");
@@ -77,9 +79,16 @@ public class FullAutoRedSideClose extends LinearOpMode {
         //TODO: launch code here
         outtakemotorright.setPower(-0.36);
         outtakemotorleft.setPower(0.36);
+
+
         kickAuto(1); // 1st ball
-        intakemotor.setPower(1);// Push 2nd ball forward
+
+        intakemotortwo.setPower(1);  // Push 2nd ball forward
         kickAuto(2); // 2nd ball
+
+        intakemotor.setPower(1); // Push 3rd ball forward
+        intakemotortwo.setPower(1);//push 3rd ball forward
+        kickAuto(3); // kick 3rd ball
 
         //2nd run
         TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
@@ -116,7 +125,7 @@ public class FullAutoRedSideClose extends LinearOpMode {
         waitForTime(kickCycleTime);
         kicker.setPosition(0);
 
-        if (1 == ballNumber) {
+        if (ballNumber<3) {
             //So kicker has time to go back to position 0
             waitForTime(kickCycleTime);
         }
