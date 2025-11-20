@@ -118,7 +118,7 @@ public class ConceptAprilTag extends LinearOpMode {
     }   // end method runOpMode()
 
     /**
-     * Initialize the AprilTag processor.
+     * Initialize the AprilTag processor.6
      */
     private void initAprilTag() {
 
