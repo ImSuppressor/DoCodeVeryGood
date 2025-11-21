@@ -29,7 +29,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     private Servo kicker;
     protected DcMotorEx outtakemotorright = null;
     protected DcMotorEx outtakemotorleft = null;
-    protected DcMotorEx intakemotortwo = null;
+//    protected DcMotorEx intakemotortwo = null;
     private Servo outtakeservo = null;
     private double home = 0, kick = 0.8;
 
@@ -89,7 +89,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     private void initHardware() {
         outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
         outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
-        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
+//        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
 
@@ -99,11 +99,16 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     public void kickBalls() {
         kickAuto(1); // 1st ball
 
-        intakemotortwo.setPower(1);  // Push 2nd ball forward
+        intakemotor.setPower(1);  // Push 2nd ball forward
+        waitForTime(kickCycleTime); //wait for 2nd / 3rd ready
+
+        intakemotor.setPower(0);
+        waitForTime(kickCycleTime); //wait for the intake stop completely
+
         kickAuto(2); // 2nd ball
 
         intakemotor.setPower(1); // Push 3rd ball forward
-        intakemotortwo.setPower(1);//push 3rd ball forward
+
         kickAuto(3); // kick 3rd ball
     }
 
@@ -118,7 +123,6 @@ public abstract class AbstractFullAuto extends LinearOpMode {
             //So kicker has time to go back to position 0
             waitForTime(kickCycleTime);
         }
-
     }
 
     private void waitForTime(double waitTime) {
