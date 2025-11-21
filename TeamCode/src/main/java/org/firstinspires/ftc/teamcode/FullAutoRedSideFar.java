@@ -57,7 +57,7 @@ public class FullAutoRedSideFar extends AbstractFullAuto {
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .turn(Math.toRadians(-110))
 
-                .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(180));
+                .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(90));
 
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);

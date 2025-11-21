@@ -64,7 +64,7 @@ public class FullAutoBlueSideFar extends AbstractFullAuto {
     public void parkOutsideLaunch(MecanumDrive drive) {
         Action trajectoryActionChosen;
         TrajectoryActionBuilder goToPark = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, -15), Math.toRadians(-90));
+                .splineToConstantHeading(new Vector2d(36, -30), Math.toRadians(-90));
         trajectoryActionChosen = goToPark.build();
         Actions.runBlocking(trajectoryActionChosen);
 
