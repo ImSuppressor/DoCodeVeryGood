@@ -54,5 +54,14 @@ public class FullAutoRedSideClose extends AbstractFullAuto {
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
     }
+    @Override
+    public void parkOutsideLaunch(MecanumDrive drive) {
+        Action trajectoryActionChosen;
+        TrajectoryActionBuilder goToPark = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(-12, 48), Math.toRadians(-90));
+        trajectoryActionChosen = goToPark.build();
+        Actions.runBlocking(trajectoryActionChosen);
+
+    }
 
 }

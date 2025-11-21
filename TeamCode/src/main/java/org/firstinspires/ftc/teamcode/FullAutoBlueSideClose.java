@@ -59,6 +59,15 @@ public class FullAutoBlueSideClose extends AbstractFullAuto {
 
 
     }
+    @Override
+    public void parkOutsideLaunch(MecanumDrive drive) {
+        Action trajectoryActionChosen;
+        TrajectoryActionBuilder goToPark = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(-9, -23), Math.toRadians(0));
+        trajectoryActionChosen = goToPark.build();
+        Actions.runBlocking(trajectoryActionChosen);
+
+    }
 
 
 }

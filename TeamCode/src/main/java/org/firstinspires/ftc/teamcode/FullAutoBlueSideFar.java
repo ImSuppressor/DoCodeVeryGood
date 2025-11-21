@@ -49,7 +49,6 @@ public class FullAutoBlueSideFar extends AbstractFullAuto {
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(36, -45), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(36, -15), Math.toRadians(0));
-//                .turn(135);
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
 
@@ -61,6 +60,14 @@ public class FullAutoBlueSideFar extends AbstractFullAuto {
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
     }
+    @Override
+    public void parkOutsideLaunch(MecanumDrive drive) {
+        Action trajectoryActionChosen;
+        TrajectoryActionBuilder goToPark = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(36, -15), Math.toRadians(-90));
+        trajectoryActionChosen = goToPark.build();
+        Actions.runBlocking(trajectoryActionChosen);
 
+    }
 
 }

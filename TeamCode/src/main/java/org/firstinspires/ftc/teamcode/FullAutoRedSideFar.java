@@ -63,4 +63,14 @@ public class FullAutoRedSideFar extends AbstractFullAuto {
         Actions.runBlocking(trajectoryActionChosen);
     }
 
+    @Override
+    public void parkOutsideLaunch(MecanumDrive drive) {
+        Action trajectoryActionChosen;
+        TrajectoryActionBuilder goToPark = drive.actionBuilder(getCurrentPos(drive))
+                .splineToConstantHeading(new Vector2d(36, 45), Math.toRadians(-90));
+        trajectoryActionChosen = goToPark.build();
+        Actions.runBlocking(trajectoryActionChosen);
+
+    }
+
 }
