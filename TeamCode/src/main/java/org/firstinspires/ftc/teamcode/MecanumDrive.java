@@ -110,7 +110,7 @@ public final class MecanumDrive {
     public final AccelConstraint defaultAccelConstraint =
             new ProfileAccelConstraint(PARAMS.minProfileAccel, PARAMS.maxProfileAccel);
 
-    public final DcMotorEx leftFront, leftBack, rightBack, rightFront, outtakemotorright, outtakemotorleft, intakemotor, intakemotortwo;
+    public final DcMotorEx leftFront, leftBack, rightBack, rightFront, outtakemotorright, outtakemotorleft, intakemotor;
     public final Servo outtakeservo, kicker;
 
 
@@ -240,7 +240,7 @@ public final class MecanumDrive {
 //        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
-        intakemotortwo = hardwareMap.get(DcMotorEx.class,"intakemotortwo");
+//        intakemotortwo = hardwareMap.get(DcMotorEx.class,"intakemotortwo");
 
         kicker = hardwareMap.get(Servo.class,"kickservo");
 
