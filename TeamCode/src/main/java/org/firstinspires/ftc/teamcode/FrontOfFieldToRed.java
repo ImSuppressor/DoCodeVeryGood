@@ -28,7 +28,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 
 @Config
-@Autonomous(name = "BLUE_TEST_AUTO_PIXEL", group = "Autonomous")
+@Autonomous(name = "FrontOfFieldToRed", group = "Autonomous")
 public class FrontOfFieldToRed extends LinearOpMode {
 
 
@@ -111,7 +111,7 @@ public class FrontOfFieldToRed extends LinearOpMode {
 
 
     public void runOpMode() {
-        Pose2d beginPose = new Pose2d(new Vector2d(72,-16), Math.toRadians(90));
+        Pose2d beginPose = new Pose2d(new Vector2d(56,12), Math.toRadians(0));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
@@ -121,8 +121,8 @@ public class FrontOfFieldToRed extends LinearOpMode {
 
         // actionBuilder builds from the drive steps passed to it
         Action path = drive.actionBuilder(beginPose)
-                .splineTo(new Vector2d(-34, 23), Math.PI / 2)
-                .turn(Math.toRadians(40))
+                .lineToX(-27)
+                .turn(Math.toRadians(130))
                 .build();
 
         Action path2 = drive.actionBuilder((beginPose))

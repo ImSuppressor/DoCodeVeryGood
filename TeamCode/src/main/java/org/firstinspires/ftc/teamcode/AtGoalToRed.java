@@ -28,7 +28,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 
 @Config
-@Autonomous(name = "BLUE_TEST_AUTO_PIXEL", group = "Autonomous")
+@Autonomous(name = "AtGoalToRed", group = "Autonomous")
 public class AtGoalToRed extends LinearOpMode {
 
 
