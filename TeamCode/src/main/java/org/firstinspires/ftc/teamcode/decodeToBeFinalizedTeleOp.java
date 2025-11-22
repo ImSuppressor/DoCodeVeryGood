@@ -261,6 +261,7 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
             telemetry.addData("color detected",detectGreen());
             telemetry.addData("transfer power", transfer.getPower());
             telemetry.addData("power setting", selectedPower);
+            telemetry.addLine("Ts pmo");
             telemetry.update();
 
 
