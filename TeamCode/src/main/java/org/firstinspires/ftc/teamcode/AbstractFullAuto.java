@@ -70,8 +70,8 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         waitForTime(2);
         intakemotor.setPower(0);
 
-        setOuttakePower();
-        kickBalls2ndRun();
+//        setOuttakePower();
+//        kickBalls2ndRun();
         parkOutsideLaunch(drive);
 
         if (isStopRequested()) {
@@ -103,10 +103,10 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         kickAuto(1); // 1st ball
 
         intakemotor.setPower(1);  // Push 2nd ball forward
-        waitForTime(kickCycleTime); //wait for 2nd / 3rd ready
+        waitForTime(kickCycleTime*0.3); //wait for 2nd / 3rd ready
 
         intakemotor.setPower(0);
-        waitForTime(kickCycleTime); //wait for the intake stop completely
+        waitForTime(kickCycleTime*0.3); //wait for the intake stop completely
 
         kickAuto(2); // 2nd ball
 
@@ -118,10 +118,10 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         kickAuto(1); // 1st ball
 
         intakemotor.setPower(1);  // Push 2nd ball forward
-        waitForTime(kickCycleTime); //wait for 2nd / 3rd ready
+        waitForTime(kickCycleTime*0.3); //wait for 2nd / 3rd ready
 
         intakemotor.setPower(0);
-        waitForTime(kickCycleTime); //wait for the intake stop completely
+        waitForTime(kickCycleTime*0.3); //wait for the intake stop completely
 
         kickAuto(2); // 2nd ball
 

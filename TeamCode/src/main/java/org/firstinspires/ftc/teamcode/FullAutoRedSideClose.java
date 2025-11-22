@@ -22,8 +22,8 @@ public class FullAutoRedSideClose extends AbstractFullAuto {
 
     @Override
     public void setOuttakePower() {
-        outtakemotorright.setPower(-0.36);
-        outtakemotorleft.setPower(0.36);
+        outtakemotorright.setPower(-0.42);
+        outtakemotorleft.setPower(0.42);
 
     }
 

@@ -21,8 +21,8 @@ public class FullAutoBlueSideFar extends AbstractFullAuto {
 
     @Override
     public void setOuttakePower() {
-        outtakemotorright.setPower(-0.42);
-        outtakemotorleft.setPower(0.42);
+        outtakemotorright.setPower(-0.49);
+        outtakemotorleft.setPower(0.49);
     }
 
     @Override
