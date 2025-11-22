@@ -59,8 +59,9 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         visionPortal.close();
 
         // First run
-        runFirstPath(drive, initialPose);
         setOuttakePower();
+
+        runFirstPath(drive, initialPose);
         kickBalls1stRun();
 
 
