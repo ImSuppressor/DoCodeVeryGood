@@ -28,8 +28,8 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 
 @Config
-@Autonomous(name = "AtGoalToRed", group = "Autonomous")
-public class AtGoalToRed extends LinearOpMode {
+@Autonomous(name = "AtGoalToBlue", group = "Autonomous")
+public class AtGoalToBlue extends LinearOpMode {
 
 
     DcMotor lf = null;
@@ -110,10 +110,8 @@ public class AtGoalToRed extends LinearOpMode {
 
 
 
-
     public void runOpMode() {
-        Pose2d beginPose = new Pose2d(new Vector2d(-52,49), Math.toRadians(-45));
-        //this pose assumes the robot starts with the intake facing away from the goal. the shooter will be facing away from the goal
+        Pose2d beginPose = new Pose2d(new Vector2d(-59,-45), Math.toRadians(0));
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
@@ -122,11 +120,9 @@ public class AtGoalToRed extends LinearOpMode {
         //creating RR path
 
         // actionBuilder builds from the drive steps passed to it
-        //this path moves backwards and turns
         Action path = drive.actionBuilder(beginPose)
-                .lineToX(-30)
-                .turn(Math.toRadians(180))
-
+                .lineToX(-35)
+                .turn(Math.toRadians(-170))
                 .build();
 
         Action path2 = drive.actionBuilder((beginPose))

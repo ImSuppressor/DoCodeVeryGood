@@ -112,7 +112,7 @@ public class FrontOfFieldToRed extends LinearOpMode {
 
     public void runOpMode() {
         Pose2d beginPose = new Pose2d(new Vector2d(56,12), Math.toRadians(0));
-
+//this pose assumes the robot starts with the intake facing the wall. the shooter will be curved towards the wall
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
         waitForStart();
