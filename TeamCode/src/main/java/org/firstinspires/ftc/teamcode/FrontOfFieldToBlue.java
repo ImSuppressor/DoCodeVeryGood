@@ -2,24 +2,17 @@ package org.firstinspires.ftc.teamcode;
 
 
 // RR-specific imports
-import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.config.Config;
 
 // Non-RR imports
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantFunction;
 import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.Pose2d;
 
@@ -28,7 +21,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 
 @Config
-@Autonomous(name = "FrontOfFieldToBLue", group = "Autonomous")
+@Autonomous(name = "FrontOfFieldToBlue", group = "Autonomous")
 public class FrontOfFieldToBlue extends LinearOpMode {
 
 
@@ -36,82 +29,59 @@ public class FrontOfFieldToBlue extends LinearOpMode {
     DcMotor lb = null;
     DcMotor rf = null;
     DcMotor rb = null;
-    Servo leftfeeder = null;
-    Servo rightfeeder = null;
+
+    DcMotor transfer =null;
+
     DcMotor launcher = null;
 
     // lift class
     private boolean initialized = false;
 
-
-
-    // within the Claw class
-    public class WarmupLaunch implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            launcher.setPower(1);
-            return false;
-        }
-    }
-    public Action Launch() {
-        return new WarmupLaunch();
-    }
-
-    public class StopLaunch implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            launcher.setPower(0);
-            return false;
-        }
-    }
-    public Action StopLaunch() {
-        return new StopLaunch();
-    }
-
-    public class TransferArtifact implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            leftfeeder.setPosition(1.0);
-            rightfeeder.setPosition(1.0);
-            return false;
-        }
-    }
-
-    int apriltag;
-
-    public Action PositionAprilTag() {
-        return new StopLaunch();
-    }
-
-    public class Position implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            if(apriltag == 43){
-                return true;
-            } else if(apriltag > 43){
-                //move forward
-            } else if(apriltag < 43){
-                //move backward
-            }
-            return false;
-        }
-    }
-    public Action TransferArtifact() {
-        return new TransferArtifact();
-    }
-
-    public class Launch implements InstantFunction{
+    public class warmupLaunch implements InstantFunction{
         @Override
         public void run(){
-            launcher.setPower(1);
+            launcher.setPower(-0.7);
         }
     }
+    public class stopLauncher implements InstantFunction{
+        @Override
+        public void run(){
+            launcher.setPower(0);
+        }
+    }
+
+    public class transferArtifact implements InstantFunction{
+        @Override
+        public void run(){
+            //   transfer.setPower(1);
+            //  sleep(200);
+            //    transfer.setPower(0);
+        }
+    }
+
+    public class Shoot implements InstantFunction{
+        @Override
+        public void run(){
+            transfer.setPower(-1);
+            sleep(50);
+            transfer.setPower(1);
+            sleep(600);
+            transfer.setPower(0);
+        }
+    }
+
+
+
+
 
 
 
 
     public void runOpMode() {
+        transfer = hardwareMap.dcMotor.get("transfer");
+        launcher = hardwareMap.dcMotor.get("launcher");
         Pose2d beginPose = new Pose2d(new Vector2d(53,-15), Math.toRadians(0));
+        //this pose assumes the robot starts with the intake facing away from the goal. the shooter will be facing away from the goal
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
@@ -120,18 +90,22 @@ public class FrontOfFieldToBlue extends LinearOpMode {
         //creating RR path
 
         // actionBuilder builds from the drive steps passed to it
+        //this path moves backwards and turns
         Action path = drive.actionBuilder(beginPose)
+                .stopAndAdd(new warmupLaunch())
+                .stopAndAdd(new transferArtifact())
                 .lineToX(-35)
                 .turn(Math.toRadians(-120))
+                .stopAndAdd(new Shoot())
+                .stopAndAdd(new stopLauncher())
                 .build();
 
         Action path2 = drive.actionBuilder((beginPose))
-                .stopAndAdd(Launch())
+                .stopAndAdd(new warmupLaunch())
                 .waitSeconds(5)
-                .stopAndAdd(TransferArtifact())
+//                .stopAndAdd(TransferArtifact())
                 .waitSeconds(1)
-                .stopAndAdd(PositionAprilTag())
-                .stopAndAdd(StopLaunch())
+                .stopAndAdd(new stopLauncher())
                 .build();
 
 
