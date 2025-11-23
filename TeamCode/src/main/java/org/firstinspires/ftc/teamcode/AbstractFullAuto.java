@@ -29,7 +29,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     private Servo kicker;
     protected DcMotorEx outtakemotorright = null;
     protected DcMotorEx outtakemotorleft = null;
-    protected DcMotorEx intakemotortwo = null;
+    protected DcMotorEx transfermotor = null;
     private Servo outtakeservo = null;
     private double home = 0, kick = 0.3;
 
@@ -70,7 +70,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
 
         waitForTime(2);
         intakemotor.setPower(0);
-        intakemotortwo.setPower(0);
+        transfermotor.setPower(0);
 
 //        setOuttakePower();
 //        kickBalls2ndRun();
@@ -94,7 +94,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     private void initHardware() {
         outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
         outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
-//        intakemotortwo = hardwareMap.get(DcMotorEx.class, "intakemotortwo");
+//        transfermotor = hardwareMap.get(DcMotorEx.class, "transfermotor");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
 
@@ -113,7 +113,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         kickAuto(2); // 2nd ball
 
         intakemotor.setPower(1); // Push 3rd ball forward
-        intakemotortwo.setPower(1);
+        transfermotor.setPower(1);
 
         kickAuto(3); // kick 3rd ball
     }
@@ -124,13 +124,14 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         waitForTime(kickCycleTime*0.15); //wait for 2nd / 3rd ready
 
         intakemotor.setPower(0);
+
         waitForTime(kickCycleTime*0.15); //wait for the intake stop completely
 
         kickAuto(2); // 2nd ball
 
-//        intakemotor.setPower(1); // Push 3rd ball forward
-//
-//        kickAuto(3); // kick 3rd ball
+        intakemotor.setPower(1); // Push 3rd ball forward
+        transfermotor.setPower(1);
+        kickAuto(3); // kick 3rd ball
     }
 
 

@@ -49,8 +49,7 @@ public class FullAutoRedSideFar extends AbstractFullAuto {
         Actions.runBlocking(trajectoryActionChosen);
 
         intakemotor.setPower(1);
-        intakemotortwo.setPower(1);
-
+        transfermotor.setPower(1);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
                 .splineToConstantHeading(new Vector2d(36, 50), Math.toRadians(-90), new TranslationalVelConstraint(30.0))
