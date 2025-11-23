@@ -29,9 +29,9 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     private Servo kicker;
     protected DcMotorEx outtakemotorright = null;
     protected DcMotorEx outtakemotorleft = null;
-//    protected DcMotorEx intakemotortwo = null;
+    protected DcMotorEx intakemotortwo = null;
     private Servo outtakeservo = null;
-    private double home = 0, kick = 0.8;
+    private double home = 0, kick = 0.3;
 
     @Override
     public void runOpMode() {
@@ -51,7 +51,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         telemetry.addData(">", "Touch START to start OpMode");
         telemetry.update();
 
-        kicker.setPosition(0);
+        kicker.setPosition(0.1);
         outtakeservo.setPosition(0.475);
         kickTimer.reset();
 
@@ -70,6 +70,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
 
         waitForTime(2);
         intakemotor.setPower(0);
+        intakemotortwo.setPower(0);
 
 //        setOuttakePower();
 //        kickBalls2ndRun();
@@ -104,14 +105,15 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         kickAuto(1); // 1st ball
 
         intakemotor.setPower(1);  // Push 2nd ball forward
-        waitForTime(kickCycleTime*0.3); //wait for 2nd / 3rd ready
+        waitForTime(kickCycleTime*0.15); //wait for 2nd / 3rd ready
 
         intakemotor.setPower(0);
-        waitForTime(kickCycleTime*0.3); //wait for the intake stop completely
+        waitForTime(kickCycleTime*0.15); //wait for the intake stop completely
 
         kickAuto(2); // 2nd ball
 
         intakemotor.setPower(1); // Push 3rd ball forward
+        intakemotortwo.setPower(1);
 
         kickAuto(3); // kick 3rd ball
     }
@@ -119,10 +121,10 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         kickAuto(1); // 1st ball
 
         intakemotor.setPower(1);  // Push 2nd ball forward
-        waitForTime(kickCycleTime*0.3); //wait for 2nd / 3rd ready
+        waitForTime(kickCycleTime*0.15); //wait for 2nd / 3rd ready
 
         intakemotor.setPower(0);
-        waitForTime(kickCycleTime*0.3); //wait for the intake stop completely
+        waitForTime(kickCycleTime*0.15); //wait for the intake stop completely
 
         kickAuto(2); // 2nd ball
 
@@ -135,12 +137,12 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     protected void kickAuto(int ballNumber) {
         kicker.setPosition(kick);
         outtakeservo.setPosition(0.475);
-        waitForTime(kickCycleTime);
-        kicker.setPosition(0);
+        waitForTime(kickCycleTime*0.25);
+        kicker.setPosition(0.1);
 
         if (ballNumber<3) {
             //So kicker has time to go back to position 0
-            waitForTime(kickCycleTime);
+            waitForTime(kickCycleTime*0.25);
         }
     }
 

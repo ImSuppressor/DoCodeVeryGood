@@ -45,10 +45,11 @@ public class FullAutoBlueSideFar extends AbstractFullAuto {
         trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
 
-        intakemotor.setPower(0.75);
+        intakemotor.setPower(1);
+        intakemotortwo.setPower(1);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, -45), Math.toRadians(90), new TranslationalVelConstraint(30.0))
+                .splineToConstantHeading(new Vector2d(36, -50), Math.toRadians(90), new TranslationalVelConstraint(30.0))
                 .splineToConstantHeading(new Vector2d(36, -15), Math.toRadians(0));
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);

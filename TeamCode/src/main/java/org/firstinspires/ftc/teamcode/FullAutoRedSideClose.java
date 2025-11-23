@@ -46,7 +46,9 @@ public class FullAutoRedSideClose extends AbstractFullAuto {
         trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
 
-        intakemotor.setPower(0.75);
+        intakemotor.setPower(1);
+        intakemotortwo.setPower(1);
+
 
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .turn(Math.toRadians(-135))

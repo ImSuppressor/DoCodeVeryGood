@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -43,19 +44,21 @@ public class FullAutoRedSideFar extends AbstractFullAuto {
         Action trajectoryActionChosen;
         TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
                 .strafeToConstantHeading(new Vector2d(36, 20))
-                .turn(Math.toRadians(110));
+                .turn(Math.toRadians(112));
         trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
 
-        intakemotor.setPower(0.75);
+        intakemotor.setPower(1);
+        intakemotortwo.setPower(1);
+
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, 45), Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(36, 50), Math.toRadians(-90), new TranslationalVelConstraint(30.0))
                 .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(0));
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
-                .turn(Math.toRadians(-110))
+                .turn(Math.toRadians(-112))
 
                 .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(90));
 
