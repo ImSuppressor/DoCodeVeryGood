@@ -256,6 +256,9 @@ public final class MecanumDrive {
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         rightFront.setDirection(DcMotorSimple.Direction.FORWARD);
         rightBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtakemotorleft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        outtakemotorright.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)

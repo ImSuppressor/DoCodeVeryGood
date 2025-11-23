@@ -5,6 +5,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -47,7 +48,7 @@ public class FullAutoBlueSideFar extends AbstractFullAuto {
         intakemotor.setPower(0.75);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, -45), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(36, -45), Math.toRadians(90), new TranslationalVelConstraint(30.0))
                 .splineToConstantHeading(new Vector2d(36, -15), Math.toRadians(0));
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
