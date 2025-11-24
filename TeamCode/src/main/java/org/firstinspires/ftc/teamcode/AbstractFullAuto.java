@@ -94,7 +94,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
     private void initHardware() {
         outtakemotorright = hardwareMap.get(DcMotorEx.class, "outtakemotorright");
         outtakeservo = hardwareMap.get(Servo.class, "outtakeservo");
-//        transfermotor = hardwareMap.get(DcMotorEx.class, "transfermotor");
+        transfermotor = hardwareMap.get(DcMotorEx.class, "transfermotor");
         outtakemotorleft = hardwareMap.get(DcMotorEx.class,"outtakemotorleft");
         intakemotor = hardwareMap.get(DcMotorEx.class,"intakemotor");
 
@@ -123,7 +123,6 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         intakemotor.setPower(1);  // Push 2nd ball forward
         waitForTime(kickCycleTime*0.15); //wait for 2nd / 3rd ready
 
-        intakemotor.setPower(0);
 
         waitForTime(kickCycleTime*0.15); //wait for the intake stop completely
 
