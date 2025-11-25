@@ -62,18 +62,20 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         setOuttakePower();
 
         runFirstPath(drive, initialPose);
-        kickBalls1stRun();
+        kickBalls();
 
 
         // 2nd run
-        runSecondPath(drive);
-
-        waitForTime(2);
         intakemotor.setPower(0);
         transfermotor.setPower(0);
+        runSecondPath(drive);
 
-//        setOuttakePower();
-//        kickBalls2ndRun();
+//        waitForTime(2);
+//        intakemotor.setPower(0);
+//        transfermotor.setPower(0);
+
+        setOuttakePower();
+        kickBalls();
         parkOutsideLaunch(drive);
 
         if (isStopRequested()) {
@@ -81,6 +83,7 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         }
 
     }
+
 
 
     public abstract Pose2d getInitialPose();
@@ -101,35 +104,19 @@ public abstract class AbstractFullAuto extends LinearOpMode {
         kicker = hardwareMap.get(Servo.class,"kickservo");
     }
 
-    public void kickBalls1stRun() {
+
+    public void kickBalls() {
         kickAuto(1); // 1st ball
 
-        intakemotor.setPower(1);  // Push 2nd ball forward
+        transfermotor.setPower(1);  // Push 2nd ball forward
         waitForTime(kickCycleTime*0.15); //wait for 2nd / 3rd ready
-
-        intakemotor.setPower(0);
-        waitForTime(kickCycleTime*0.15); //wait for the intake stop completely
 
         kickAuto(2); // 2nd ball
 
         intakemotor.setPower(1); // Push 3rd ball forward
         transfermotor.setPower(1);
-
-        kickAuto(3); // kick 3rd ball
-    }
-    public void kickBalls2ndRun() {
-        kickAuto(1); // 1st ball
-
-        intakemotor.setPower(1);  // Push 2nd ball forward
-        waitForTime(kickCycleTime*0.15); //wait for 2nd / 3rd ready
-
-
         waitForTime(kickCycleTime*0.15); //wait for the intake stop completely
 
-        kickAuto(2); // 2nd ball
-
-        intakemotor.setPower(1); // Push 3rd ball forward
-        transfermotor.setPower(1);
         kickAuto(3); // kick 3rd ball
     }
 

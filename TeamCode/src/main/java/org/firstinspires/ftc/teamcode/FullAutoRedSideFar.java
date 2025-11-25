@@ -31,7 +31,7 @@ public class FullAutoRedSideFar extends AbstractFullAuto {
     public void runFirstPath(MecanumDrive drive, Pose2d initialPose) {
         TrajectoryActionBuilder goToLaunchSpot = drive.actionBuilder(initialPose)
                 .setTangent(Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(180))
+                .strafeToConstantHeading(new Vector2d(53, 15))
                 .turn(Math.toRadians(-22));
         Action trajectoryActionChosen = goToLaunchSpot.build();
         Actions.runBlocking(trajectoryActionChosen);
@@ -52,14 +52,13 @@ public class FullAutoRedSideFar extends AbstractFullAuto {
         transfermotor.setPower(1);
 
         TrajectoryActionBuilder adjustIntakePos = drive.actionBuilder(getCurrentPos(drive))
-                .splineToConstantHeading(new Vector2d(36, 50), Math.toRadians(-90), new TranslationalVelConstraint(30.0))
+                .strafeToConstantHeading(new Vector2d(36, 50), new TranslationalVelConstraint(30.0))
                 .splineToConstantHeading(new Vector2d(36, 15), Math.toRadians(0));
         trajectoryActionChosen = adjustIntakePos.build();
         Actions.runBlocking(trajectoryActionChosen);
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .turn(Math.toRadians(-112))
-
-                .splineToConstantHeading(new Vector2d(53, 15), Math.toRadians(90));
+                .strafeToConstantHeading(new Vector2d(53, 15));
 
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);

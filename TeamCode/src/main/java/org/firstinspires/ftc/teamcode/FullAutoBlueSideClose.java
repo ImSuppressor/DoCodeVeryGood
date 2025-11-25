@@ -46,14 +46,14 @@ public class FullAutoBlueSideClose extends AbstractFullAuto {
         Action trajectoryActionChosen;
         TrajectoryActionBuilder goToIntake = drive.actionBuilder(getCurrentPos(drive))
                 .turn(Math.toRadians(-135))
-                .splineToConstantHeading(new Vector2d(-12, -48), Math.toRadians(90));
+                .strafeToConstantHeading(new Vector2d(-12, -48));
         trajectoryActionChosen = goToIntake.build();
         Actions.runBlocking(trajectoryActionChosen);
         intakemotor.setPower(1);
         transfermotor.setPower(1);
         TrajectoryActionBuilder goToLaunchSpot2 = drive.actionBuilder(getCurrentPos(drive))
                 .turn(Math.toRadians(135))
-                .splineToConstantHeading(new Vector2d(-12, -23), Math.toRadians(-90));
+                .strafeToConstantHeading(new Vector2d(-12, -23));
 
         trajectoryActionChosen = goToLaunchSpot2.build();
         Actions.runBlocking(trajectoryActionChosen);
