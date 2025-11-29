@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,9 +9,8 @@ import subsystems.Shooter;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp")
-@Config
 public class Tele extends LinearOpMode {
-    public static boolean enableTesting = false;
+
     private ElapsedTime runtime = new ElapsedTime();
 
     private BrainSTEMRobot robot;
@@ -75,26 +73,24 @@ public class Tele extends LinearOpMode {
             double x = gamepad1.left_stick_x * 0.6;
             double rx = gamepad1.right_stick_x * 0.6;
 
-            if (enableTesting)
-                robot.drive.setMotorPowers(1,1,1,1);
-            else
-                robot.drive.setMotorPowers(
-                        y + x + rx,
-                        y - x - rx,
-                        y - x + rx,
-                        y + x - rx
-                );
+            robot.drive.setMotorPowers(0.5, -0.5, -0.5,0.5);
 
-            telemetry.addData("frontLeft", robot.drive.leftFront.getPower());
-            telemetry.addData("frontRight", robot.drive.rightFront.getPower());
-            telemetry.addData("backLeft", robot.drive.leftack.getPower());
-            telemetry.addData("backRight", robot.drive.rightBack.getPower());
+//            robot.drive.setMotorPowers(
+//                    y + x + rx,
+//                    y - x - rx,
+//                    y - x + rx,
+//                    y + x - rx
+//            );
+//            telemetry.addData("frontLeft", robot.frontLeft.getPower());
+//            telemetry.addData("frontRight", robot.frontRight.getPower());
+//            telemetry.addData("backLeft", robot.backLeft.getPower());
+//            telemetry.addData("backRight", robot.backRight.getPower());
 
-            B
+
             telemetry.addData("y-axis :", y);
             telemetry.addData("x-axis :", x);
             telemetry.addData("turn :", rx);
-            telemetry.update();
+            //telemetry.update();
 
 
         }
