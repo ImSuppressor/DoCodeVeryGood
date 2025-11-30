@@ -204,7 +204,7 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
                 sleep(50);
 
                 transfer.setPower(1);
-                sleep(75);
+                sleep(67);
 
                 transfer.setPower(0);
             }
