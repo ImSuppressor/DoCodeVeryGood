@@ -10,15 +10,12 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.vision.VisionPortal;
 
 
 @TeleOp
-public class AdecodeTeleOpTwoControllers extends LinearOpMode {
-    private final ElapsedTime runtime = new ElapsedTime();
+public class decodeToBeFinalizedTeleOp extends LinearOpMode {
 
     DcMotor frontLeftMotor = null;
     DcMotor backLeftMotor = null;
@@ -33,6 +30,8 @@ public class AdecodeTeleOpTwoControllers extends LinearOpMode {
     DcMotor launcher = null;
     Servo deciderofdoom = null;
     NormalizedColorSensor csensor = null;
+
+    double selectedPower = 0.0;
 
     private String detectGreen() {
         if (csensor == null) {
@@ -74,7 +73,10 @@ public class AdecodeTeleOpTwoControllers extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        VisionPortal webcam;
+        // Variables outside loop
+        boolean dpadRightWasPressed = false;
+        long lastTapTime = 0;
+        long doubleTapTimeWindow = 300; // milliseconds allowed between taps
 
         //Hardwaremap
 
@@ -93,16 +95,15 @@ public class AdecodeTeleOpTwoControllers extends LinearOpMode {
         leftintake = hardwareMap.dcMotor.get("leftintake");
         rightintake = hardwareMap.dcMotor.get("rightintake");
 
-//        intake = hardwareMap.dcMotor.get(("intake"));
         launcher = hardwareMap.dcMotor.get("launcher");
         csensor = hardwareMap.get(NormalizedColorSensor.class, "colorsensor");
         deciderofdoom = hardwareMap.servo.get(("deciderservo"));
 
 
-        // Set motor settings
-        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        // Set motor settings
+//        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         rightintake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -112,8 +113,8 @@ public class AdecodeTeleOpTwoControllers extends LinearOpMode {
         IMU imu = hardwareMap.get(IMU.class, "imu");
         // Adjust the orientation parameters to match your robot
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
-                RevHubOrientationOnRobot.UsbFacingDirection.UP));
+                RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT));
         // Without this, the REV Hub's orientation is assumed to be logo up / USB forward
         imu.initialize(parameters);
 
@@ -143,10 +144,10 @@ public class AdecodeTeleOpTwoControllers extends LinearOpMode {
             rotX = rotX * 1.1;  // Counteract imperfect strafing
 
             double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = ((rotY + rotX + rx) / denominator)*0.5;
-            double backLeftPower = ((rotY - rotX + rx) / denominator)*0.5;
-            double frontRightPower = ((rotY - rotX - rx) / denominator)*0.5;
-            double backRightPower = ((rotY + rotX - rx) / denominator)*0.5;
+            double frontLeftPower = ((rotY + rotX + rx) / denominator*0.7);
+            double backLeftPower = ((rotY - rotX + rx) / denominator*0.7);
+            double frontRightPower = ((rotY - rotX - rx) / denominator*0.7);
+            double backRightPower = ((rotY + rotX - rx) / denominator*0.7);
 
             /*
             NOTE:
@@ -164,54 +165,102 @@ public class AdecodeTeleOpTwoControllers extends LinearOpMode {
             backRightMotor.setPower(backRightPower);
 
             //Triggers
-            float leftTrigger = gamepad2.left_trigger;
-            float rightTrigger = gamepad2.right_trigger;
+            float gamepad2leftTrigger = gamepad2.left_trigger;
+            float gamePad1rightTrigger = gamepad1.right_trigger;
+            float gamePad1LeftTrigger = gamepad1.left_trigger;
+
 
             //Gate Servo Movement
-            if(detectGreen().equals("GREEN")){
-                sleep(150);
-                deciderofdoom.setPosition(-0.6);
-            } else if(detectGreen().equals("UNKNOWN")){
-                deciderofdoom.setPosition(0.3);
-            }
+//            if(detectGreen().equals("GREEN")){
+//                sleep(150);
+//                deciderofdoom.setPosition(-0.6);
+//            } else if(detectGreen().equals("UNKNOWN")){
+//                deciderofdoom.setPosition(0.3);
+//            }
 
             //Transfer Code(Foward and Inverse Code)
 
             //Forward Commands
-            if(gamepad2.b){
-                transfer.setPower(1);
-            } else {
-                transfer.setPower(0);
-            }
-
-            //Inverse Commands
-            if(gamepad2.x){
+            if(gamepad2.y){
                 transfer.setPower(-1);
             } else {
                 transfer.setPower(0);
             }
 
+            //Inverse Commands
+            if(gamepad2.a){
+                transfer.setPower(1);
+            } else {
+                transfer.setPower(0);
+            }
+
+            if(gamepad2.dpad_up){
+                launcher.setPower(1);
+            }
+
+
+            if(gamepad2.bWasPressed()){
+                transfer.setPower(-1);
+                sleep(50);
+
+                transfer.setPower(1);
+                sleep(66);
+
+                transfer.setPower(0);
+            }
+
+            //Setting Code
+
+            if(gamepad2.dpad_up){
+                //Most power
+                selectedPower = 0.85;
+
+            } else if(gamepad2.dpad_down){
+                //Least Power
+                selectedPower = 1;
+
+            } else if(gamepad2.dpad_left){
+                //Middle Power
+                selectedPower = 0.75;
+
+            } else if(gamepad2.dpad_right){
+
+                selectedPower = -0.85;
+
+            }
 
             //Launcher + Intake Trigger Code
-            launcher.setPower(leftTrigger);
-            rightintake.setPower(rightTrigger);
-            leftintake.setPower(rightTrigger);
+
+
+
+
+
+
+            launcher.setPower(-gamepad2leftTrigger*selectedPower    );
+            //Half speed
+            rightintake.setPower(gamePad1rightTrigger*0.75);
+            leftintake.setPower(gamePad1rightTrigger*0.75);
+
+
+
 
             //Feeder Commands(Retractable)
             if(gamepad2.right_bumper){
                 rightfeeder.setPosition(-1);
-                sleep(100);
+                sleep(300);
                 rightfeeder.setPosition(1);
             }
 
             if(gamepad2.left_bumper){
-                leftfeeder.setPosition(0.75);
-                sleep(100);
-                leftfeeder.setPosition(-0.75);
+                leftfeeder.setPosition(1);
+                sleep(300);
+                leftfeeder.setPosition(-1);
             }
 
             //Telemetry
             telemetry.addData("color detected",detectGreen());
+            telemetry.addData("transfer power", transfer.getPower());
+            telemetry.addData("power setting", selectedPower);
             telemetry.update();
 
 

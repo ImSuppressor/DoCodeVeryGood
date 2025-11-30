@@ -72,7 +72,7 @@ public class AtGoalToRed extends LinearOpMode {
             transfer.setPower(-1);
             sleep(50);
             transfer.setPower(1);
-            sleep(600);
+            sleep(100);
             transfer.setPower(0);
         }
     }
@@ -99,21 +99,33 @@ public class AtGoalToRed extends LinearOpMode {
         // actionBuilder builds from the drive steps passed to it
         //this path moves backwards and turns
         Action path = drive.actionBuilder(beginPose)
-                .stopAndAdd(new warmupLaunch())
                 .stopAndAdd(new transferArtifact())
+                .stopAndAdd(new warmupLaunch())
                 .lineToX(-25)
                 .turn(Math.toRadians(180))
+                .stopAndAdd(new transferArtifact())
                 .stopAndAdd(new Shoot())
-                .stopAndAdd(new stopLauncher())
-                .build();
-
-        Action path2 = drive.actionBuilder((beginPose))
-                .stopAndAdd(new warmupLaunch())
-                .waitSeconds(5)
-//                .stopAndAdd(TransferArtifact())
+                .waitSeconds(1)
+                .strafeTo(new Vector2d(-25,20))
+                .strafeTo(new Vector2d(-34,20))
+                .stopAndAdd(new transferArtifact())
+                .stopAndAdd(new Shoot())
                 .waitSeconds(1)
                 .stopAndAdd(new stopLauncher())
                 .build();
+
+        Action closepath = drive.actionBuilder((beginPose))
+                .lineToX(-25)
+                .turn(Math.toRadians(180))
+                .lineToX(-34)
+                .turn(Math.toRadians(63))
+                .strafeTo(new Vector2d(56,20))
+                .strafeTo(new Vector2d(56,40))
+
+                        .build();
+        Action complexsplinepa = drive.actionBuilder((beginPose))
+
+                        .build();
 
 
         Actions.runBlocking(new SequentialAction(path));
