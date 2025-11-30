@@ -94,10 +94,10 @@ public class FrontOfFieldToBlue extends LinearOpMode {
         Action path = drive.actionBuilder(beginPose)
                 .stopAndAdd(new warmupLaunch())
                 .stopAndAdd(new transferArtifact())
-                .lineToX(-35)
-                .turn(Math.toRadians(-120))
+                .lineToX(-20)
+                .turn(Math.toRadians(-130))
                 .stopAndAdd(new Shoot())
-                .stopAndAdd(new stopLauncher())
+              //  .stopAndAdd(new stopLauncher())
                 .build();
 
         Action path2 = drive.actionBuilder((beginPose))

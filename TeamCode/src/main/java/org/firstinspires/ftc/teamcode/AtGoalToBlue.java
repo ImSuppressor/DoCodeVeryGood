@@ -80,7 +80,7 @@ public class AtGoalToBlue extends LinearOpMode {
     public void runOpMode() {
         transfer = hardwareMap.dcMotor.get("transfer");
         launcher = hardwareMap.dcMotor.get("launcher");
-        Pose2d beginPose = new Pose2d(new Vector2d(-59,-45), Math.toRadians(0));
+        Pose2d beginPose = new Pose2d(new Vector2d(-52,-60), Math.toRadians(45));
         //this pose assumes the robot starts with the intake facing away from the goal. the shooter will be facing away from the goal
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
@@ -94,8 +94,8 @@ public class AtGoalToBlue extends LinearOpMode {
         Action path = drive.actionBuilder(beginPose)
                 .stopAndAdd(new warmupLaunch())
                 .stopAndAdd(new transferArtifact())
-                .lineToX(-35)
-                .turn(Math.toRadians(-170))
+                .lineToX(-20)
+                .turn(Math.toRadians(-180))
                 .stopAndAdd(new Shoot())
                 .stopAndAdd(new stopLauncher())
                 .build();

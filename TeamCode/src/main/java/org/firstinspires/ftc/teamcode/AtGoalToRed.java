@@ -105,27 +105,9 @@ public class AtGoalToRed extends LinearOpMode {
                 .turn(Math.toRadians(180))
                 .stopAndAdd(new transferArtifact())
                 .stopAndAdd(new Shoot())
-                .waitSeconds(1)
-                .strafeTo(new Vector2d(-25,20))
-                .strafeTo(new Vector2d(-34,20))
-                .stopAndAdd(new transferArtifact())
-                .stopAndAdd(new Shoot())
-                .waitSeconds(1)
-                .stopAndAdd(new stopLauncher())
+
                 .build();
 
-        Action closepath = drive.actionBuilder((beginPose))
-                .lineToX(-25)
-                .turn(Math.toRadians(180))
-                .lineToX(-34)
-                .turn(Math.toRadians(63))
-                .strafeTo(new Vector2d(56,20))
-                .strafeTo(new Vector2d(56,40))
-
-                        .build();
-        Action complexsplinepa = drive.actionBuilder((beginPose))
-
-                        .build();
 
 
         Actions.runBlocking(new SequentialAction(path));

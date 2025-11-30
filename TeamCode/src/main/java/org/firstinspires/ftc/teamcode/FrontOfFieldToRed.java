@@ -92,44 +92,12 @@ public class FrontOfFieldToRed extends LinearOpMode {
                 .stopAndAdd(new warmupLaunch())
                 .lineToX(-18)
                 .turn(Math.toRadians(130))
-                .stopAndAdd(new Shoot())
-                .strafeTo(new Vector2d(-30,25))
                 .stopAndAdd(new transferArtifact())
                 .stopAndAdd(new Shoot())
-                .waitSeconds(2)
-                .stopAndAdd(new stopLauncher())
-                .strafeTo(new Vector2d(-18,12))
-                .turn(Math.toRadians(50))
-                .lineToX(56)
+
                 .build();
 
-        Action closeshot = drive.actionBuilder((beginPose))
-                .lineToX(34)
-                .splineTo(new Vector2d(-20, 20), Math.toRadians(-90))
-                .turn(Math.toRadians(45))
-                .turn(Math.toRadians(-45))
-                .strafeTo(new Vector2d(36,20))
-                .strafeTo(new Vector2d(36,56))
-                .strafeTo(new Vector2d(36,20))
-                .splineTo(new Vector2d(-20, 20), Math.toRadians(-90))
-                .turn(Math.toRadians(45))
-                .turn(Math.toRadians(-45))
-                .strafeTo(new Vector2d(56,20))
-                        .build();
 
-        Action farshot = drive.actionBuilder((beginPose))
-                .lineToX(38)
-                .turn(Math.toRadians(180))
-                .lineToX(50)
-                .turn(Math.toRadians(-20))
-                .splineTo(new Vector2d(38, 25), Math.toRadians(90))
-                .strafeTo(new Vector2d(38,56))
-                .strafeTo(new Vector2d(38,20))
-                .splineTo(new Vector2d(50,12),Math.toRadians(0))
-                .turn(Math.toRadians(-20))
-                .turn(Math.toRadians(20))
-                .lineToX(38)
-                .build();
 
 
         Actions.runBlocking(new SequentialAction(path));
