@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -21,7 +22,7 @@ public class Tele extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, this);
+        robot = new BrainSTEMRobot(this.hardwareMap, this.telemetry, this, new Pose2d(0, 0, 0));
 
 
         waitForStart();
@@ -40,7 +41,7 @@ public class Tele extends LinearOpMode {
 
             robot.update();
 
-            boolean a_Button_Is_Pressed_This_Loop = gamepad1.a;
+            boolean a_Button_Is_Pressed_This_Loop = gamepad2.x;
             if (a_Button_Is_Pressed_This_Loop && !a_Button_Was_Pressed_Last_Loop) {
                 robot.spindexer.rotateDegrees(120);
             }
@@ -52,7 +53,7 @@ public class Tele extends LinearOpMode {
 
             a_Button_Was_Pressed_Last_Loop = a_Button_Is_Pressed_This_Loop;
 
-            if (gamepad1.b) {
+            if (gamepad1.a) {
 //                robot.collector.collectorState = Collector.CollectorState.ON;
                 robot.collector.collectorMotor.setPower(0.8);
             } else {
@@ -60,14 +61,14 @@ public class Tele extends LinearOpMode {
                 robot.collector.collectorMotor.setPower(0);
             }
 
-            if (gamepad1.y) {
+            if (gamepad2.b) {
                 robot.finger.fingerState = Finger.FingerState.UP;
             } else {
                 robot.finger.fingerState = Finger.FingerState.DOWN;
             }
 
 
-            if (gamepad1.x) {
+            if (gamepad1.b) {
                 robot.shooter.shooterState = Shooter.ShooterState.ON;
             } else {
                 robot.shooter.shooterState = Shooter.ShooterState.OFF;
@@ -78,14 +79,14 @@ public class Tele extends LinearOpMode {
             double x = gamepad1.left_stick_x * 0.6;
             double rx = gamepad1.right_stick_x * 0.6;
 
-            robot.drive.setMotorPowers(0.5, -0.5, -0.5,0.5);
+//            robot.drive.setMotorPowers(0.5, -0.5, -0.5,0.5);
 
-//            robot.drive.setMotorPowers(
-//                    y + x + rx,
-//                    y - x - rx,
-//                    y - x + rx,
-//                    y + x - rx
-//            );
+            robot.drive.setMotorPowers(
+                    y + x + rx,
+                    y - x - rx,
+                    y - x + rx,
+                    y + x - rx
+            );
 //            telemetry.addData("frontLeft", robot.frontLeft.getPower());
 //            telemetry.addData("frontRight", robot.frontRight.getPower());
 //            telemetry.addData("backLeft", robot.backLeft.getPower());
