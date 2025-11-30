@@ -5,69 +5,29 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 @TeleOp
-public class decodeToBeFinalizedTeleOp extends LinearOpMode {
+public class decodeDec7th extends LinearOpMode {
 
     DcMotor frontLeftMotor = null;
     DcMotor backLeftMotor = null;
     DcMotor frontRightMotor = null;
     DcMotor backRightMotor = null;
     DcMotor transfer = null;
-    DcMotor leftintake = null;
-    DcMotor rightintake = null;
 
-    Servo leftfeeder = null;
-    Servo rightfeeder = null;
+
     DcMotor launcher = null;
-    Servo deciderofdoom = null;
-    NormalizedColorSensor csensor = null;
+
+    DcMotor vertintake =null;
 
     double selectedPower = 0.0;
-
-    private String detectGreen() {
-        if (csensor == null) {
-            return "ERROR: Sensor not initialized";
-        }
-
-        NormalizedRGBA colors = csensor.getNormalizedColors();
-
-        float r = colors.red;
-        float g = colors.green;
-        float b = colors.blue;
-        float a = colors.alpha;
+    double moveSpeed = 0.0;
 
 
-        if (a != 0) {
-            r /= a;
-            g /= a;
-            b /= a;
-        }
-
-        telemetry.addData("Raw RGB", "R: %.3f  G: %.3f  B: %.3f", r, g, b);
-
-
-        float total = r + g + b;
-        if (total == 0) return "UNKNOWN";
-        float redRatio = r / total;
-        float greenRatio = g / total;
-        float blueRatio = b / total;
-
-
-        if (greenRatio > 0.45 && greenRatio > redRatio + 0.10 && greenRatio > blueRatio + 0.10 && g > 0.2) {
-            return "GREEN";
-        }
-
-        return "UNKNOWN";
-    }
 
 
     @Override
@@ -89,24 +49,11 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
         //Expansion Hub
         transfer = hardwareMap.dcMotor.get(("transfer"));
 
-        leftfeeder = hardwareMap.servo.get("leftfeeder");
-        rightfeeder = hardwareMap.servo.get("rightfeeder");
-
-        leftintake = hardwareMap.dcMotor.get("leftintake");
-        rightintake = hardwareMap.dcMotor.get("rightintake");
+        vertintake = hardwareMap.dcMotor.get("intake");
 
         launcher = hardwareMap.dcMotor.get("launcher");
-        csensor = hardwareMap.get(NormalizedColorSensor.class, "colorsensor");
-        deciderofdoom = hardwareMap.servo.get(("deciderservo"));
 
 
-//        // Set motor settings
-//        frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-//        backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
-        rightintake.setDirection(DcMotorSimple.Direction.REVERSE);
         // Sets IMU
 
         // Retrieve the IMU from the hardware map
@@ -144,10 +91,10 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
             rotX = rotX * 1.1;  // Counteract imperfect strafing
 
             double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = ((rotY + rotX + rx) / denominator*0.7);
-            double backLeftPower = ((rotY - rotX + rx) / denominator*0.7);
-            double frontRightPower = ((rotY - rotX - rx) / denominator*0.7);
-            double backRightPower = ((rotY + rotX - rx) / denominator*0.7);
+            double frontLeftPower = ((rotY + rotX + rx) / denominator*moveSpeed);
+            double backLeftPower = ((rotY - rotX + rx) / denominator*moveSpeed);
+            double frontRightPower = ((rotY - rotX - rx) / denominator*moveSpeed);
+            double backRightPower = ((rotY + rotX - rx) / denominator*moveSpeed);
 
             /*
             NOTE:
@@ -182,22 +129,17 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
 
             //Forward Commands
             if(gamepad2.y){
-                transfer.setPower(-1);
+                transfer.setPower(1);
             } else {
                 transfer.setPower(0);
             }
 
             //Inverse Commands
             if(gamepad2.a){
-                transfer.setPower(1);
+                transfer.setPower(-1);
             } else {
                 transfer.setPower(0);
             }
-
-            if(gamepad2.dpad_up){
-                launcher.setPower(1);
-            }
-
 
             if(gamepad2.bWasPressed()){
                 transfer.setPower(-1);
@@ -229,6 +171,12 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
 
             }
 
+            if(gamepad1.left_bumper){
+                moveSpeed = 0.7;
+            } else if(gamepad1.right_bumper){
+                moveSpeed = 0.4;
+            }
+
             //Launcher + Intake Trigger Code
 
 
@@ -236,31 +184,21 @@ public class decodeToBeFinalizedTeleOp extends LinearOpMode {
 
 
 
-            launcher.setPower(-gamepad2leftTrigger*selectedPower    );
+            launcher.setPower(-gamepad2leftTrigger*selectedPower);
             //Half speed
-            rightintake.setPower(gamePad1rightTrigger*0.75);
-            leftintake.setPower(gamePad1rightTrigger*0.75);
+            vertintake.setPower(-gamePad1LeftTrigger);
+            vertintake.setPower(gamePad1rightTrigger);
 
 
 
 
             //Feeder Commands(Retractable)
-            if(gamepad2.right_bumper){
-                rightfeeder.setPosition(-1);
-                sleep(300);
-                rightfeeder.setPosition(1);
-            }
-
-            if(gamepad2.left_bumper){
-                leftfeeder.setPosition(1);
-                sleep(300);
-                leftfeeder.setPosition(-1);
-            }
 
             //Telemetry
-            telemetry.addData("color detected",detectGreen());
+
             telemetry.addData("transfer power", transfer.getPower());
             telemetry.addData("power setting", selectedPower);
+            telemetry.addData("speed", moveSpeed);
             telemetry.update();
 
 
