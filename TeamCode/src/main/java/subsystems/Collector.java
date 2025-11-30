@@ -50,11 +50,8 @@ public class Collector implements Component {
                 break;
         }
     }
-
     @Override
-    public String test() {
-        return null;
-    }
+    public String test() {return null;}
 
 
 }

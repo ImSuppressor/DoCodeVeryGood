@@ -65,6 +65,14 @@ public class Shooter implements Component {
         }
     }
 
+    public void setShooterOn(){
+        shooterState = ShooterState.ON;
+    }
+
+    public void setShooterOff(){
+        shooterState = ShooterState.OFF;
+    }
+
     @Override
     public String test() {
         return null;
