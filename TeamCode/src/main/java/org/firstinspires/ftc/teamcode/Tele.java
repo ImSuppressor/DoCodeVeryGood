@@ -52,6 +52,8 @@ public class Tele extends LinearOpMode {
 
             a_Button_Was_Pressed_Last_Loop = a_Button_Is_Pressed_This_Loop;
 
+
+
             if (gamepad1.a) {
 //                robot.collector.collectorState = Collector.CollectorState.ON;
                 robot.collector.collectorMotor.setPower(0.8);
@@ -86,10 +88,10 @@ public class Tele extends LinearOpMode {
                     y - x + rx,
                     y + x - rx
             );
-//            telemetry.addData("frontLeft", robot.frontLeft.getPower());
-//            telemetry.addData("frontRight", robot.frontRight.getPower());
-//            telemetry.addData("backLeft", robot.backLeft.getPower());
-//            telemetry.addData("backRight", robot.backRight.getPower());
+            telemetry.addData("frontLeft", robot.drive.leftFront.getPower());
+            telemetry.addData("frontRight", robot.drive.rightFront.getPower());
+            telemetry.addData("backLeft", robot.drive.leftBack).getClass();
+            telemetry.addData("backRight", robot.drive.rightBack).getClass();
 
 
             telemetry.addData("y-axis :", y);

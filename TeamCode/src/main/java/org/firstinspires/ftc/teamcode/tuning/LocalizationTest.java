@@ -31,6 +31,9 @@ public class LocalizationTest extends LinearOpMode {
                         -gamepad1.right_stick_x
                 ));
 
+                if(gamepad1.a)
+                    drive.localizer.setPose(new Pose2d(0, 0, 0));
+
                 drive.updatePoseEstimate();
 
                 Pose2d pose = drive.localizer.getPose();

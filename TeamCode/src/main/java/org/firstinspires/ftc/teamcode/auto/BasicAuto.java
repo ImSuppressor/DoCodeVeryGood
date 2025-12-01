@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.auto;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -16,22 +17,41 @@ import org.firstinspires.ftc.teamcode.auto_subsystems.Finger;
 import org.firstinspires.ftc.teamcode.auto_subsystems.Spindexer;
 
 @Autonomous (name = "Auto")
+@Config
 public final class BasicAuto extends LinearOpMode {
+    public static class Positions {
+        public double startX = 62.6, startY = 16.6, startA = Math.toRadians(180);
+        public double preloadX = 49, preloadY = 11, preloadA = Math.toRadians(145), preloadT = Math.toRadians(145);
+        public double collectX = 36, collectY = 32, collectA = Math.toRadians(90), collectT = Math.toRadians(90);
+        public double collect2X = 10, collect2Y = 42.5, collect2A = Math.toRadians(90), collect2T = Math.toRadians(90);
+    }
+    public static Positions positions = new Positions();
+
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Pose2d beginPose = new Pose2d(62.5, 15.8, Math.toRadians(177.8));
-            BrainSTEMAutoRobot robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
+        // DECLARE POSES
+        Pose2d beginPose = new Pose2d(positions.startX, positions.startY, positions.startA);
+        Pose2d shootPose = new Pose2d(positions.preloadX, positions.preloadY, positions.preloadA);
+        Pose2d collectPose = new Pose2d(positions.collectX, positions.collectY, positions.collectA);
 
-             
+        BrainSTEMAutoRobot robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
 
-            Action setCollect1 = new AutoActions().setCollect1(robot);
-            Action robotUpdate = new AutoActions().robotUpdate(robot);
+        Action preloadDrive = robot.drive.actionBuilder(beginPose)
+             .splineToLinearHeading(shootPose, positions.preloadT)
+                .build();
 
-            Action setCollect2 = new AutoActions().setCollect2(robot);
+        Action collectDrive = robot.drive.actionBuilder(shootPose)
+                    .splineToLinearHeading(collectPose, positions.collectT)
+                    .build();
 
-            Action setCollect3 = new AutoActions().setCollect3(robot);
-            waitForStart();
+        Action setCollect1 = new AutoActions().setCollect1(robot);
+        Action robotUpdate = new AutoActions().robotUpdate(robot);
+
+        Action setCollect2 = new AutoActions().setCollect2(robot);
+
+        Action setCollect3 = new AutoActions().setCollect3(robot);
+        waitForStart();
 
 
             if (isStopRequested()) return;
@@ -40,33 +60,17 @@ public final class BasicAuto extends LinearOpMode {
 
             Actions.runBlocking(
                     new ParallelAction(
-                            new SequentialAction(
+                            new Action[]{new SequentialAction(
 //
 //                                    setCollect1,
 //                                    new SleepAction(1.0),
 //                                    setCollect2
-                                    robot.drive.actionBuilder(beginPose)
 
-                                            .splineToSplineHeading(new Pose2d(30, 30, 0), 0)
-                                            .build()
-
+                                    preloadDrive,
+                                    collectDrive
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-                            ),
-                            robotUpdate
-                    )
+                            ), robotUpdate})
 
             );
 

@@ -81,6 +81,7 @@ public class Shooter implements Component {
 
 
 
+
     public void setShooterShootFar(){
         shooterState = ShooterState.SHOOT_FAR;
     }
