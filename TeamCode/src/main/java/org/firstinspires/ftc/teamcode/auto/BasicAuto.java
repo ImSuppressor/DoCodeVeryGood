@@ -35,6 +35,7 @@ public final class BasicAuto extends LinearOpMode {
         Pose2d shootPose = new Pose2d(positions.preloadX, positions.preloadY, positions.preloadA);
         Pose2d collectPose = new Pose2d(positions.collect1X, positions.collect1Y, positions.collect1A);
 
+
         BrainSTEMAutoRobot robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
 
         Action preloadDrive = robot.drive.actionBuilder(beginPose)
