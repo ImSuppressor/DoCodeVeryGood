@@ -19,7 +19,7 @@ public class Spindexer implements Component {
     private int spindexerTargetPosition;
     public static double SPINDEXER_TICKS_PER_REVOLUTION = 288;
 
-    public static double SPINDEXER_GEAR_RATIO = 72.0;
+    public static double SPINDEXER_GEAR_RATIO = 1.0;
 
     public static final double SPINDEXER_TICKS_PER_DEGREE = (SPINDEXER_TICKS_PER_REVOLUTION * SPINDEXER_GEAR_RATIO) / 360.0;
 

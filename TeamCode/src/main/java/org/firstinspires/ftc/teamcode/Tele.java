@@ -46,9 +46,9 @@ public class Tele extends LinearOpMode {
 
             //Gamepad 1 controls ↓
             if (gamepad1.a) {
-                robot.collector.collectorState = Collector.CollectorState.ON;
+                robot.collector.collectorMotor.setPower(0.8);
             } else {
-                robot.collector.collectorState = Collector.CollectorState.ON;
+                robot.collector.collectorMotor.setPower(0);
             }
 
             if (gamepad1.b) {
@@ -72,9 +72,9 @@ public class Tele extends LinearOpMode {
                 robot.spindexer.rotateDegrees(60);
             }
 
-            if (gamepad2.x && !robot.spindexer.isSpindexerBusy() && (robot.finger.fingerState == Finger.FingerState.DOWN)) {
-                shootThreeBalls.start();
-            }
+//            if (gamepad2.x && !robot.spindexer.isSpindexerBusy() && (robot.finger.fingerState == Finger.FingerState.DOWN)) {
+//                shootThreeBalls.start();
+//            }
 
             //driving ↓
             double y = -gamepad1.left_stick_y * 0.6;
