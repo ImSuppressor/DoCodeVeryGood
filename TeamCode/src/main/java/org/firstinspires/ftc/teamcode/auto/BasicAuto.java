@@ -22,8 +22,9 @@ public final class BasicAuto extends LinearOpMode {
     public static class Positions {
         public double startX = 62.6, startY = 16.6, startA = Math.toRadians(180);
         public double preloadX = 49, preloadY = 11, preloadA = Math.toRadians(145), preloadT = Math.toRadians(145);
-        public double collect1X = 36, collect1Y = 32, collect1A = Math.toRadians(90), collect1T = Math.toRadians(90);
-        public double collect2X = 10, collect2Y = 42.5, collect2A = Math.toRadians(90), collect2T = Math.toRadians(90);
+        public double collect1X = 38, collect1Y = 30.5, collect1A = Math.toRadians(90), collect1T = Math.toRadians(90);
+        public double collect2X = 38, collect2Y = 32.5, collect2A = Math.toRadians(90), collect2T = Math.toRadians(90);
+       
     }
     public static Positions positions = new Positions();
 
@@ -34,6 +35,7 @@ public final class BasicAuto extends LinearOpMode {
         Pose2d beginPose = new Pose2d(positions.startX, positions.startY, positions.startA);
         Pose2d shootPose = new Pose2d(positions.preloadX, positions.preloadY, positions.preloadA);
         Pose2d collectPose = new Pose2d(positions.collect1X, positions.collect1Y, positions.collect1A);
+        Pose2d collectPose2 = new Pose2d(positions.collect2X, positions.collect2Y, positions.collect2A);
 
         BrainSTEMAutoRobot robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
 
@@ -45,7 +47,11 @@ public final class BasicAuto extends LinearOpMode {
                     .splineToLinearHeading(collectPose, positions.collect1T)
                     .build();
 
-        Action setCollect1 = new AutoActions().setCollect1(robot);
+        Action collectDrive2 = robot.drive.actionBuilder(collectPose)
+                .splineToLinearHeading(collectPose2, positions.collect2T)
+                .build();
+
+        Action set1Collect = new AutoActions().setCollect1(robot);
         Action robotUpdate = new AutoActions().robotUpdate(robot);
 
         Action setCollect2 = new AutoActions().setCollect2(robot);
@@ -67,8 +73,8 @@ public final class BasicAuto extends LinearOpMode {
 //                                    setCollect2
 
                                     preloadDrive,
-                                    collectDrive
-
+                                    collectDrive,
+                                    collectDrive2
 
                             ), robotUpdate})
 
