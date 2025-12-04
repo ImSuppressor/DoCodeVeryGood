@@ -66,8 +66,8 @@ public class Shooter implements Component {
 
                 break;
             case SHOOT_FAR:
-                shooterMotorOne.setVelocity(4000);
-                shooterMotorTwo.setVelocity(4000);
+                shooterMotorOne.setVelocity(3750);
+                shooterMotorTwo.setVelocity(3750);
 
                 break;
             case SHOOT_CLOSE:

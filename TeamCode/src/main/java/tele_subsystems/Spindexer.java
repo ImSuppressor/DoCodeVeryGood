@@ -45,7 +45,7 @@ public class Spindexer implements Component {
 
         spindexerMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        this.spindexerState = SpindexerState.OFF;
+        spindexerState = SpindexerState.OFF;
 
         spindexerMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
@@ -54,14 +54,12 @@ public class Spindexer implements Component {
 
     public void rotateDegrees(double degrees){
 
-        spindexerTargetPosition = spindexerMotor.getCurrentPosition() + (int)(degrees * SPINDEXER_TICKS_PER_DEGREE);
+            spindexerTargetPosition = spindexerMotor.getCurrentPosition() + (int)(degrees * SPINDEXER_TICKS_PER_DEGREE);
+            spindexerMotor.setTargetPosition(spindexerTargetPosition);
+            spindexerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            spindexerMotor.setPower(0.5);
+            spindexerState = SpindexerState.ON;
 
-        spindexerMotor.setTargetPosition(spindexerTargetPosition);
-
-        spindexerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        spindexerMotor.setPower(1);
-        spindexerState = SpindexerState.ON;
     }
 
 
@@ -74,15 +72,12 @@ public class Spindexer implements Component {
     public void update() {
         switch (spindexerState) {
             case OFF:
-                spindexerMotor.setPower(0);
+//                spindexerMotor.setPower(0);
                 break;
             case ON:
-                if (!isSpindexerBusy()) {
-
+                if (!spindexerMotor.isBusy()) {
                     spindexerMotor.setPower(0);
-
                     spindexerState = SpindexerState.OFF;
-
                     spindexerMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
                 }
                 break;

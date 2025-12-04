@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+
+
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.utils.teleHelpers.GamepadTracker;
 
 import tele_subsystems.Collector;
 import tele_subsystems.Finger;
@@ -16,16 +19,26 @@ import org.firstinspires.ftc.teamcode.ShootThreeBalls;
 
 @TeleOp(name = "TeleOp")
 public class Tele extends LinearOpMode {
-
+    private GamepadTracker gp1;
+    private GamepadTracker gp2;
     private ElapsedTime runtime = new ElapsedTime();
     private BrainSTEMTeleRobot robot;
     private ShootThreeBalls shootThreeBalls;
+
+    private boolean aWasPressed;
+    private boolean yWasPressed;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         robot = new BrainSTEMTeleRobot(this.hardwareMap, this.telemetry, this, new Pose2d(0, 0, 0));
         shootThreeBalls = new ShootThreeBalls(this.robot.shooter, this.robot.finger, this.robot.spindexer, telemetry);
+
+        gp1 = new GamepadTracker(gamepad1);
+        gp2 = new GamepadTracker(gamepad2);
+
+
 
 //        Shooter shooter;
 //        Finger finger;
@@ -43,12 +56,14 @@ public class Tele extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             telemetry.update();
             robot.update();
+            gp1.update();;
+            gp2.update();
 
             //Gamepad 1 controls ↓
             if (gamepad1.a) {
-                robot.collector.collectorMotor.setPower(0.8);
+                robot.collector.collectorState = Collector.CollectorState.ON;
             } else {
-                robot.collector.collectorMotor.setPower(0);
+                robot.collector.collectorState = Collector.CollectorState.OFF;
             }
 
             if (gamepad1.b) {
@@ -57,10 +72,27 @@ public class Tele extends LinearOpMode {
                 robot.shooter.shooterState = Shooter.ShooterState.OFF;
             }
 
+
             //Gamepad 2 controls ↓
-            if (gamepad2.a && !robot.spindexer.isSpindexerBusy()) {
+//            if (gamepad2.a && !robot.spindexer.isSpindexerBusy()) {
+//                robot.spindexer.rotateDegrees(120);
+//            } else if (gamepad2.y && !robot.spindexer.isSpindexerBusy()){
+//                robot.spindexer.rotateDegrees(60);
+//            }
+
+            boolean aIsPressed = gamepad2.a;
+            boolean yIsPressed = gamepad2.y;
+
+
+            if (gp2.isFirstA()) {
                 robot.spindexer.rotateDegrees(120);
+//                robot.spindexer.spindexerMotor.setPower(1);
             }
+
+//            if ( ){
+////                robot.spindexer.rotateDegrees(60);
+//            }
+
 
             if (gamepad2.b) {
                 robot.finger.fingerState = Finger.FingerState.UP;
@@ -68,9 +100,9 @@ public class Tele extends LinearOpMode {
                 robot.finger.fingerState = Finger.FingerState.DOWN;
             }
 
-            if (gamepad2.y && !robot.spindexer.isSpindexerBusy()) {
-                robot.spindexer.rotateDegrees(60);
-            }
+//            if (gamepad2.y && !robot.spindexer.isSpindexerBusy()) {
+//                robot.spindexer.rotateDegrees(60);
+//            }
 
 //            if (gamepad2.x && !robot.spindexer.isSpindexerBusy() && (robot.finger.fingerState == Finger.FingerState.DOWN)) {
 //                shootThreeBalls.start();
@@ -92,6 +124,8 @@ public class Tele extends LinearOpMode {
             telemetry.addData("frontRight", robot.drive.rightFront.getPower());
             telemetry.addData("backLeft", robot.drive.leftBack).getClass();
             telemetry.addData("backRight", robot.drive.rightBack).getClass();
+
+            telemetry.addData("spindexer", robot.spindexer.spindexerMotor.getPower());
 
 
             telemetry.addData("y-axis :", y);

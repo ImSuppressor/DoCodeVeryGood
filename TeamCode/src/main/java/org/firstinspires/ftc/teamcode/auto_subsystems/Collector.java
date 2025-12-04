@@ -14,7 +14,7 @@ public class Collector implements Component {
     private HardwareMap map;
     private Telemetry telemetry;
     public DcMotorEx collectorMotor;
-    public CollectorState collectorState;
+    public tele_subsystems.Collector.CollectorState collectorState;
     public enum CollectorState {
 
         OFF,
@@ -25,7 +25,7 @@ public class Collector implements Component {
         this.map = hardwareMap;
         this.telemetry = telemetry;
 
-        this.collectorState = CollectorState.OFF;
+//        this.collectorState = CollectorState.OFF;
 
         collectorMotor = map.get(DcMotorEx.class, "collectorMotor");
     }
