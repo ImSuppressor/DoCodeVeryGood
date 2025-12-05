@@ -5,6 +5,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -49,6 +50,7 @@ public class decodeDec7thWithChanges extends LinearOpMode {
 
         launcher = hardwareMap.dcMotor.get("launcher");
 
+        transfer.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         // Sets IMU
@@ -154,33 +156,34 @@ public class decodeDec7thWithChanges extends LinearOpMode {
             }
 
             if(gamepad2.a){
-                transfer.setPower(-1);
-            } else if(gamepad2.y){
                 transfer.setPower(1);
+            } else if(gamepad2.y){
+                transfer.setPower(-1);
             } else{
                 transfer.setPower(0);
             }
+
 
             //Launcher + Intake Trigger Code
 
 
             launcher.setPower(-gamepad2leftTrigger*selectedPower);
             //Half speed
-            vertintake.setPower(-gamePad1leftTrigger);
             vertintake.setPower(gamePad1rightTrigger);
 
-            if(gamePad1rightTrigger < 0 || gamePad1rightTrigger > 0){
-                transfer.setPower(-0.5);
+
+            if(gamePad1rightTrigger > 0){
+                transfer.setPower(0.5);
                 launcher.setPower(-0.1);
             } else{
                 transfer.setPower(0);
-                launcher.setPower(0);
+
             }
 
 
 
-            if(gamepad2leftTrigger < 0){
-                vertintake.setPower(0.1);
+            if(gamePad1leftTrigger > 0){
+                vertintake.setPower(1);
             }
 
 
