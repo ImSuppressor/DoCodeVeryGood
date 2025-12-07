@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.BrainSTEMAutoRobot;
 
-import tele_subsystems.Collector;
 
 public class AutoActions {
 

@@ -30,7 +30,8 @@ public class Spindexer implements Component {
     private int spindexerTargetPosition;
     public enum SpindexerState {
         OFF,
-        ON
+        ON,
+        NORMAL
     }
 
     public Spindexer(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -45,7 +46,7 @@ public class Spindexer implements Component {
 
         spindexerMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        spindexerState = SpindexerState.OFF;
+        spindexerState = SpindexerState.NORMAL;
 
     }
 
@@ -83,6 +84,8 @@ public class Spindexer implements Component {
                     spindexerMotor.setPower(0);
                     spindexerState = SpindexerState.OFF;
                 }
+                break;
+            case NORMAL:
                 break;
         }
     }
