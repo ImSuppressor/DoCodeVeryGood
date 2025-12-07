@@ -60,7 +60,7 @@ public class Tele extends LinearOpMode {
             gp2.update();
 
             //Gamepad 1 controls ↓
-            if (gamepad1.a) {
+            if (gp1.isFirstA()) {
                 robot.collector.collectorState = Collector.CollectorState.ON;
             } else {
                 robot.collector.collectorState = Collector.CollectorState.OFF;
@@ -74,23 +74,12 @@ public class Tele extends LinearOpMode {
 
 
             //Gamepad 2 controls ↓
-//            if (gamepad2.a && !robot.spindexer.isSpindexerBusy()) {
-//                robot.spindexer.rotateDegrees(120);
+            if (gamepad2.a) {
+//                robot.spindexer.rotate120degrees();
+                robot.spindexer.spindexerMotor.setPower(0.5);
+            }
 //            } else if (gamepad2.y && !robot.spindexer.isSpindexerBusy()){
 //                robot.spindexer.rotateDegrees(60);
-//            }
-
-            boolean aIsPressed = gamepad2.a;
-            boolean yIsPressed = gamepad2.y;
-
-
-            if (gp2.isFirstA()) {
-                robot.spindexer.rotateDegrees(120);
-//                robot.spindexer.spindexerMotor.setPower(1);
-            }
-
-//            if ( ){
-////                robot.spindexer.rotateDegrees(60);
 //            }
 
 
@@ -99,14 +88,6 @@ public class Tele extends LinearOpMode {
             } else {
                 robot.finger.fingerState = Finger.FingerState.DOWN;
             }
-
-//            if (gamepad2.y && !robot.spindexer.isSpindexerBusy()) {
-//                robot.spindexer.rotateDegrees(60);
-//            }
-
-//            if (gamepad2.x && !robot.spindexer.isSpindexerBusy() && (robot.finger.fingerState == Finger.FingerState.DOWN)) {
-//                shootThreeBalls.start();
-//            }
 
             //driving ↓
             double y = -gamepad1.left_stick_y * 0.6;

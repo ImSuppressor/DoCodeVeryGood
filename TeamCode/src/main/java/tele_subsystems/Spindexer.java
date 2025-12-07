@@ -16,10 +16,9 @@ import org.firstinspires.ftc.teamcode.Component;
 public class Spindexer implements Component {
 
 
-    private int spindexerTargetPosition;
     public static double SPINDEXER_TICKS_PER_REVOLUTION = 288;
 
-    public static double SPINDEXER_GEAR_RATIO = 1.0;
+    public static double SPINDEXER_GEAR_RATIO = 72.0;
 
     public static final double SPINDEXER_TICKS_PER_DEGREE = (SPINDEXER_TICKS_PER_REVOLUTION * SPINDEXER_GEAR_RATIO) / 360.0;
 
@@ -28,6 +27,7 @@ public class Spindexer implements Component {
     private Telemetry telemetry;
     public DcMotorEx spindexerMotor;
     public SpindexerState spindexerState;
+    private int spindexerTargetPosition;
     public enum SpindexerState {
         OFF,
         ON
@@ -38,18 +38,14 @@ public class Spindexer implements Component {
         this.telemetry = telemetry;
 
         spindexerMotor = map.get(DcMotorEx.class, "spindexerMotor");
+        spindexerMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         spindexerMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        spindexerMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-
-        spindexerMotor.setTargetPositionTolerance(2);
+        spindexerMotor.setTargetPositionTolerance(5);
 
         spindexerMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         spindexerState = SpindexerState.OFF;
-
-
-
 
     }
 
@@ -59,8 +55,13 @@ public class Spindexer implements Component {
             spindexerMotor.setTargetPosition(spindexerTargetPosition);
             spindexerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             spindexerMotor.setPower(0.5);
-            spindexerState = SpindexerState.ON;
 
+    }
+    public void rotate120degrees(){
+        spindexerMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        spindexerMotor.setTargetPosition(96);
+        spindexerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        spindexerMotor.setPower(0.5);
     }
 
 
@@ -73,13 +74,14 @@ public class Spindexer implements Component {
     public void update() {
         switch (spindexerState) {
             case OFF:
-//                spindexerMotor.setPower(0);
+                if (spindexerMotor.getPower() != 0) {
+                    spindexerMotor.setPower(0);
+                }
                 break;
             case ON:
                 if (!spindexerMotor.isBusy()) {
                     spindexerMotor.setPower(0);
                     spindexerState = SpindexerState.OFF;
-                    spindexerMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
                 }
                 break;
         }

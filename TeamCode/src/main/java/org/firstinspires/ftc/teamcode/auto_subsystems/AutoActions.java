@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.teamcode.BrainSTEMAutoRobot;
 
@@ -11,11 +14,20 @@ import tele_subsystems.Collector;
 
 public class AutoActions {
 
-    public Action setCollect1(BrainSTEMAutoRobot robot) {
+    public Action setIndex1(BrainSTEMAutoRobot robot) {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 robot.spindexer.spindexerState = Spindexer.SpindexerState.COLLECT1;
+                return false;
+            }
+        };
+    }
+    public Action rotate120(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+               robot.spindexer.rotate120Degrees();
                 return false;
             }
         };
@@ -41,7 +53,7 @@ public class AutoActions {
         };
     }
 
-    public Action setCollect2(BrainSTEMAutoRobot robot) {
+    public Action setIndex2(BrainSTEMAutoRobot robot) {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -51,7 +63,7 @@ public class AutoActions {
         };
     }
 
-    public Action setCollect3(BrainSTEMAutoRobot robot) {
+    public Action setIndex3(BrainSTEMAutoRobot robot) {
         return new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -60,4 +72,7 @@ public class AutoActions {
             }
         };
     }
+
+
+
 }
