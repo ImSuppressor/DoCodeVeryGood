@@ -25,7 +25,7 @@ public class Collector implements Component {
         this.map = hardwareMap;
         this.telemetry = telemetry;
 
-//        this.collectorState = CollectorState.OFF;
+        this.collectorState = CollectorState.OFF;
 
         collectorMotor = map.get(DcMotorEx.class, "collectorMotor");
     }

@@ -7,8 +7,6 @@ import com.acmerobotics.roadrunner.Action;
 
 import org.firstinspires.ftc.teamcode.BrainSTEMAutoRobot;
 
-import tele_subsystems.Collector;
-
 public class AutoActions {
 
     public Action setCollect1(BrainSTEMAutoRobot robot) {

@@ -17,6 +17,8 @@ import org.firstinspires.ftc.teamcode.auto_subsystems.Finger;
 import org.firstinspires.ftc.teamcode.auto_subsystems.Spindexer;
 
 import tele_subsystems.Collector;
+import tele_subsystems.Collector.CollectorState;
+
 @Autonomous (name = "Auto")
 @Config
 public final class BasicAuto extends LinearOpMode {
@@ -38,9 +40,9 @@ public final class BasicAuto extends LinearOpMode {
         Pose2d beginPose = new Pose2d(positions.startX, positions.startY, positions.startA);
         Pose2d shootPose = new Pose2d(positions.preloadX, positions.preloadY, positions.preloadA);
         Pose2d collectPose = new Pose2d(positions.collect1X, positions.collect1Y, positions.collect1A);
-        robot.collector.collectorState = Collector.CollectorState.ON;
+        robot.collector.collectorState = CollectorState.ON;
         wait(500);
-        robot.collector.collectorState = Collector.CollectorState.OFF;
+        robot.collector.collectorState = CollectorState.OFF;
         wait(500);
         Pose2d collectPose2 = new Pose2d(positions.collect2X, positions.collect2Y, positions.collect2A);
         wait(500);

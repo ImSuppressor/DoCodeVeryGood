@@ -85,8 +85,8 @@ public class Tele extends LinearOpMode {
 
 
             if (gp2.isFirstA()) {
-                robot.spindexer.rotateDegrees(120);
-//                robot.spindexer.spindexerMotor.setPower(1);
+//                robot.spindexer.spindexerMotor.setPower(0.1);
+////                robot.spindexer.spindexerMotor.setPower(1);
             }
 
 //            if ( ){
