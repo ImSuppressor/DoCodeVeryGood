@@ -60,7 +60,7 @@ public class Tele extends LinearOpMode {
             gp2.update();
 
             //Gamepad 1 controls ↓
-            if (gp1.isFirstA()) {
+            if (gamepad1.a) {
                 robot.collector.collectorState = Collector.CollectorState.ON;
             } else {
                 robot.collector.collectorState = Collector.CollectorState.OFF;
@@ -74,7 +74,7 @@ public class Tele extends LinearOpMode {
 
 
             //Gamepad 2 controls ↓
-            if (gamepad2.a) {
+            if (gp2.isFirstA()) {
 //                robot.spindexer.rotate120degrees();
                 robot.spindexer.spindexerState = Spindexer.SpindexerState.NORMAL;
                 robot.spindexer.rotate120degrees();
@@ -104,8 +104,8 @@ public class Tele extends LinearOpMode {
 
             telemetry.addData("frontLeft", robot.drive.leftFront.getPower());
             telemetry.addData("frontRight", robot.drive.rightFront.getPower());
-            telemetry.addData("backLeft", robot.drive.leftBack).getClass();
-            telemetry.addData("backRight", robot.drive.rightBack).getClass();
+            telemetry.addData("backLeft", robot.drive.leftBack.getPower());
+            telemetry.addData("backRight", robot.drive.rightBack.getPower());
 
             telemetry.addData("spindexer", robot.spindexer.spindexerMotor.getPower());
 

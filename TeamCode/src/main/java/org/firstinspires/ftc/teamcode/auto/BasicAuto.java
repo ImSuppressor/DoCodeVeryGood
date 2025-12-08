@@ -35,7 +35,6 @@ public final class BasicAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Pose2d beginPose = new Pose2d(positions.startX, positions.startY, positions.startA);
-        BrainSTEMAutoRobot robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
 
         robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
 

@@ -45,7 +45,8 @@ public class Spindexer implements Component {
         COLLECT3,
         SHOOT1,
         SHOOT2,
-        SHOOT3
+        SHOOT3,
+        NORMAL
     }
 
     public Spindexer(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -82,6 +83,7 @@ public class Spindexer implements Component {
         spindexerMotor.setTargetPosition(96);
         spindexerMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         spindexerMotor.setPower(0.5);
+
     }
 
 
@@ -122,6 +124,8 @@ public class Spindexer implements Component {
                 break;
             case SHOOT3:
                 setTargetPosition(convertDegreesToTicks(SHOOT3_POS));
+                break;
+            case NORMAL:
                 break;
         }
     }

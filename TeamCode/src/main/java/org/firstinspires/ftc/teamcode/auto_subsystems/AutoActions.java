@@ -24,10 +24,16 @@ public class AutoActions {
     }
     public Action rotate120(BrainSTEMAutoRobot robot) {
         return new Action() {
+
+            private boolean alreadyPressed = false;
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-               robot.spindexer.rotate120Degrees();
-                return false;
+               if (!alreadyPressed){
+                   robot.spindexer.rotate120Degrees();
+                   robot.spindexer.spindexerState = Spindexer.SpindexerState.NORMAL;
+               }
+                return robot.spindexer.spindexerMotor.isBusy();
+
             }
         };
     }
@@ -47,7 +53,7 @@ public class AutoActions {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 robot.update();
-                return false;
+                return true;
             }
         };
     }
