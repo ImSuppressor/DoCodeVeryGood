@@ -74,7 +74,7 @@ public class Tele extends LinearOpMode {
                 robot.shooter.shooterState = Shooter.ShooterState.SHOOT_CLOSE;
             } else {
                 robot.shooter.shooterState = Shooter.ShooterState.OFF;
-            } 
+            }
 
 
             }
@@ -130,4 +130,3 @@ public class Tele extends LinearOpMode {
 
         }
     }
-}
