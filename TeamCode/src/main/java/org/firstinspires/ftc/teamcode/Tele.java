@@ -67,7 +67,10 @@ public class Tele extends LinearOpMode {
             }
 
             if (gamepad1.b) {
+
                 robot.shooter.shooterState = Shooter.ShooterState.SHOOT_FAR;
+            } else if (gamepad1.y) {
+                robot.shooter.shooterState = Shooter.ShooterState.SHOOT_CLOSE;
             } else {
                 robot.shooter.shooterState = Shooter.ShooterState.OFF;
             }
@@ -76,8 +79,9 @@ public class Tele extends LinearOpMode {
             //Gamepad 2 controls ↓
             if (gp2.isFirstA()) {
 //                robot.spindexer.rotate120degrees();
+                telemetry.addData("isAClicked",gp2.isFirstA());
                 robot.spindexer.spindexerState = Spindexer.SpindexerState.NORMAL;
-                robot.spindexer.rotate120degrees();
+                robot.spindexer.rotateDegrees(120);
             }
 //            } else if (gamepad2.y && !robot.spindexer.isSpindexerBusy()){
 //                robot.spindexer.rotateDegrees(60);
@@ -107,12 +111,16 @@ public class Tele extends LinearOpMode {
             telemetry.addData("backLeft", robot.drive.leftBack.getPower());
             telemetry.addData("backRight", robot.drive.rightBack.getPower());
 
-            telemetry.addData("spindexer", robot.spindexer.spindexerMotor.getPower());
+            telemetry.addData("spindexer current position", robot.spindexer.spindexerMotor.getCurrentPosition());
 
 
             telemetry.addData("y-axis :", y);
             telemetry.addData("x-axis :", x);
             telemetry.addData("turn :", rx);
+
+            telemetry.addData("spindexer power", robot.spindexer.spindexerMotor.getPower());
+
+            telemetry.update();
 
 
         }
