@@ -17,6 +17,8 @@ public class Shooter implements Component {
     private Telemetry telemetry;
     public DcMotorEx shooterMotorTwo;
     public DcMotorEx shooterMotorOne;
+    public double CLOSE_SHOOT_VEL = 2000;
+    public double FAR_SHOOT_VEL = 3750;
 
     public ShooterState shooterState;
 
@@ -66,13 +68,13 @@ public class Shooter implements Component {
 
                 break;
             case SHOOT_FAR:
-                shooterMotorOne.setVelocity(3750);
-                shooterMotorTwo.setVelocity(3750);
+                shooterMotorOne.setVelocity(FAR_SHOOT_VEL);
+                shooterMotorTwo.setVelocity(FAR_SHOOT_VEL);
 
                 break;
             case SHOOT_CLOSE:
-                shooterMotorOne.setVelocity(2000);
-                shooterMotorTwo.setVelocity(2000);
+                shooterMotorOne.setVelocity(CLOSE_SHOOT_VEL);
+                shooterMotorTwo.setVelocity(CLOSE_SHOOT_VEL);
                 break;
             case PRESPIN:
                 shooterMotorOne.setVelocity(1000);
