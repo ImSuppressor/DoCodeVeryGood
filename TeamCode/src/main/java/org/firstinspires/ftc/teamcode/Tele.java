@@ -3,8 +3,10 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.utils.teleHelpers.GamepadTracker;
 
@@ -25,6 +27,7 @@ public class Tele extends LinearOpMode {
     private BrainSTEMTeleRobot robot;
     private ShootThreeBalls shootThreeBalls;
 
+
     private boolean aWasPressed;
     private boolean yWasPressed;
 
@@ -39,11 +42,7 @@ public class Tele extends LinearOpMode {
         gp2 = new GamepadTracker(gamepad2);
 
 
-
-//        Shooter shooter;
-//        Finger finger;
-//        Spindexer spindexer;
-//        Telemetry telemetry;
+//
 
         waitForStart();
 
@@ -56,8 +55,10 @@ public class Tele extends LinearOpMode {
         while (opModeIsActive() && !isStopRequested()) {
             telemetry.update();
             robot.update();
-            gp1.update();;
+            gp1.update();
+            ;
             gp2.update();
+
 
             //Gamepad 1 controls ↓
             if (gamepad1.a) {
@@ -77,14 +78,10 @@ public class Tele extends LinearOpMode {
             }
 
 
-            }
-
-
-
             //Gamepad 2 controls ↓
-            if (gp2.isFirstA()) {
+            if (gp2.isFirstA() && !robot.spindexer.spindexerMotor.isBusy()) {
 //                robot.spindexer.rotate120degrees();
-                telemetry.addData("isAClicked",gp2.isFirstA());
+                telemetry.addData("isAClicked", gp2.isFirstA());
                 robot.spindexer.spindexerState = Spindexer.SpindexerState.NORMAL;
                 robot.spindexer.rotateDegrees(120);
             }
@@ -117,7 +114,7 @@ public class Tele extends LinearOpMode {
             telemetry.addData("backRight", robot.drive.rightBack.getPower());
 
             telemetry.addData("spindexer current position", robot.spindexer.spindexerMotor.getCurrentPosition());
-
+            telemetry.addData("spindexer target position", robot.spindexer.spindexerMotor.getTargetPosition());
 
             telemetry.addData("y-axis :", y);
             telemetry.addData("x-axis :", x);
@@ -130,3 +127,4 @@ public class Tele extends LinearOpMode {
 
         }
     }
+}
