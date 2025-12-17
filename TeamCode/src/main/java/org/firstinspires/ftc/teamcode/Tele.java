@@ -111,7 +111,7 @@ public class Tele extends LinearOpMode {
         else if (gamepad1.aWasPressed())
             robot.shooter.shooterState = Shooter.ShooterState.OFF;
     }
-    private void updateDriver2() {
+    private void updateDriver2() throws InterruptedException {
         // all d2 commands
         if(gamepad2.rightBumperWasPressed()) {
             robot.spindexer.rotateDegrees(Spindexer.normalRotateDeg);
@@ -125,6 +125,11 @@ public class Tele extends LinearOpMode {
         }
         else if(gamepad2.xWasPressed() && robot.spindexer.spindexerState == Spindexer.SpindexerState.SHOOT) {
             robot.spindexer.rotateDegrees(-Spindexer.shootRotateDeg);
+            try {
+                wait(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             robot.spindexer.spindexerState = Spindexer.SpindexerState.COLLECT;
         }
 
