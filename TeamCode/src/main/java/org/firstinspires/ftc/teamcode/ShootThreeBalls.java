@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import tele_subsystems.Finger;
-import tele_subsystems.Shooter;
-import tele_subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Finger;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Spindexer;
 
 public class ShootThreeBalls {
 

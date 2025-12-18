@@ -1,4 +1,4 @@
-package tele_subsystems;
+package org.firstinspires.ftc.teamcode.tele_subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
 

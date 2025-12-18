@@ -11,9 +11,9 @@ import org.firstinspires.ftc.teamcode.auto_subsystems.Spindexer;
 
 import java.util.ArrayList;
 
-import tele_subsystems.Collector;
-import tele_subsystems.Finger;
-import tele_subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Collector;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Finger;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Shooter;
 
 
 public class BrainSTEMAutoRobot {

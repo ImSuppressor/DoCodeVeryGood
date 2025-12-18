@@ -13,9 +13,9 @@ import org.firstinspires.ftc.teamcode.BrainSTEMAutoRobot;
 import org.firstinspires.ftc.teamcode.auto_subsystems.AutoActions;
 import org.firstinspires.ftc.teamcode.auto_subsystems.Spindexer;
 
-@Autonomous (name = "Auto")
+@Autonomous (name = "Red Far Auto")
 @Config
-public final class testAuto extends LinearOpMode {
+public final class RedFarAuto extends LinearOpMode {
     public static class Positions {
         public double startX = 62.6, startY = 16.6, startA = Math.toRadians(180);
         public double preloadX = 49, preloadY = 11, preloadA = Math.toRadians(145), preloadT = Math.toRadians(145);
@@ -36,12 +36,12 @@ public final class testAuto extends LinearOpMode {
         BrainSTEMAutoRobot robot = new BrainSTEMAutoRobot(hardwareMap, telemetry, this, beginPose);
 
         Action preloadDrive = robot.drive.actionBuilder(beginPose)
-             .splineToLinearHeading(shootPose, positions.preloadT)
+                .splineToLinearHeading(shootPose, positions.preloadT)
                 .build();
 
         Action collectDrive = robot.drive.actionBuilder(shootPose)
-                    .splineToLinearHeading(collectPose, positions.collect1T)
-                    .build();
+                .splineToLinearHeading(collectPose, positions.collect1T)
+                .build();
 
         Action setCollect1 = new AutoActions().setIndex1(robot);
         Action robotUpdate = new AutoActions().robotUpdate(robot);
@@ -54,26 +54,26 @@ public final class testAuto extends LinearOpMode {
 
         waitForStart();
 
-        
-            if (isStopRequested()) return;
 
-            robot.spindexer.spindexerState = Spindexer.SpindexerState.COLLECT1;
+        if (isStopRequested()) return;
 
-            Actions.runBlocking(
-                    new ParallelAction(
-                            new Action[]{new SequentialAction(
+        robot.spindexer.spindexerState = Spindexer.SpindexerState.COLLECT1;
+
+        Actions.runBlocking(
+                new ParallelAction(
+                        new Action[]{new SequentialAction(
 //
 //                                    setCollect1,
 //                                    new SleepAction(1.0),
 //                                    setCollect2
 
-                                    preloadDrive,
-                                    collectDrive
+                                preloadDrive,
+                                collectDrive
 
 
-                            ), robotUpdate})
+                        ), robotUpdate})
 
-            );
+        );
 
 
 //            robot.shooter.setShooterShootFar();

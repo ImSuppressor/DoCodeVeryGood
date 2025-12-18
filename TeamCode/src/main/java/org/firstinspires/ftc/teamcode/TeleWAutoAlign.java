@@ -14,17 +14,13 @@ import org.firstinspires.ftc.teamcode.utils.teleHelpers.GamepadTracker;
 
 
 
-import tele_subsystems.Collector;
-import tele_subsystems.Finger;
-import tele_subsystems.Shooter;
-import tele_subsystems.Spindexer;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Collector;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Finger;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.tele_subsystems.Spindexer;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-
 
 
 @TeleOp(name = "TeleOp")
