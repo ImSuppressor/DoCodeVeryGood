@@ -62,5 +62,6 @@ public class BrainSTEMTeleRobot {
         for (Component c : subsystems) {
             c.update();
         }
+        drive.localizer.update();
     }
 }
