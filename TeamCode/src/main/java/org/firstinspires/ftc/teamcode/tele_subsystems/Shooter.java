@@ -16,8 +16,8 @@ public class Shooter implements Component {
     public static double SHOOTER_TICKS_PER_REVOLUTION = 288;
     private HardwareMap map;
     private Telemetry telemetry;
-    public DcMotorEx shooterMotorTwo;
-    public DcMotorEx shooterMotorOne;
+    public org.firstinspires.ftc.teamcode.auto_subsystems.Shooter.ShooterState shooterMotorTwo;
+    public org.firstinspires.ftc.teamcode.auto_subsystems.Shooter.ShooterState shooterMotorOne;
 
     public static double FAR_SHOOT_VEL = 1000;
     public static double CLOSE_SHOOT_VEL = 1000;
@@ -44,8 +44,8 @@ public class Shooter implements Component {
         this.map = hardwareMap;
         this.telemetry = telemetry;
 
-        shooterMotorOne = map.get(DcMotorEx.class, "shooterMotorOne");
-        shooterMotorTwo = map.get(DcMotorEx.class, "shooterMotorTwo");
+        shooterMotorOne = map.get(org.firstinspires.ftc.teamcode.auto_subsystems.Shooter.ShooterState.class, "shooterMotorOne");
+        shooterMotorTwo = map.get(org.firstinspires.ftc.teamcode.auto_subsystems.Shooter.ShooterState.class, "shooterMotorTwo");
 
         shooterMotorOne.setDirection(REVERSE);
         shooterMotorTwo.setDirection(REVERSE);
@@ -78,7 +78,7 @@ public class Shooter implements Component {
 
                 break;
             case SHOOT_FAR:
-                double power = shooterPid.update(shooterMotorOne.getVelocity());
+                double power = shooterPid.update(Double.parseDouble(shooterMotorOne.getVelocity()));
                 telemetry.addData("pid power", power);
                 double minPower = pidKF * shooterPid.getTarget();
                 power = power - Math.abs(minPower); // -75, 75
@@ -88,7 +88,7 @@ public class Shooter implements Component {
                 shooterMotorTwo.setPower(-power);
                 break;
             case SHOOT_CLOSE:
-                power = shooterPid.update(shooterMotorTwo.getVelocity());
+                power = shooterPid.update(Double.parseDouble(shooterMotorTwo.getVelocity()));
                 telemetry.addData("pid power", power);
                 minPower = pidKF * shooterPid.getTarget();
                 power = power - Math.abs(minPower); // -75, 75

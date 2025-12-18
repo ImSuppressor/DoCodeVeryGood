@@ -21,7 +21,9 @@ public class Finger implements Component {
     public HardwareMap map;
     public enum FingerState {
         DOWN,
-        UP
+        UP;
+        public static org.firstinspires.ftc.teamcode.tele_subsystems.Finger.FingerState upPosition;
+        public static org.firstinspires.ftc.teamcode.tele_subsystems.Finger.FingerState downPosition;
     }
 
     public Finger(HardwareMap hardwareMap, Telemetry telemetry) {

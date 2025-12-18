@@ -130,5 +130,11 @@ public class Tele extends LinearOpMode {
             robot.spindexer.indexerCued = true;
             robot.finger.flickerTimer.reset();
         }
+
+        if (gamepad2.left_trigger > 0.9) {
+            robot.spindexer.rotateDegrees(3);
+
+
+        }
     }
 }

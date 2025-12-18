@@ -77,6 +77,89 @@ public class AutoActions {
         };
     }
 
+    public Action shooterMotorOne(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.shooter.shooterMotorOne = Shooter.ShooterState.SHOOT_FAR;
+                return false;
+            }
+        };
+    }
+
+    public Action shooterMotorTwo(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.shooter.shooterMotorTwo = Shooter.ShooterState.SHOOT_FAR;
+                return false;
+            }
+        };
+    }
+
+    public Action shooterMotorOneOff(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.shooter.shooterMotorTwo = Shooter.ShooterState.SHOOT_FAR;
+                return false;
+            }
+        };
+
+
+
+    }
+
+    public Action shoot1_pos(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.spindexer.spindexerState = Spindexer.SpindexerState.SHOOT1;
+                return false;
+            }
+        };
+    }
+
+
+    public Action SHOOT2_POS(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.spindexer.spindexerState = Spindexer.SpindexerState.SHOOT2;
+                return false;
+            }
+        };
+    }
+
+    public Action SHOOT3_POS(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.spindexer.spindexerState = Spindexer.SpindexerState.SHOOT3;
+                return false;
+            }
+        };
+    }
+
+    public Action fingerServoU(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.finger.fingerState = Finger.FingerState.upPosition;
+                return false;
+            }
+        };
+    }
+
+    public Action fingerServoD(BrainSTEMAutoRobot robot) {
+        return new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                robot.finger.fingerState = Finger.FingerState.downPosition;
+                return false;
+            }
+        };
+    }
 
 
 }
