@@ -12,7 +12,12 @@ public class JoystickBindings {
     }
     public void mainJoystickButtons(Robot robot){
         if(gamepad1.x){
-
+            robot.getFlywheel().whenShooting();
         }
+        if(gamepad1.y){
+            robot.getFlywheel().normalSpin();
+        }
+        if(gamepad1.back)
+            robot.getFlywheel().stop();
     }
 }
