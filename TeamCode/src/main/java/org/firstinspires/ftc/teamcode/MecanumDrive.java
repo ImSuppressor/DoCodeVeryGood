@@ -217,6 +217,13 @@ public final class MecanumDrive {
         }
     }
 
+    public void setMotorMode(DcMotor.RunMode mode) {
+        leftBack.setMode(mode);
+        leftFront.setMode(mode);
+        rightFront.setMode(mode);
+        rightBack.setMode(mode);
+    }
+
     public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 

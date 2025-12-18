@@ -44,13 +44,13 @@ public final class BasicAuto extends LinearOpMode {
         // DECLARE POSES
 
         Pose2d shootPose = new Pose2d(positions.preloadX, positions.preloadY, positions.preloadA);
-        wait(500);
+        //wait(500);
         Pose2d collectPose = new Pose2d(positions.collect1X, positions.collect1Y, positions.collect1A);
-        wait(500);
+        //wait(500);
         Pose2d collectPose2 = new Pose2d(positions.collect2X, positions.collect2Y, positions.collect2A);
-        wait(500);
+        //wait(500);
         Pose2d collectPose3 = new Pose2d(positions.collect3X, positions.collect3Y, positions.collect3A);
-        wait(500);
+        //wait(500);
 
 
 
@@ -60,6 +60,8 @@ public final class BasicAuto extends LinearOpMode {
         Action preloadDrive = robot.drive.actionBuilder(beginPose)
                 .splineToLinearHeading(shootPose, positions.preloadT)
                 .build();
+
+
 
         Action collectDrive = robot.drive.actionBuilder(shootPose)
                 .splineToLinearHeading(collectPose, positions.collect1T)
@@ -73,14 +75,14 @@ public final class BasicAuto extends LinearOpMode {
                 .splineToLinearHeading(collectPose3, positions.collect3T)
                 .build();
 
-        Action setIndex1 = new AutoActions().setIndex1(robot);
-        Action robotUpdate = new AutoActions().robotUpdate(robot);
-
-        Action setIndex2 = new AutoActions().setIndex2(robot);
-
-        Action setIndex3 = new AutoActions().setIndex3(robot);
-        Action rotate120 = new AutoActions().rotate120(robot);
-        waitForStart();
+//        Action setIndex1 = new AutoActions().setIndex1(robot);
+//        Action robotUpdate = new AutoActions().robotUpdate(robot);
+//
+//        Action setIndex2 = new AutoActions().setIndex2(robot);
+//
+//        Action setIndex3 = new AutoActions().setIndex3(robot);
+//        Action rotate120 = new AutoActions().rotate120(robot);
+//        waitForStart();
 
 
             if (isStopRequested()) return;
@@ -91,7 +93,7 @@ public final class BasicAuto extends LinearOpMode {
                 new ParallelAction(
                        new SequentialAction(
 
-                                setIndex1,
+//                                setIndex1,
                                 new SleepAction(1.0),
  //                               rotate120
 //                                setIndex2
@@ -103,9 +105,9 @@ public final class BasicAuto extends LinearOpMode {
                                 collectDrive2,
                                 collectDrive3
 
-                        ), robotUpdate)
+//                        ), robotUpdate)
 
-        );
+        )));
 
 
 //            robot.shooter.setShooterShootFar();

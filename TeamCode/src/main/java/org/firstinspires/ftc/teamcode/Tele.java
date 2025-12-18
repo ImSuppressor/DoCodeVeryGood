@@ -125,11 +125,7 @@ public class Tele extends LinearOpMode {
         }
         else if(gamepad2.xWasPressed() && robot.spindexer.spindexerState == Spindexer.SpindexerState.SHOOT) {
             robot.spindexer.rotateDegrees(-Spindexer.shootRotateDeg);
-            try {
-                wait(500);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+
             robot.spindexer.spindexerState = Spindexer.SpindexerState.COLLECT;
         }
 
