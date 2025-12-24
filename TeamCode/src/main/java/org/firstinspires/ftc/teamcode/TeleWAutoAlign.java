@@ -5,11 +5,17 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Pose2d;
+
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.teamcode.util.PIDController;
 import org.firstinspires.ftc.teamcode.util.GamepadTracker;
 
@@ -19,6 +25,8 @@ import org.firstinspires.ftc.teamcode.tele_subsystems.Collector;
 import org.firstinspires.ftc.teamcode.tele_subsystems.Finger;
 import org.firstinspires.ftc.teamcode.tele_subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.tele_subsystems.Spindexer;
+
+import org.firstinspires.ftc.teamcode.util.BallTracker;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -33,7 +41,14 @@ public class TeleWAutoAlign extends LinearOpMode {
     private BrainSTEMTeleRobot robot;
     private ShootThreeBalls shootThreeBalls;
 
-    public static double kP = 0.1;
+    private Limelight3A limelight;
+
+    private BallTracker ballTracker;
+
+    private int spindexerCurrentPosition;
+
+
+    public static double kP = 0.3;
     public static double DRAWING_TARGET_RADIUS = 2;
 
     enum Mode{
@@ -54,15 +69,20 @@ public class TeleWAutoAlign extends LinearOpMode {
         robot = new BrainSTEMTeleRobot(this.hardwareMap, this.telemetry, this, new Pose2d(0, 0, 0));
         shootThreeBalls = new ShootThreeBalls(this.robot.shooter, this.robot.finger, this.robot.spindexer, telemetry);
 
+        ballTracker = new BallTracker(telemetry);
+
         gp1 = new GamepadTracker(gamepad1);
         gp2 = new GamepadTracker(gamepad2);
 
-
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//        limelight.pipelineSwitch(0);
+//        limelight.start();
 
         //somehow transfer pose from auto
 
         headingController.setInputBounds(-Math.PI, Math.PI);
 
+        spindexerCurrentPosition = robot.spindexer.spindexerMotor.getCurrentPosition();
         waitForStart();
 
         while (!opModeIsActive()) {
@@ -93,15 +113,11 @@ public class TeleWAutoAlign extends LinearOpMode {
             telemetry.addData("finger timer", robot.finger.flickerTimer.seconds());
             telemetry.addData("mode",currentMode);
 
+
             telemetry.addData("current pose", robot.drive.localizer.getPose());
             telemetry.update();
 
             TelemetryPacket packet = new TelemetryPacket();
-
-            Canvas fieldOverlay = packet.fieldOverlay();
-
-            //put in function
-
 
 
 
@@ -116,7 +132,7 @@ public class TeleWAutoAlign extends LinearOpMode {
         double rx = gamepad1.right_stick_x * 0.6;
 
         if(gamepad2.y){
-            rx = autoAlignRobo();
+            rx = autoAlignRoboOdo();
         }
 
         robot.drive.setMotorPowers(
@@ -148,65 +164,45 @@ public class TeleWAutoAlign extends LinearOpMode {
             robot.shooter.shooterState = Shooter.ShooterState.OFF;
     }
     private void updateDriver2() {
+
+        robot.spindexer.getCurrentPosition();
         // all d2 commands
         if(gamepad2.rightBumperWasPressed()) {
-            robot.spindexer.rotateDegrees(Spindexer.normalRotateDeg);
+            robot.spindexer.adjustPosition(80);
+            ballTracker.rotated120();
         }
         else if(gamepad2.leftBumperWasPressed()) {
+            //add in roated - degs.
             robot.spindexer.rotateDegrees(-Spindexer.normalRotateDeg);
         }
         else if(gamepad2.aWasPressed() && robot.spindexer.spindexerState == Spindexer.SpindexerState.COLLECT) {
-            robot.spindexer.rotateDegrees(Spindexer.shootRotateDeg);
+            ballTracker.rotated60();
+            robot.spindexer.adjustPosition(40);
             robot.spindexer.spindexerState = Spindexer.SpindexerState.SHOOT;
         }
         else if(gamepad2.xWasPressed() && robot.spindexer.spindexerState == Spindexer.SpindexerState.SHOOT) {
+
+            //add in - rotated.
             robot.spindexer.rotateDegrees(-Spindexer.shootRotateDeg);
             robot.spindexer.spindexerState = Spindexer.SpindexerState.COLLECT;
         }
-
-
         if (gamepad2.bWasPressed()) {
+
+            ballTracker.recordShot();
             robot.finger.fingerState = Finger.FingerState.UP;
             robot.spindexer.indexerCued = true;
             robot.finger.flickerTimer.reset();
         }
 
-    }
-
-    public void setDriveModes() {
-        switch(currentMode){
-            case DRIVER_CONTROL:
-                if (gamepad2.b){
-                    currentMode = Mode.ALIGN_TO_POINT;
-                }
-
-                Vector2d fieldFrameInput = new Vector2d(
-                        -gamepad1.left_stick_y,
-                        -gamepad1.left_stick_x
-                );
-
-                Vector2d robotFrameInput = rotateVector(fieldFrameInput, -robot.drive.localizer.getPose().heading.toDouble());
-                Vector2d difference = targetPosition.minus(robot.drive.localizer.getPose().position);
-
-                double theta = Math.atan2(difference.y, difference.x);
-
-
-
-                break;
-
-            case ALIGN_TO_POINT:
-                break;
+        if (gp2.isFirstDpadDown()){
+            ballTracker.addColorToQueau(BallTracker.BallColor.GREEN);
         }
-    }
-    private Vector2d rotateVector(Vector2d v, double angle) {
-        double cos = Math.cos(angle);
-        double sin = Math.sin(angle);
-        return new Vector2d(
-                v.x * cos - v.y * sin,
-                v.x * sin + v.y * cos
-        );
-    }
 
+        if (gp2.isFirstDpadUp()){
+            ballTracker.addColorToQueau(BallTracker.BallColor.PURPLE);
+        }
+
+    }
 
     private double calculateAngle(){
         Vector2d redGoal = new Vector2d(-72, 72);
@@ -220,13 +216,27 @@ public class TeleWAutoAlign extends LinearOpMode {
         return angle;
     }
 
-    private double autoAlignRobo(){
+    private double autoAlignRoboOdo() {
+
         double angle = calculateAngle();
         double headingError = angle - robot.drive.localizer.getPose().heading.toDouble();
 
+        headingError = headingError + 2*Math.PI;
+        headingError = headingError % (2*Math.PI);
+        if (headingError > Math.toRadians(180)){
+            headingError = headingError - 2*(Math.PI);
+        }
+        telemetry.addData("error", headingError);
         double power = kP*headingError;
         telemetry.addData("power", power);
-        return power;
+
+        if (Math.abs(headingError) <= Math.toRadians(3)){
+           return 0;
+        } else {
+            return -power;
+        }
+
     }
+
 
 }
