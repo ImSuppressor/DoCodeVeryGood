@@ -1,21 +1,22 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.graphics.Color;
-
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.sun.tools.javac.tree.DCTree;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -52,8 +53,9 @@ public class BlueDepot extends LinearOpMode {
 
 
 
+
         waitForStart();
-        Actions.runBlocking(new SequentialAction(//place spec 1
+        Actions.runBlocking(new ParallelAction(//place spec 1
                 Detect
 
         ));
@@ -73,13 +75,14 @@ public class BlueDepot extends LinearOpMode {
             return false;
         }
     }
+
     public class ShootBall implements Action {
         Servo Bay1Boot;
         Servo Bay2Boot;
         Servo Bay3Boot;
-        boolean Booter1 = false;
-        boolean Booter2 = false;
-        boolean Booter3 = false;
+//        boolean Booter1 = false;
+//        boolean Booter2 = false;
+//        boolean Booter3 = false;
         double shoot;
         double ready;
         double Shoot;
@@ -101,7 +104,7 @@ public class BlueDepot extends LinearOpMode {
         private ColorSensor Bay32;
         private DistanceSensor Bay32_DistanceSensor;
         private DistanceSensor Bay31_DistanceSensor;
-        ElapsedTime time2;
+//        ElapsedTime time2;
 
         public ShootBall(String ShootState) {
             this.shoot = 1;
@@ -109,6 +112,7 @@ public class BlueDepot extends LinearOpMode {
         }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
             if ((ShootState.equals("Detect"))){
                 if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 3 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 3)) {
                     if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
@@ -184,16 +188,16 @@ public class BlueDepot extends LinearOpMode {
             if (ShootState.equals("Shoot")) {
                 if(pattern.equals("PPG")){
                     if (ColorBay1.equals("Purple1")) {
-                        time2.reset();
-                        Booter1 = true;
+//                        time2.reset();
+//                        Booter1 = true;
                         Bay1Boot.setPosition(shoot);
                     } else if (ColorBay2.equals("Purple1")) {
-                        time2.reset();
-                        Booter2 = true;
+//                        time2.reset();
+//                        Booter2 = true;
                         Bay2Boot.setPosition(shoot);
                     } else if (ColorBay3.equals("Purple1")) {
-                        time2.reset();
-                        Booter3 = true;
+//                        time2.reset();
+//                        Booter3 = true;
                         Bay3Boot.setPosition(shoot);
                     }
 
