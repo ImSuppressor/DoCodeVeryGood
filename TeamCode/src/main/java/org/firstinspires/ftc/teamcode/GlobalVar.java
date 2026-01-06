@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
 public class GlobalVar {
-    String ColorBay1;
-    String ColorBay2;
-    String ColorBay3;
-    String Pattern;
+    public static String ColorBay1;
+    public static String ColorBay2;
+    public static String ColorBay3;
+    public static String pattern;
 
-    public GlobalVar(String colorBay1) {
+    public GlobalVar() {
+        pattern = "none";
     }
 }
