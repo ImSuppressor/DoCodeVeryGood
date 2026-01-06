@@ -7,8 +7,11 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Time;
 import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -20,30 +23,26 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.sun.tools.javac.tree.DCTree;
 
+import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
 
 @Autonomous(name="BlueDepot", preselectTeleOp = "Drive26")
 public class BlueDepot extends LinearOpMode {
+    public String pattern;
     @Override
     public void runOpMode() throws InterruptedException {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
 
-        //TODO KYS NOW
+        //TODO:Init
+        Limelight3A Limelight = hardwareMap.get(Limelight3A.class,"Limelight");
+        Limelight.pipelineSwitch(0);
+        Limelight.setPollRateHz(50);
+        Limelight.start();
 
-        ColorSensor colorBay11 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.1");
-        ColorSensor colorBay12 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.2");
-//        DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.2");
-//        DistanceSensor colorBay11_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.1");
-        ColorSensor Bay21 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
-        ColorSensor Bay22 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
-//        DistanceSensor Bay22_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.2");
-//        DistanceSensor Bay21_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.1");
-        ColorSensor Bay31 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
-        ColorSensor Bay32 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
-//        DistanceSensor Bay32_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay3.2");
-//        DistanceSensor Bay31_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay3.1");
+
         ElapsedTime time2;
+
 
         //TODO:Init Everything cracka
         Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
@@ -82,27 +81,28 @@ public class BlueDepot extends LinearOpMode {
     }
 
     public class ShootBall implements Action {
-        Servo Bay1Boot;
-        Servo Bay2Boot;
-        Servo Bay3Boot;
-//        boolean Booter1 = false;
-//        boolean Booter2 = false;
-//        boolean Booter3 = false;
+        Servo Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
+        Servo Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
+        Servo Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
+        boolean Booter1 = false;
+        boolean Booter2 = false;
+        boolean Booter3 = false;
         double shoot;
         double ready;
-        double Shoot;
+        double cycle;
         String ShootState;
+//        public Constants = new Constants;
         String pattern;
         String ColorBay1 = "Empty";
         String ColorBay2 = "Empty";
         String ColorBay3 = "Empty";
         ColorSensor colorBay11 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.1");
         ColorSensor colorBay12 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.2");
-                DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.2");
+        DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.2");
         DistanceSensor colorBay11_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.1");
         ColorSensor Bay21 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
         ColorSensor Bay22 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
-                DistanceSensor Bay22_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.2");
+        DistanceSensor Bay22_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.2");
         DistanceSensor Bay21_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.1");
         ColorSensor Bay31 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
         ColorSensor Bay32 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
@@ -111,19 +111,33 @@ public class BlueDepot extends LinearOpMode {
 
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class,"Limelight");
 
-
-//        ElapsedTime time2;
+        ElapsedTime time2;
 
         public ShootBall(String ShootState) {
+            this.time2 = new ElapsedTime();
             this.ShootState = ShootState;
             this.shoot = 1;
             this.ready = 0;
+            this.cycle = 1;
         }
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             if (opModeIsActive()) {
                 while (opModeIsActive()) {
                     LLResult result = Limelight.getLatestResult();
+                    for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()){
+                    if (pattern.equals("none")) {
+                        if (fiducial.getFiducialId() == 21){
+                            pattern.equals("GPP");
+                        }
+                        else if (fiducial.getFiducialId() == 22) {
+                            pattern.equals("PGP");
+                        }
+                        else if (fiducial.getFiducialId() == 23) {
+                            pattern.equals("PPG");
+                        }
+                    }
+                    }
                     if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 3 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 3)) {
                         if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
                             ColorBay1 = "Purple1";
@@ -198,18 +212,20 @@ public class BlueDepot extends LinearOpMode {
                 if (ShootState.equals("Shoot")) {
                     if (pattern.equals("PPG")) {
                         if (ColorBay1.equals("Purple1")) {
-//                        time2.reset();
-//                        Booter1 = true;
+                        time2.reset();
+                        Booter1 = true;
                             Bay1Boot.setPosition(shoot);
                         } else if (ColorBay2.equals("Purple1")) {
-//                        time2.reset();
-//                        Booter2 = true;
+                        time2.reset();
+                            Booter2 = true;
                             Bay2Boot.setPosition(shoot);
                         } else if (ColorBay3.equals("Purple1")) {
-//                        time2.reset();
-//                        Booter3 = true;
+                        time2.reset();
+                        Booter3 = true;
                             Bay3Boot.setPosition(shoot);
                         }
+
+
 
                     }
 //                    } else if (pattern.equals("PGP")) {
@@ -219,6 +235,15 @@ public class BlueDepot extends LinearOpMode {
 //                    } else {
 //
 //                    }
+                }
+                if (Booter1){
+
+                }
+                if (Booter2){
+
+                }
+                if (Booter3){
+
                 }
                 }
             }
