@@ -111,10 +111,10 @@ public class BlueDepot extends LinearOpMode {
         String ColorBay1 = "Empty";
         String ColorBay2 = "Empty";
         String ColorBay3 = "Empty";
-        ColorSensor colorBay11 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.1");
-        ColorSensor colorBay12 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.2");
-        DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.2");
-        DistanceSensor colorBay11_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.1");
+        ColorSensor colorBay11 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
+        ColorSensor colorBay12 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
+        DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay1.2");
+        DistanceSensor colorBay11_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay1.1");
         ColorSensor Bay21 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
         ColorSensor Bay22 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
         DistanceSensor Bay22_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.2");
@@ -144,8 +144,8 @@ public class BlueDepot extends LinearOpMode {
         public ShootBall(String ShootState) {
             this.time2 = new ElapsedTime();
             this.ShootState = ShootState;
-            this.shoot = 1;
-            this.ready = 0;
+            this.shoot = .6;
+            this.ready = .95;
             this.cycle = 1;
         }
         @Override
@@ -165,7 +165,7 @@ public class BlueDepot extends LinearOpMode {
                             pattern = "PPG";
                         }
                     }
-                    telemetry.addData("paty",pattern);
+                    telemetry.addData("pattern",pattern);
                     }
                     if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 3 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 3)) {
                         if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
@@ -239,9 +239,10 @@ public class BlueDepot extends LinearOpMode {
                     telemetry.update();
 
                 if (ShootState.equals("Shoot")) {
-                    if (amshooting == false) {
-                        time2.reset();
-                    }
+//                    if (!amshooting) {
+//                        time2.reset();
+//                        amshooting = true;
+//                    }
                     if (pattern.equals("PPG")) {
                         if (ColorBay1.equals("Purple1")) {
                         time2.reset();
