@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Time;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -35,7 +36,7 @@ public class BlueDepot extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         pattern = "none";
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-48, 55, 0));
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class,"limelight");
@@ -58,23 +59,52 @@ public class BlueDepot extends LinearOpMode {
 //        ElapsedTime time2;
 
         ElapsedTime time2;
+        Action  PlaceSpec1 = drive.actionBuilder(new Pose2d(-48, 55, 0))//place first spec
 
+                .strafeToLinearHeading(new Vector2d(-46, 0), 0)
+
+                .waitSeconds(.1)
+                .build();
 
         //TODO:Init Everything cracka
-        Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-//                .stopAndAdd(new Setpositionforservo(Server,1))
-                .stopAndAdd(new ShootBall("Detect"))
-                .waitSeconds(30)
+//        Action Detect = drive.actionBuilder(new Pose2d(-54, 54, 0))//start
+////                .stopAndAdd(new Setpositionforservo(Server,1))
+//                .stopAndAdd(new ShootBall("Detect"))
+//                .waitSeconds(30)
 
 
+                //.build();
+        Action Score = drive.actionBuilder((new Pose2d(-55,54,0)))// scoreing pos
+                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
+                        .build();
+        Action lineONE = drive.actionBuilder(new Pose2d(-63,32,0))
+                        .strafeToLinearHeading(new Vector2d(-48,0),0)
+                                .build();
+        Action shootLineONe = drive.actionBuilder(new Pose2d(-48,0,0))
+                        .strafeToLinearHeading(new Vector2d(-62,32),0)
+                                .build();
+        Action LIneTWO = drive.actionBuilder(new Pose2d(-62,32,0))
+                .strafeToLinearHeading(new Vector2d(-48,12.5),0)
+                        .build();
+        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48,12.5,0))
+                .strafeToLinearHeading(new Vector2d(-62,32),0)
+                                .build();
+        Action LIentree = drive.actionBuilder(new Pose2d(-62,32,0))// 48 36 0
+                .strafeToLinearHeading(new Vector2d(-48,36),0)
                 .build();
+        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48,-36,0))
+                        .strafeToLinearHeading(new Vector2d(-63,32),0)
+                                .build();
+        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK =drive.actionBuilder(new Pose2d(-63,32,0))
+                .strafeToLinearHeading(new Vector2d(-40,0),0)
+                                .build();
 
 
 
 
         waitForStart();
         Actions.runBlocking(new ParallelAction(//place spec 1
-                Detect
+               // Detect
 
         ));
 
@@ -165,7 +195,7 @@ public class BlueDepot extends LinearOpMode {
                             pattern = "PPG";
                         }
                     }
-                    telemetry.addData("pattern",pattern);
+                    telemetry.addData("pattern0",pattern);
                     }
                     if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 3 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 3)) {
                         if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
