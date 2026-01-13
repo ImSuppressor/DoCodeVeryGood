@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Time;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -29,13 +30,13 @@ import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
 
-@Autonomous(name="BlueDepot", preselectTeleOp = "Drive26")
+@Autonomous(name="RedDepot", preselectTeleOp = "Drive26")
 public class BlueDepot extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         pattern = "none";
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, -45));
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class,"limelight");
@@ -67,6 +68,33 @@ public class BlueDepot extends LinearOpMode {
                 .waitSeconds(30)
 
 
+                .build();
+        Action Score = drive.actionBuilder((new Pose2d(-55,54,0)))// scoreing pos
+                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
+                .build();
+        Action lineONE = drive.actionBuilder(new Pose2d(-63,32,0))
+                .strafeToLinearHeading(new Vector2d(-48,0),0)
+                .build();
+        Action shootLineONe = drive.actionBuilder(new Pose2d(-48,0,0))
+                .strafeToLinearHeading(new Vector2d(-62,32),0)
+                .build();
+        Action LIneTWO = drive.actionBuilder(new Pose2d(-62,32,0))
+                .strafeToLinearHeading(new Vector2d(-48,12.5),0)
+                .build();
+        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48,12.5,0))
+                .strafeToLinearHeading(new Vector2d(-62,32),0)
+                .build();
+        Action LIentree = drive.actionBuilder(new Pose2d(-62,32,0))// 48 36 0
+                .strafeToLinearHeading(new Vector2d(-48,36),0)
+
+
+
+                .build();
+        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48,-36,0))
+                .strafeToLinearHeading(new Vector2d(-63,32),0)
+                .build();
+        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK =drive.actionBuilder(new Pose2d(-63,32,0))
+                .strafeToLinearHeading(new Vector2d(-40,0),0)
                 .build();
 
 
@@ -237,6 +265,8 @@ public class BlueDepot extends LinearOpMode {
                     telemetry.addData("Bay 2", ColorBay2);
                     telemetry.addData("Bay 1", ColorBay1);
                     telemetry.update();
+                    
+
 
                 if (ShootState.equals("Shoot")) {
 //                    if (!amshooting) {
