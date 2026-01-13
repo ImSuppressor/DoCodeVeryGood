@@ -8,5 +8,8 @@ public class GlobalVar {
 
     public GlobalVar() {
         pattern = "none";
+        ColorBay1 = "Empty";
+        ColorBay2 = "Empty";
+        ColorBay3 = "Empty";
     }
 }
