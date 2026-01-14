@@ -6,6 +6,7 @@ public class GlobalVar {
     public static String ColorBay3;
     public static String pattern;
     public static String team;
+    public static boolean Scanning;
 
     public GlobalVar() {
         pattern = "none";
@@ -13,5 +14,6 @@ public class GlobalVar {
         ColorBay2 = "Empty";
         ColorBay3 = "Empty";
         team = "idk";
+        Scanning = true;
     }
 }
