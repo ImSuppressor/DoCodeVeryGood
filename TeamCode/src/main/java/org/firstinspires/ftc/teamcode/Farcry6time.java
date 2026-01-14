@@ -76,8 +76,9 @@ public class Farcry6time extends LinearOpMode {
         Action ShootSpike3 =drive.actionBuilder(new Pose2d(0,-68,0))
                 .strafeToLinearHeading(new Vector2d(50, 60), 0)
                 .build();
-        Action GATE = drive.actionBuilder(new Pose2d(50,60,0))
-                .strafeToLinearHeading()
+//        Action GATE = drive.actionBuilder(new Pose2d(50,60,0))
+//                .strafeToLinearHeading()
+//                .build();
 
 
     }

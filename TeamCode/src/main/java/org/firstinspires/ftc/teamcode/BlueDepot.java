@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.GlobalVar.ColorBay3;
 import static org.firstinspires.ftc.teamcode.GlobalVar.pattern;
 
+import static java.lang.Math.atan2;
+
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -30,6 +32,7 @@ import com.sun.tools.javac.tree.DCTree;
 
 import org.firstinspires.ftc.robotcore.external.Const;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
 
 @Autonomous(name="BlueDepot", preselectTeleOp = "Drive26")
@@ -56,21 +59,50 @@ public class BlueDepot extends LinearOpMode {
         //TODO:Init Everything cracka
         Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
                 .stopAndAdd(new ColorSense("on"))
+                .stopAndAdd(new ColorSense("on"))
+                .stopAndAdd(new ColorSense("on"))
+                .stopAndAdd(new ColorSense("on"))
+                .stopAndAdd(new ColorSense("on"))
                 .waitSeconds(2)
+//                .stopAndAdd(new ColorSense("off"))
+//                .waitSeconds(1)
+//                .stopAndAdd(new ShootBall("Shoot1"))
+//                .waitSeconds(1)
+//                .stopAndAdd(new ColorSense("Shoot2"))
+//                .waitSeconds(1)
+//                .stopAndAdd(new ShootBall("Shoot3"))
+//                .waitSeconds(25)
+
+                .build();
+        Action one = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
                 .stopAndAdd(new ColorSense("off"))
                 .waitSeconds(1)
                 .stopAndAdd(new ShootBall("Shoot1"))
                 .waitSeconds(1)
-                .stopAndAdd(new ColorSense("Shoot2"))
-                .waitSeconds(1)
-                .stopAndAdd(new ShootBall("Shoot3"))
-                .waitSeconds(25)
 
                 .build();
+        Action two = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+                .stopAndAdd(new ShootBall("Shoot2"))
+                .waitSeconds(1)
+
+                .build();
+        Action three = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+                .stopAndAdd(new ShootBall("Shoot3"))
+                .waitSeconds(1)
+
+                .build();
+        Action reset = drive.actionBuilder(new Pose2d(-64,-7,0))
+                .stopAndAdd(new ShootBall("Done"))
+                .waitSeconds(4)
+                        .build();
 
         waitForStart();
-        Actions.runBlocking(new ParallelAction(//place spec 1
-                Detect
+        Actions.runBlocking(new SequentialAction(//place spec 1
+                Detect,
+                one,
+                two,
+                three,
+                reset
 
 
         ));
@@ -118,13 +150,6 @@ public class BlueDepot extends LinearOpMode {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-//            if (ShootState.equals("Shoot")) {
-//                time2.reset();
-//                if (!amshooting & time2.seconds() < cycle) {
-//                    amshooting = true;
-//                    if (time2.seconds() > 3 * cycle) {
-//                    }
-//                    if (amshooting) {
 
             if (pattern.equals("PPG")) {
                 if (ShootState.equals("Shoot1")) {
@@ -194,17 +219,7 @@ public class BlueDepot extends LinearOpMode {
                         Bay3Boot.setPosition(shoot);
                     }
                 }
-//                if (ShootState.equals("Done")) {
-//                    Bay1Boot.setPosition(ready);
-//                    Bay2Boot.setPosition(ready);
-//                    Bay3Boot.setPosition(ready);
-//                    amshooting = false;
-//                    ShootState = "none";
-//                    return false;
-//                }
             }
-
-            pattern.equals("PPG");
             if (pattern.equals("PGP")) {
                 if (ShootState.equals("Shoot1")) {
 
@@ -272,14 +287,6 @@ public class BlueDepot extends LinearOpMode {
                         Bay3Boot.setPosition(shoot);
                     }
                 }
-//                if (ShootState.equals("Done")) {
-//                    Bay1Boot.setPosition(ready);
-//                    Bay2Boot.setPosition(ready);
-//                    Bay3Boot.setPosition(ready);
-////                            amshooting = false;
-//                    ShootState = "none";
-////                    return false;
-//                }
             }
 
 
@@ -356,9 +363,10 @@ public class BlueDepot extends LinearOpMode {
                 Bay3Boot.setPosition(ready);
 ////                            amshooting = false;
 //                ShootState = "none";
-                return false;
+//                return false;
             }
             telemetry.addData("shootstate", ShootState);
+            telemetry.addData("Pattern", pattern);
 //            telemetry.addData("time", time2.seconds());
             telemetry.update();
             return false;
@@ -391,97 +399,102 @@ public class BlueDepot extends LinearOpMode {
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//                if (opModeIsActive()) {
+//                    if (!color.equals("on")) {
+//                        return false;
+//                    }
                 if (color.equals("on")) {
-                    for (int count = 0; count < 10; count++) {
-                        LLResult result = Limelight.getLatestResult();
-                        for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
-                            if (pattern.equals("none")) {
-                                if (fiducial.getFiducialId() == 21) {
-                                    pattern = "GPP";
-                                } else if (fiducial.getFiducialId() == 22) {
-                                    pattern = "PGP";
-                                } else if (fiducial.getFiducialId() == 23) {
-                                    pattern = "PPG";
-                                }
+                    LLResult result = Limelight.getLatestResult();
+                    for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+                        if (pattern.equals("none")) {
+                            if (fiducial.getFiducialId() == 21) {
+                                pattern = "GPP";
+                            } else if (fiducial.getFiducialId() == 22) {
+                                pattern = "PGP";
+                            } else if (fiducial.getFiducialId() == 23) {
+                                pattern = "PPG";
                             }
-                            telemetry.addData("pattern", pattern);
                         }
-                        if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                            if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
-                                ColorBay1 = "Purple1";
-                            } else if ((ColorBay3.equals("Purple1") || ColorBay2.equals("Purple1")) && !ColorBay3.equals("Purple2") && !ColorBay2.equals("Purple2")) {
-                                ColorBay1 = "Purple2";
-                            } else if ((ColorBay3.equals("Purple1") || ColorBay2.equals("Purple1")) && (ColorBay3.equals("Purple2") || ColorBay2.equals("Purple2"))) {
-                                ColorBay1 = "Purple3";
-                            }
-                            telemetry.addLine("Bay 1 Purple");
-                        } else if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 && (colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                            if (!ColorBay3.equals("Green1") && !ColorBay2.equals("Green1")) {
-                                ColorBay1 = "Green1";
-                            } else if ((ColorBay3.equals("Green1") || ColorBay2.equals("Green1")) && !ColorBay3.equals("Green2") && !ColorBay2.equals("Green2")) {
-                                ColorBay1 = "Green2";
-                            } else if ((ColorBay3.equals("Green1") || ColorBay2.equals("Green1")) && (ColorBay3.equals("Green2") || ColorBay2.equals("Green2"))) {
-                                ColorBay1 = "Green3";
-                            }
-                            telemetry.addLine("Bay 1 Green");
-                        } else {
-                            ColorBay1 = "Empty";
-                            telemetry.addLine("Bay 1 Empty");
-                        }
-                        if ((((NormalizedColorSensor) Bay21).getNormalizedColors().blue + ((NormalizedColorSensor) Bay22).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) Bay21).getNormalizedColors().green + ((NormalizedColorSensor) Bay22).getNormalizedColors().green) / 2 && (Bay22_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || Bay21_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                            if (!ColorBay3.equals("Purple1") && !ColorBay1.equals("Purple1")) {
-                                ColorBay2 = "Purple1";
-                            } else if ((ColorBay3.equals("Purple1") || ColorBay1.equals("Purple1")) && !ColorBay3.equals("Purple2") && !ColorBay1.equals("Purple2")) {
-                                ColorBay2 = "Purple2";
-                            } else if ((ColorBay3.equals("Purple1") || ColorBay1.equals("Purple1")) && (ColorBay3.equals("Purple2") || ColorBay1.equals("Purple2"))) {
-                                ColorBay2 = "Purple3";
-                            }
-                            telemetry.addLine("Bay 2 Purple");
-                        } else if ((((NormalizedColorSensor) Bay21).getNormalizedColors().green + ((NormalizedColorSensor) Bay22).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) Bay21).getNormalizedColors().blue + ((NormalizedColorSensor) Bay22).getNormalizedColors().blue) / 2 && (Bay21_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || Bay22_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                            if (!ColorBay3.equals("Green1") && !ColorBay1.equals("Green1")) {
-                                ColorBay2 = "Green1";
-                            } else if ((ColorBay3.equals("Green1") || ColorBay1.equals("Green1")) && !ColorBay3.equals("Green2") && !ColorBay1.equals("Green2")) {
-                                ColorBay2 = "Green2";
-                            } else if ((ColorBay3.equals("Green1") || ColorBay1.equals("Green1")) && (ColorBay3.equals("Green2") || ColorBay1.equals("Green2"))) {
-                                ColorBay2 = "Green3";
-                            }
-                            telemetry.addLine("Bay 2 Green");
-                        } else {
-                            ColorBay2 = "Empty";
-                            telemetry.addLine("Bay 2 Empty");
-                        }
-                        if ((((NormalizedColorSensor) Bay31).getNormalizedColors().blue + ((NormalizedColorSensor) Bay32).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) Bay31).getNormalizedColors().green + ((NormalizedColorSensor) Bay32).getNormalizedColors().green) / 2 && (Bay32_DistanceSensor.getDistance(DistanceUnit.CM) <= 10 || Bay31_DistanceSensor.getDistance(DistanceUnit.CM) <= 10)) {
-                            if (!ColorBay1.equals("Purple1") && !ColorBay2.equals("Purple1")) {
-                                ColorBay3 = "Purple1";
-                            } else if ((ColorBay1.equals("Purple1") || ColorBay2.equals("Purple1")) && !ColorBay1.equals("Purple2") && !ColorBay2.equals("Purple2")) {
-                                ColorBay3 = "Purple2";
-                            } else if ((ColorBay1.equals("Purple1") || ColorBay2.equals("Purple1")) && (ColorBay1.equals("Purple2") || ColorBay2.equals("Purple2"))) {
-                                ColorBay3 = "Purple3";
-                            }
-                            telemetry.addLine("Bay 3 Purple");
-                        } else if ((((NormalizedColorSensor) Bay31).getNormalizedColors().green + ((NormalizedColorSensor) Bay32).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) Bay31).getNormalizedColors().blue + ((NormalizedColorSensor) Bay32).getNormalizedColors().blue) / 2 && (Bay31_DistanceSensor.getDistance(DistanceUnit.CM) <= 10 || Bay32_DistanceSensor.getDistance(DistanceUnit.CM) <= 10)) {
-                            if (!ColorBay1.equals("Green1") && !ColorBay2.equals("Green1")) {
-                                ColorBay3 = "Green1";
-                            } else if ((ColorBay1.equals("Green1") || ColorBay2.equals("Green1")) && !ColorBay1.equals("Green2") && !ColorBay2.equals("Green2")) {
-                                ColorBay3 = "Green2";
-                            } else if ((ColorBay1.equals("Green1") || ColorBay2.equals("Green1")) && (ColorBay1.equals("Green2") || ColorBay2.equals("Green2"))) {
-                                ColorBay3 = "Green3";
-                            }
-                            telemetry.addLine("Bay 3 Green");
-                        } else {
-                            ColorBay3 = "Empty";
-                            telemetry.addLine("Bay 3 Empty");
-                        }
-                        telemetry.addData("Bay 3", ColorBay3);
-                        telemetry.addData("Bay 2", ColorBay2);
-                        telemetry.addData("Bay 1", ColorBay1);
-                        telemetry.addData("colorsense", color);
-                        telemetry.update();
+                        telemetry.addData("pattern", pattern);
                     }
+                    if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
+                        if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
+                            ColorBay1 = "Purple1";
+                        } else if ((ColorBay3.equals("Purple1") || ColorBay2.equals("Purple1")) && !ColorBay3.equals("Purple2") && !ColorBay2.equals("Purple2")) {
+                            ColorBay1 = "Purple2";
+                        } else if ((ColorBay3.equals("Purple1") || ColorBay2.equals("Purple1")) && (ColorBay3.equals("Purple2") || ColorBay2.equals("Purple2"))) {
+                            ColorBay1 = "Purple3";
+                        }
+                        telemetry.addLine("Bay 1 Purple");
+                    } else if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 && (colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
+                        if (!ColorBay3.equals("Green1") && !ColorBay2.equals("Green1")) {
+                            ColorBay1 = "Green1";
+                        } else if ((ColorBay3.equals("Green1") || ColorBay2.equals("Green1")) && !ColorBay3.equals("Green2") && !ColorBay2.equals("Green2")) {
+                            ColorBay1 = "Green2";
+                        } else if ((ColorBay3.equals("Green1") || ColorBay2.equals("Green1")) && (ColorBay3.equals("Green2") || ColorBay2.equals("Green2"))) {
+                            ColorBay1 = "Green3";
+                        }
+                        telemetry.addLine("Bay 1 Green");
+                    } else {
+                        ColorBay1 = "Empty";
+                        telemetry.addLine("Bay 1 Empty");
+                    }
+                    if ((((NormalizedColorSensor) Bay21).getNormalizedColors().blue + ((NormalizedColorSensor) Bay22).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) Bay21).getNormalizedColors().green + ((NormalizedColorSensor) Bay22).getNormalizedColors().green) / 2 && (Bay22_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || Bay21_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
+                        if (!ColorBay3.equals("Purple1") && !ColorBay1.equals("Purple1")) {
+                            ColorBay2 = "Purple1";
+                        } else if ((ColorBay3.equals("Purple1") || ColorBay1.equals("Purple1")) && !ColorBay3.equals("Purple2") && !ColorBay1.equals("Purple2")) {
+                            ColorBay2 = "Purple2";
+                        } else if ((ColorBay3.equals("Purple1") || ColorBay1.equals("Purple1")) && (ColorBay3.equals("Purple2") || ColorBay1.equals("Purple2"))) {
+                            ColorBay2 = "Purple3";
+                        }
+                        telemetry.addLine("Bay 2 Purple");
+                    } else if ((((NormalizedColorSensor) Bay21).getNormalizedColors().green + ((NormalizedColorSensor) Bay22).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) Bay21).getNormalizedColors().blue + ((NormalizedColorSensor) Bay22).getNormalizedColors().blue) / 2 && (Bay21_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || Bay22_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
+                        if (!ColorBay3.equals("Green1") && !ColorBay1.equals("Green1")) {
+                            ColorBay2 = "Green1";
+                        } else if ((ColorBay3.equals("Green1") || ColorBay1.equals("Green1")) && !ColorBay3.equals("Green2") && !ColorBay1.equals("Green2")) {
+                            ColorBay2 = "Green2";
+                        } else if ((ColorBay3.equals("Green1") || ColorBay1.equals("Green1")) && (ColorBay3.equals("Green2") || ColorBay1.equals("Green2"))) {
+                            ColorBay2 = "Green3";
+                        }
+                        telemetry.addLine("Bay 2 Green");
+                    } else {
+                        ColorBay2 = "Empty";
+                        telemetry.addLine("Bay 2 Empty");
+                    }
+                    if ((((NormalizedColorSensor) Bay31).getNormalizedColors().blue + ((NormalizedColorSensor) Bay32).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) Bay31).getNormalizedColors().green + ((NormalizedColorSensor) Bay32).getNormalizedColors().green) / 2 && (Bay32_DistanceSensor.getDistance(DistanceUnit.CM) <= 10 || Bay31_DistanceSensor.getDistance(DistanceUnit.CM) <= 10)) {
+                        if (!ColorBay1.equals("Purple1") && !ColorBay2.equals("Purple1")) {
+                            ColorBay3 = "Purple1";
+                        } else if ((ColorBay1.equals("Purple1") || ColorBay2.equals("Purple1")) && !ColorBay1.equals("Purple2") && !ColorBay2.equals("Purple2")) {
+                            ColorBay3 = "Purple2";
+                        } else if ((ColorBay1.equals("Purple1") || ColorBay2.equals("Purple1")) && (ColorBay1.equals("Purple2") || ColorBay2.equals("Purple2"))) {
+                            ColorBay3 = "Purple3";
+                        }
+                        telemetry.addLine("Bay 3 Purple");
+                    } else if ((((NormalizedColorSensor) Bay31).getNormalizedColors().green + ((NormalizedColorSensor) Bay32).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) Bay31).getNormalizedColors().blue + ((NormalizedColorSensor) Bay32).getNormalizedColors().blue) / 2 && (Bay31_DistanceSensor.getDistance(DistanceUnit.CM) <= 10 || Bay32_DistanceSensor.getDistance(DistanceUnit.CM) <= 10)) {
+                        if (!ColorBay1.equals("Green1") && !ColorBay2.equals("Green1")) {
+                            ColorBay3 = "Green1";
+                        } else if ((ColorBay1.equals("Green1") || ColorBay2.equals("Green1")) && !ColorBay1.equals("Green2") && !ColorBay2.equals("Green2")) {
+                            ColorBay3 = "Green2";
+                        } else if ((ColorBay1.equals("Green1") || ColorBay2.equals("Green1")) && (ColorBay1.equals("Green2") || ColorBay2.equals("Green2"))) {
+                            ColorBay3 = "Green3";
+                        }
+                        telemetry.addLine("Bay 3 Green");
+                    } else {
+                        ColorBay3 = "Empty";
+                        telemetry.addLine("Bay 3 Empty");
+                    }
+                    telemetry.addData("Bay 3", ColorBay3);
+                    telemetry.addData("Bay 2", ColorBay2);
+                    telemetry.addData("Bay 1", ColorBay1);
+                    telemetry.addData("colorsense", color);
+                    telemetry.update();
                 }
-                return false;
 
+
+                return false;
             }
+
+
 
         }
     }
