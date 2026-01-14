@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -66,8 +67,37 @@ public class BlueDepot extends LinearOpMode {
 //                .waitSeconds(1)
 //                .stopAndAdd(new ShootBall("Shoot3"))
 //                .waitSeconds(25)
+                .build();
+
+        Action Score = drive.actionBuilder((new Pose2d(-55,54,0)))// scoreing pos
+                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
+                .build();
+        Action lineONE = drive.actionBuilder(new Pose2d(-63,32,0))
+                .strafeToLinearHeading(new Vector2d(-48,0),0)
+                .build();
+        Action shootLineONe = drive.actionBuilder(new Pose2d(-48,0,0))
+                .strafeToLinearHeading(new Vector2d(-62,32),0)
+                .build();
+        Action LIneTWO = drive.actionBuilder(new Pose2d(-62,32,0))
+                .strafeToLinearHeading(new Vector2d(-48,12.5),0)
+                .build();
+        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48,12.5,0))
+                .strafeToLinearHeading(new Vector2d(-62,32),0)
+                .build();
+        Action LIentree = drive.actionBuilder(new Pose2d(-62,32,0))// 48 36 0
+                .strafeToLinearHeading(new Vector2d(-48,36),0)
+
+
 
                 .build();
+        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48,-36,0))
+                .strafeToLinearHeading(new Vector2d(-63,32),0)
+                .build();
+        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK =drive.actionBuilder(new Pose2d(-63,32,0))
+                .strafeToLinearHeading(new Vector2d(-40,0),0)
+                .build();
+
+
         Action one = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
                 .stopAndAdd(new ColorSense("off"))
                 .waitSeconds(1)
@@ -102,6 +132,7 @@ public class BlueDepot extends LinearOpMode {
                         reset
                 )
         ));
+
 //        Actions.runBlocking(new SequentialAction(//place spec 1
 //                Detect,
 //                one,
