@@ -20,8 +20,6 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -29,22 +27,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
-import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
-import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShooterPID;
 
-@Autonomous(name="BlueDepot", preselectTeleOp = "Drive26")
-public class BlueDepot extends LinearOpMode {
-
+@Autonomous(name="FarRed", preselectTeleOp = "Drive26")
+public class FarRed extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         pattern = "none";
-        ColorBay1 = "Empty";
-        ColorBay2 = "Empty";
-        ColorBay3 = "Empty";
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
-        ShooterPID shooterPID = new ShooterPID(hardwareMap);
-        ShootNow shootNow = new ShootNow(hardwareMap);
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0, -68, 45));
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -52,116 +42,109 @@ public class BlueDepot extends LinearOpMode {
         Limelight.setPollRateHz(50);
         Limelight.start();
 
+//        ColorSensor colorBay11 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.1");
+//        ColorSensor colorBay12 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "colorBay1.2");
+////        DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.2");
+////        DistanceSensor colorBay11_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("colorBay1.1");
+//        ColorSensor Bay21 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
+//        ColorSensor Bay22 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
+////        DistanceSensor Bay22_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.2");
+////        DistanceSensor Bay21_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.1");
+//        ColorSensor Bay31 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
+//        ColorSensor Bay32 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
+////        DistanceSensor Bay32_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay3.2");
+////        DistanceSensor Bay31_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay3.1");
+//        ElapsedTime time2;
+
         ElapsedTime time2;
 
 
         //TODO:Init Everything cracka
-        Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ColorSense("on"))
-                .waitSeconds(2)
-//                .stopAndAdd(new ColorSense("off"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ShootBall("Shoot1"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ColorSense("Shoot2"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ShootBall("Shoot3"))
-//                .waitSeconds(25)
+        Action Detect = drive.actionBuilder(new Pose2d(0, -68, 0))//move to park
+//                .stopAndAdd(new Setpositionforservo(Server,1))
+//                .stopAndAdd(new BlueDepot.ShootBall("Detect"))
+                .waitSeconds(30)
                 .build();
-
-        Action Score = drive.actionBuilder((new Pose2d(-55,54,0)))// scoreing pos
-                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
+        Action ScorePRE = drive.actionBuilder(new Pose2d(0,-68,0))
+                .strafeToLinearHeading(new Vector2d(48, 36), 0)
                 .build();
-        Action lineUpOne = drive.actionBuilder(new Pose2d(-55,54,0))
-                .strafeToLinearHeading(new Vector2d(0, 40), 0)
+        Action Spike3 = drive.actionBuilder(new Pose2d(48,36,0))
+                .strafeToLinearHeading(new Vector2d(0, -68), 0)
                 .build();
-        Action lineONE = drive.actionBuilder(new Pose2d(-63,32,0))
-                .strafeToLinearHeading(new Vector2d(-48,0),0)
+        Action ShootSpike3 =drive.actionBuilder(new Pose2d(0,-68,0))
+                .strafeToLinearHeading(new Vector2d(50, 60), 0)
                 .build();
-        Action shootLineONe = drive.actionBuilder(new Pose2d(-48,0,0))
-                .strafeToLinearHeading(new Vector2d(-62,32),0)
-                .build();
-        Action LIneTWO = drive.actionBuilder(new Pose2d(-62,32,0))
-                .strafeToLinearHeading(new Vector2d(-48,12.5),0)
-                .build();
-        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48,12.5,0))
-                .strafeToLinearHeading(new Vector2d(-62,32),0)
-                .build();
-        Action LIentree = drive.actionBuilder(new Pose2d(-62,32,0))// 48 36 0
-                .strafeToLinearHeading(new Vector2d(-48,36),0)
-
-
-
-                .build();
-        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48,-36,0))
-                .strafeToLinearHeading(new Vector2d(-63,32),0)
-                .build();
-        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK =drive.actionBuilder(new Pose2d(-63,32,0))
-                .strafeToLinearHeading(new Vector2d(-40,0),0)
-                .build();
-
-
+//        Action GATE = drive.actionBuilder(new Pose2d(50,60,0))
+//                .strafeToLinearHeading()
+//                .build();
         Action one = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ColorSense("off"))
+                .stopAndAdd(new FarRed.ColorSense("off"))
                 .waitSeconds(1)
-                .stopAndAdd(new ShootBall("Shoot1"))
+                .stopAndAdd(new FarRed.ShootBall("Shoot1"))
                 .waitSeconds(1)
 
                 .build();
         Action two = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ShootBall("Shoot2"))
+                .stopAndAdd(new FarRed.ShootBall("Shoot2"))
                 .waitSeconds(1)
 
                 .build();
         Action three = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ShootBall("Shoot3"))
+                .stopAndAdd(new FarRed.ShootBall("Shoot3"))
                 .waitSeconds(1)
 
                 .build();
         Action reset = drive.actionBuilder(new Pose2d(-64, -7, 0))
-                .stopAndAdd(new ShootBall("Done"))
+                .stopAndAdd(new FarRed.ShootBall("Done"))
                 .waitSeconds(4)
                 .build();
 
-        while (!isStopRequested() && !opModeIsActive()) {
-            LLResult result = Limelight.getLatestResult();
-            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
-                telemetry.addData("AprilTag", fiducial.getFiducialId());
-                telemetry.update();
-            }
-        }
+
 
         waitForStart();
-        //TODO: Run auto
-        Actions.runBlocking(new SequentialAction(
-//                shooterPID.spinUp(),
-                new SequentialAction(
-                        Detect,
-                        shootNow.shoot()
-//                        one,
-//                        two,
-//                        three,
-//                        reset
-                )
+        Actions.runBlocking(new SequentialAction(// go shood preload
+                ScorePRE,
+                Detect,
+                one,
+                two,
+                three,
+                reset
         ));
-        Actions.runBlocking(new ParallelAction()
-
-
-
-        );
-
-//        Actions.runBlocking(new SequentialAction(//place spec 1
-//                Detect,
-//                one,
-//                two,
-//                three,
-//                reset
+//        Actions.runBlocking(new SequentialAction((//get the third spike
+//                Spike3
+//                //intake on
 //        ));
-//        Actions.runBlocking(shooterPID.spinUp());
+        Actions.runBlocking(new SequentialAction(//shoot the balls
+                ShootSpike3,
+                Detect,one,
+                two,
+                three,
+                reset
+        ));
+
+
     }
 
 
 
+
+
+
+    public class Setpositionforservo implements Action {
+        Servo servo;
+        double position;
+
+        public Setpositionforservo(Servo servo, double position) {
+            this.servo = servo;
+            this.position = position;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            servo.setPosition(position);
+            return false;
+        }
+    }
 
     public class ShootBall implements Action {
         Servo Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
@@ -521,15 +504,131 @@ public class BlueDepot extends LinearOpMode {
             }
 
 
-            return !ColorBay1.equals("Empty") & !ColorBay2.equals("Empty") & !ColorBay3.equals("Empty") & !pattern.equals("none");
-        }
-
-
-    }
-
-
-
+            return false;
+        }   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
