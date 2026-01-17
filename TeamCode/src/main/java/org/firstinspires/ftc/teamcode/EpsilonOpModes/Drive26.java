@@ -62,45 +62,7 @@ public class Drive26 extends LinearOpMode {
                 drive.updatePoseEstimate();
                 Pose2d sigma = drive.localizer.getPose();
                 double currentX = sigma.position.x;
-                double currentY = sigma.position.y;
-                if (team.equals("red")) {
-                    if (currentX < 0) {
-                        double DisToGoalX = -currentX + 72;
-
-                    }
-                    if (currentX > 0) {
-                        double DisToGoalX = currentX;
-
-                    }
-                    if (currentY < 0) {
-                        double DisToGoalY = -currentY + 72;
-
-                    }
-                    if (currentY > 0) {
-                        double DisToGoalY = currentY;
-
-                    }
-                }
-                if (team.equals("blue")) {
-                    if (currentX < 0) {
-                        double DisToGoalX = -currentX + 72;
-
-                    }
-                    if (currentX > 0) {
-                        double DisToGoalX = currentX;
-
-                    }
-                    if (currentY < 0) {
-                        double DisToGoalY = -currentY + 72;
-
-                    }
-                    if (currentY > 0) {
-                        double DisToGoalY = currentY;
-
-                    }
-
-
-                }
+                double currentY = getCurrentY(sigma, currentX);
 
 //                double currentX = sigma.position.x;
 //                double currentY = sigma.position.y;
@@ -117,6 +79,49 @@ public class Drive26 extends LinearOpMode {
                 telemetry.update();
             }
         }
+    }
+
+    private static double getCurrentY(Pose2d sigma, double currentX) {
+        double currentY = sigma.position.y;
+        if (team==1) {
+            if (currentX < 0) {
+                double DisToGoalX = -currentX + 72;
+
+            }
+            if (currentX > 0) {
+                double DisToGoalX = currentX;
+
+            }
+            if (currentY < 0) {
+                double DisToGoalY = -currentY + 72;
+
+            }
+            if (currentY > 0) {
+                double DisToGoalY = currentY;
+
+            }
+        }
+        if (team==2) {
+            if (currentX < 0) {
+                double DisToGoalX = -currentX + 72;
+
+            }
+            if (currentX > 0) {
+                double DisToGoalX = currentX;
+
+            }
+            if (currentY < 0) {
+                double DisToGoalY = -currentY + 72;
+
+            }
+            if (currentY > 0) {
+                double DisToGoalY = currentY;
+
+            }
+
+
+        }
+        return currentY;
     }
 }
 

@@ -23,7 +23,9 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -31,6 +33,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShooterPID;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 @Autonomous(name="BlueDepot", preselectTeleOp = "Drive26")
 public class BlueDepot extends LinearOpMode {
@@ -38,13 +41,14 @@ public class BlueDepot extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         pattern = "none";
-        ColorBay1 = "Empty";
-        ColorBay2 = "Empty";
-        ColorBay3 = "Empty";
+        ColorBay1 = 1;
+        ColorBay2 = 2;
+        ColorBay3 = 0;
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
+        TurretPID turretPID = new TurretPID(hardwareMap);
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -57,7 +61,7 @@ public class BlueDepot extends LinearOpMode {
 
         //TODO:Init Everything cracka
         Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ColorSense("on"))
+                .stopAndAdd(new ColorSense(hardwareMap))
                 .waitSeconds(2)
 //                .stopAndAdd(new ColorSense("off"))
 //                .waitSeconds(1)
@@ -101,32 +105,38 @@ public class BlueDepot extends LinearOpMode {
                 .build();
 
 
-        Action one = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ColorSense("off"))
-                .waitSeconds(1)
-                .stopAndAdd(new ShootBall("Shoot1"))
-                .waitSeconds(1)
-
-                .build();
-        Action two = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ShootBall("Shoot2"))
-                .waitSeconds(1)
-
-                .build();
-        Action three = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ShootBall("Shoot3"))
-                .waitSeconds(1)
-
-                .build();
-        Action reset = drive.actionBuilder(new Pose2d(-64, -7, 0))
-                .stopAndAdd(new ShootBall("Done"))
-                .waitSeconds(4)
+//        Action one = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+//                .stopAndAdd(new ColorSense("off"))
+//                .waitSeconds(1)
+//                .stopAndAdd(new ShootBall("Shoot1"))
+//                .waitSeconds(1)
+//
+//                .build();
+//        Action two = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+//                .stopAndAdd(new ShootBall("Shoot2"))
+//                .waitSeconds(1)
+//
+//                .build();
+//        Action three = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+//                .stopAndAdd(new ShootBall("Shoot3"))
+//                .waitSeconds(1)
+//
+//                .build();
+//        Action reset = drive.actionBuilder(new Pose2d(-64, -7, 0))
+//                .stopAndAdd(new ShootBall("Done"))
+//                .waitSeconds(4)
+//                .build();
+        Action Waiting = drive.actionBuilder(new Pose2d(-64,-7,0))
+                .waitSeconds(5)
                 .build();
 
         while (!isStopRequested() && !opModeIsActive()) {
             LLResult result = Limelight.getLatestResult();
             for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
                 telemetry.addData("AprilTag", fiducial.getFiducialId());
+                telemetry.addData("Bay 3", ColorBay3);
+                telemetry.addData("Bay 2", ColorBay2);
+                telemetry.addData("Bay 1", ColorBay1);
                 telemetry.update();
             }
         }
@@ -136,19 +146,16 @@ public class BlueDepot extends LinearOpMode {
         Actions.runBlocking(new SequentialAction(
 //                shooterPID.spinUp(),
                 new SequentialAction(
-                        Detect,
-                        shootNow.shoot()
+//                        Detect,
+//                        shootNow.shoot(),
+                        turretPID.homeTurret(),
+                        Waiting
 //                        one,
 //                        two,
 //                        three,
 //                        reset
                 )
         ));
-        Actions.runBlocking(new ParallelAction()
-
-
-
-        );
 
 //        Actions.runBlocking(new SequentialAction(//place spec 1
 //                Detect,
@@ -163,277 +170,284 @@ public class BlueDepot extends LinearOpMode {
 
 
 
-    public class ShootBall implements Action {
-        Servo Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
-        Servo Bay2Boot = hardwareMap.get(Servo.class, "Boot2");
-        Servo Bay3Boot = hardwareMap.get(Servo.class, "Boot3");
-        double shoot;
-        double ready;
-        double cycle;
-        String ShootState;
-
-        public ShootBall(String ShootState) {
-            this.ShootState = ShootState;
-            this.shoot = .6;
-            this.ready = .95;
-            this.cycle = 1;
-        }
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-            if (pattern.equals("PPG")) {
-                if (ShootState.equals("Shoot1")) {
-                    telemetry.addLine("ball1");
-                    if (ColorBay1.equals("Purple1")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Purple1")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Purple1")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-                if (ShootState.equals("Shoot2")) {
-                    telemetry.addLine("ball2");
-
-                    if (ColorBay1.equals("Purple2")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Purple2")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Purple2")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-                if (ShootState.equals("Shoot3")) {
-                    telemetry.addLine("ball3");
-                    if (ColorBay1.equals("Green1")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Green1")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Green1")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-            }
-            if (pattern.equals("PGP")) {
-                if (ShootState.equals("Shoot1")) {
-
-                    if (ColorBay1.equals("Purple1")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Purple1")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Purple1")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-                if (ShootState.equals("Shoot2")) {
-
-                    if (ColorBay1.equals("Green1")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Green1")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Green1")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-                if (ShootState.equals("Shoot3")) {
-
-                    if (ColorBay1.equals("Purple2")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Purple2")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Purple2")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-            }
-
-
-            if (pattern.equals("GPP")) {
-                if (ShootState.equals("Shoot1")) {
-                    if (ColorBay1.equals("Green1")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Green1")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Green1")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-                if (ShootState.equals("Shoot2")) {
-
-                    if (ColorBay1.equals("Purple1")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Purple1")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Purple1")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-                if (ShootState.equals("Shoot3")) {
-                    if (ColorBay1.equals("Purple2")) {
-
-                        Bay2Boot.setPosition(ready);
-                        Bay3Boot.setPosition(ready);
-
-                        Bay1Boot.setPosition(shoot);
-                    } else if (ColorBay2.equals("Purple2")) {
-                        Bay1Boot.setPosition(ready);
-
-                        Bay3Boot.setPosition(ready);
-
-                        Bay2Boot.setPosition(shoot);
-                    } else if (ColorBay3.equals("Purple2")) {
-                        Bay1Boot.setPosition(ready);
-                        Bay2Boot.setPosition(ready);
-
-
-                        Bay3Boot.setPosition(shoot);
-                    }
-                }
-            }
-
-            if (ShootState.equals("Done")) {
-                Bay1Boot.setPosition(ready);
-                Bay2Boot.setPosition(ready);
-                Bay3Boot.setPosition(ready);
-////                            amshooting = false;
-//                ShootState = "none";
-//                return false;
-            }
-            telemetry.addData("shootstate", ShootState);
-            telemetry.addData("Pattern", pattern);
-//            telemetry.addData("time", time2.seconds());
-            telemetry.update();
-            return false;
-
-        }
-    }
+//    public class ShootBall implements Action {
+//        Servo Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
+//        Servo Bay2Boot = hardwareMap.get(Servo.class, "Boot2");
+//        Servo Bay3Boot = hardwareMap.get(Servo.class, "Boot3");
+//        double shoot;
+//        double ready;
+//        double cycle;
+//        String ShootState;
+//
+//        public ShootBall(String ShootState) {
+//            this.ShootState = ShootState;
+//            this.shoot = .6;
+//            this.ready = .95;
+//            this.cycle = 1;
+//        }
+//
+//        @Override
+//        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//
+//            if (pattern.equals("PPG")) {
+//                if (ShootState.equals("Shoot1")) {
+//                    telemetry.addLine("ball1");
+//                    if (ColorBay1.equals("Purple1")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Purple1")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Purple1")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//                if (ShootState.equals("Shoot2")) {
+//                    telemetry.addLine("ball2");
+//
+//                    if (ColorBay1.equals("Purple2")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Purple2")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Purple2")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//                if (ShootState.equals("Shoot3")) {
+//                    telemetry.addLine("ball3");
+//                    if (ColorBay1.equals("Green1")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Green1")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Green1")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//            }
+//            if (pattern.equals("PGP")) {
+//                if (ShootState.equals("Shoot1")) {
+//
+//                    if (ColorBay1.equals("Purple1")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Purple1")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Purple1")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//                if (ShootState.equals("Shoot2")) {
+//
+//                    if (ColorBay1.equals("Green1")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Green1")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Green1")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//                if (ShootState.equals("Shoot3")) {
+//
+//                    if (ColorBay1.equals("Purple2")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Purple2")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Purple2")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//            }
+//
+//
+//            if (pattern.equals("GPP")) {
+//                if (ShootState.equals("Shoot1")) {
+//                    if (ColorBay1.equals("Green1")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Green1")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Green1")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//                if (ShootState.equals("Shoot2")) {
+//
+//                    if (ColorBay1.equals("Purple1")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Purple1")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Purple1")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//                if (ShootState.equals("Shoot3")) {
+//                    if (ColorBay1.equals("Purple2")) {
+//
+//                        Bay2Boot.setPosition(ready);
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay1Boot.setPosition(shoot);
+//                    } else if (ColorBay2.equals("Purple2")) {
+//                        Bay1Boot.setPosition(ready);
+//
+//                        Bay3Boot.setPosition(ready);
+//
+//                        Bay2Boot.setPosition(shoot);
+//                    } else if (ColorBay3.equals("Purple2")) {
+//                        Bay1Boot.setPosition(ready);
+//                        Bay2Boot.setPosition(ready);
+//
+//
+//                        Bay3Boot.setPosition(shoot);
+//                    }
+//                }
+//            }
+//
+//            if (ShootState.equals("Done")) {
+//                Bay1Boot.setPosition(ready);
+//                Bay2Boot.setPosition(ready);
+//                Bay3Boot.setPosition(ready);
+//////                            amshooting = false;
+////                ShootState = "none";
+////                return false;
+//            }
+//            telemetry.addData("shootstate", ShootState);
+//            telemetry.addData("Pattern", pattern);
+////            telemetry.addData("time", time2.seconds());
+//            telemetry.update();
+//            return false;
+//
+//        }
+//    }
 
 
     public class ColorSense implements Action {
-        String color;
-        ColorSensor colorBay11 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
-        ColorSensor colorBay12 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
-        DistanceSensor colorBay12_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay1.2");
-        DistanceSensor colorBay11_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay1.1");
-        ColorSensor Bay21 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
-        ColorSensor Bay22 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
-        DistanceSensor Bay22_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.2");
-        DistanceSensor Bay21_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay2.1");
-        ColorSensor Bay31 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
-        ColorSensor Bay32 = (ColorSensor) hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
-        DistanceSensor Bay32_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay3.2");
-        DistanceSensor Bay31_DistanceSensor = (DistanceSensor) hardwareMap.colorSensor.get("Bay3.1");
-        Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
+    private final NormalizedColorSensor bay11, bay12, bay21, bay22, bay31, bay32;
+    private final DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
+    private final Limelight3A Limelight;
+    private boolean initialized = false;
+    private ElapsedTime timer;
 
 
-        public ColorSense(String color) {
-            this.color = color;
+        public ColorSense(HardwareMap hwMap) {
+            this.bay11 = hwMap.get(NormalizedColorSensor.class, "Bay1.1");
+            this.bay12 = hwMap.get(NormalizedColorSensor.class, "Bay1.2");
+            this.dist11 = hwMap.get(DistanceSensor.class, "Bay1.1");
+            this.dist12 = hwMap.get(DistanceSensor.class, "Bay1.2");
+            this.bay21 = hwMap.get(NormalizedColorSensor.class, "Bay2.1");
+            this.bay22 = hwMap.get(NormalizedColorSensor.class, "Bay2.2");
+            this.dist21 = hwMap.get(DistanceSensor.class, "Bay2.1");
+            this.dist22 = hwMap.get(DistanceSensor.class, "Bay2.2");
+            this.bay31 = hwMap.get(NormalizedColorSensor.class, "Bay3.1");
+            this.bay32 = hwMap.get(NormalizedColorSensor.class, "Bay3.2");
+            this.dist31 = hwMap.get(DistanceSensor.class, "Bay3.1");
+            this.dist32 = hwMap.get(DistanceSensor.class, "Bay3.2");
+            this.Limelight = hwMap.get(Limelight3A.class, "limelight");
+            this.timer = new ElapsedTime();
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-//                if (opModeIsActive()) {
-//                    if (!color.equals("on")) {
-//                        return false;
-//                    }
-            if (color.equals("on")) {
+            if (!initialized) {
+                ColorBay1 = 0;
+                ColorBay2 = 0;
+                ColorBay3 = 0;
+                pattern = "none";
+                timer.reset();
+                initialized = true; // Prevents this block from running again
+            }
                 LLResult result = Limelight.getLatestResult();
                 for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
                     if (pattern.equals("none")) {
@@ -447,81 +461,57 @@ public class BlueDepot extends LinearOpMode {
                     }
                     telemetry.addData("pattern", pattern);
                 }
-                if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 && (colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                    if (!ColorBay3.equals("Purple1") && !ColorBay2.equals("Purple1")) {
-                        ColorBay1 = "Purple1";
-                    } else if ((ColorBay3.equals("Purple1") || ColorBay2.equals("Purple1")) && !ColorBay3.equals("Purple2") && !ColorBay2.equals("Purple2")) {
-                        ColorBay1 = "Purple2";
-                    } else if ((ColorBay3.equals("Purple1") || ColorBay2.equals("Purple1")) && (ColorBay3.equals("Purple2") || ColorBay2.equals("Purple2"))) {
-                        ColorBay1 = "Purple3";
-                    }
-                    telemetry.addLine("Bay 1 Purple");
-                } else if ((((NormalizedColorSensor) colorBay11).getNormalizedColors().green + ((NormalizedColorSensor) colorBay12).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) colorBay11).getNormalizedColors().blue + ((NormalizedColorSensor) colorBay12).getNormalizedColors().blue) / 2 && (colorBay11_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || colorBay12_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                    if (!ColorBay3.equals("Green1") && !ColorBay2.equals("Green1")) {
-                        ColorBay1 = "Green1";
-                    } else if ((ColorBay3.equals("Green1") || ColorBay2.equals("Green1")) && !ColorBay3.equals("Green2") && !ColorBay2.equals("Green2")) {
-                        ColorBay1 = "Green2";
-                    } else if ((ColorBay3.equals("Green1") || ColorBay2.equals("Green1")) && (ColorBay3.equals("Green2") || ColorBay2.equals("Green2"))) {
-                        ColorBay1 = "Green3";
-                    }
-                    telemetry.addLine("Bay 1 Green");
+            NormalizedRGBA colors11 = bay11.getNormalizedColors();
+            NormalizedRGBA colors12 = bay12.getNormalizedColors();
+            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
+            double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+            NormalizedRGBA colors21 = bay21.getNormalizedColors();
+            NormalizedRGBA colors22 = bay22.getNormalizedColors();
+            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+            double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+            NormalizedRGBA colors31 = bay31.getNormalizedColors();
+            NormalizedRGBA colors32 = bay32.getNormalizedColors();
+            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+            double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+            if (distance1 < 3) {
+                if (avgBlue1 > avgGreen1) {
+                   ColorBay1 = 1;
+                } else if (avgGreen1 > avgBlue1){
+                    ColorBay1 = 2;
                 } else {
-                    ColorBay1 = "Empty";
-                    telemetry.addLine("Bay 1 Empty");
+                    ColorBay1 = 0;
                 }
-                if ((((NormalizedColorSensor) Bay21).getNormalizedColors().blue + ((NormalizedColorSensor) Bay22).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) Bay21).getNormalizedColors().green + ((NormalizedColorSensor) Bay22).getNormalizedColors().green) / 2 && (Bay22_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || Bay21_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                    if (!ColorBay3.equals("Purple1") && !ColorBay1.equals("Purple1")) {
-                        ColorBay2 = "Purple1";
-                    } else if ((ColorBay3.equals("Purple1") || ColorBay1.equals("Purple1")) && !ColorBay3.equals("Purple2") && !ColorBay1.equals("Purple2")) {
-                        ColorBay2 = "Purple2";
-                    } else if ((ColorBay3.equals("Purple1") || ColorBay1.equals("Purple1")) && (ColorBay3.equals("Purple2") || ColorBay1.equals("Purple2"))) {
-                        ColorBay2 = "Purple3";
-                    }
-                    telemetry.addLine("Bay 2 Purple");
-                } else if ((((NormalizedColorSensor) Bay21).getNormalizedColors().green + ((NormalizedColorSensor) Bay22).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) Bay21).getNormalizedColors().blue + ((NormalizedColorSensor) Bay22).getNormalizedColors().blue) / 2 && (Bay21_DistanceSensor.getDistance(DistanceUnit.CM) <= 5 || Bay22_DistanceSensor.getDistance(DistanceUnit.CM) <= 5)) {
-                    if (!ColorBay3.equals("Green1") && !ColorBay1.equals("Green1")) {
-                        ColorBay2 = "Green1";
-                    } else if ((ColorBay3.equals("Green1") || ColorBay1.equals("Green1")) && !ColorBay3.equals("Green2") && !ColorBay1.equals("Green2")) {
-                        ColorBay2 = "Green2";
-                    } else if ((ColorBay3.equals("Green1") || ColorBay1.equals("Green1")) && (ColorBay3.equals("Green2") || ColorBay1.equals("Green2"))) {
-                        ColorBay2 = "Green3";
-                    }
-                    telemetry.addLine("Bay 2 Green");
+            }
+            if (distance2 < 3) {
+                if (avgBlue2 > avgGreen2) {
+                    ColorBay2 = 1;
+                } else if (avgGreen2 > avgBlue2){
+                    ColorBay2 = 2;//bay 2 is stipud
                 } else {
-                    ColorBay2 = "Empty";
-                    telemetry.addLine("Bay 2 Empty");
+                    ColorBay2 = 0;
                 }
-                if ((((NormalizedColorSensor) Bay31).getNormalizedColors().blue + ((NormalizedColorSensor) Bay32).getNormalizedColors().blue) / 2 > (((NormalizedColorSensor) Bay31).getNormalizedColors().green + ((NormalizedColorSensor) Bay32).getNormalizedColors().green) / 2 && (Bay32_DistanceSensor.getDistance(DistanceUnit.CM) <= 10 || Bay31_DistanceSensor.getDistance(DistanceUnit.CM) <= 10)) {
-                    if (!ColorBay1.equals("Purple1") && !ColorBay2.equals("Purple1")) {
-                        ColorBay3 = "Purple1";
-                    } else if ((ColorBay1.equals("Purple1") || ColorBay2.equals("Purple1")) && !ColorBay1.equals("Purple2") && !ColorBay2.equals("Purple2")) {
-                        ColorBay3 = "Purple2";
-                    } else if ((ColorBay1.equals("Purple1") || ColorBay2.equals("Purple1")) && (ColorBay1.equals("Purple2") || ColorBay2.equals("Purple2"))) {
-                        ColorBay3 = "Purple3";
-                    }
-                    telemetry.addLine("Bay 3 Purple");
-                } else if ((((NormalizedColorSensor) Bay31).getNormalizedColors().green + ((NormalizedColorSensor) Bay32).getNormalizedColors().green) / 2 > (((NormalizedColorSensor) Bay31).getNormalizedColors().blue + ((NormalizedColorSensor) Bay32).getNormalizedColors().blue) / 2 && (Bay31_DistanceSensor.getDistance(DistanceUnit.CM) <= 10 || Bay32_DistanceSensor.getDistance(DistanceUnit.CM) <= 10)) {
-                    if (!ColorBay1.equals("Green1") && !ColorBay2.equals("Green1")) {
-                        ColorBay3 = "Green1";
-                    } else if ((ColorBay1.equals("Green1") || ColorBay2.equals("Green1")) && !ColorBay1.equals("Green2") && !ColorBay2.equals("Green2")) {
-                        ColorBay3 = "Green2";
-                    } else if ((ColorBay1.equals("Green1") || ColorBay2.equals("Green1")) && (ColorBay1.equals("Green2") || ColorBay2.equals("Green2"))) {
-                        ColorBay3 = "Green3";
-                    }
-                    telemetry.addLine("Bay 3 Green");
+            }
+            if (distance3 < 10) {
+                if (avgBlue3 > avgGreen3) {
+                    ColorBay3 = 1;
+                } else if (avgGreen3 > avgBlue3){
+                    ColorBay3 = 2;
                 } else {
-                    ColorBay3 = "Empty";
-                    telemetry.addLine("Bay 3 Empty");
+                    ColorBay3 = 0;
                 }
+            }
                 telemetry.addData("Bay 3", ColorBay3);
                 telemetry.addData("Bay 2", ColorBay2);
                 telemetry.addData("Bay 1", ColorBay1);
-                telemetry.addData("colorsense", color);
+                telemetry.addData("time", timer.seconds());
                 telemetry.update();
-            }
 
 
-            return !ColorBay1.equals("Empty") & !ColorBay2.equals("Empty") & !ColorBay3.equals("Empty") & !pattern.equals("none");
+
+            return timer.seconds() < .4;
         }
 
 
