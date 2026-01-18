@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.SubSystemsAndMORE;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.Scanning;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
@@ -15,6 +16,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
 
@@ -28,9 +30,12 @@ public class TurretPID {
     public final double I_tur_Lim = 0.00015;
     public final double D_tur_Lim = .001;
 
-    private DcMotorEx turret;
-    private Limelight3A limelight;
+    private final DcMotorEx turret;
+    private final Limelight3A limelight;
     private MecanumDrive drive;
+    private final DcMotorEx outakeL;
+    private final DcMotorEx outakeR;
+    private final Servo hood;
 
         public TurretPID(HardwareMap hardwareMap) {
             this.hwMap = hardwareMap;
@@ -38,15 +43,19 @@ public class TurretPID {
             this.turret = hwMap.get(DcMotorEx.class, "turret");
             this.turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             this.limelight = hwMap.get(Limelight3A.class, "limelight");
+            this.outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
+            this.outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
+            this.hood = hardwareMap.get(Servo.class,"Hood");
         }
 //1235 is ticks buddy boy
         public class HomeTurret implements Action {
-    private PIDController TurController;
-    private double ErrorInDegrees = 0;
+    private final PIDController TurController;
+    private final PIDController TurControllerL;
     private double DisToGoalX = 0;
     private double DisToGoalY = 0;
     public HomeTurret() {
         TurController = new PIDController(P_tur, I_tur, D_tur);
+        TurControllerL = new PIDController(P_tur_Lim, I_tur_Lim, D_tur_Lim);
         drive = new MecanumDrive(hwMap, new Pose2d(-64, -7, 0));
 
         limelight.start();
@@ -61,42 +70,100 @@ public class TurretPID {
         double currentX = currentPose.position.x;
         double currentY = currentPose.position.y;
         double currentH = currentPose.heading.toDouble();
-
-
         LLResult result = limelight.getLatestResult();
 
-        if (!Scanning) {
-            if (Math.abs(ErrorInDegrees) < 15) {
-                if (result != null && result.isValid()) {
-                    TurController.setPID(P_tur_Lim, I_tur_Lim, D_tur_Lim);
-                    double turretPosFromTargetInDegrees = result.getTx();
-                    double PIDturret = TurController.calculate(turretPosFromTargetInDegrees, 0);
-                    turret.setPower(-PIDturret);
+
+        if (team == 1) {
+            double DisToGoalX = 72 + currentX;
+            double DisToGoalY = 72 - currentY;
+            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
+
+            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
+
+            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
+
+            outakeL.setPower(-powervar);
+            outakeR.setPower(powervar);
+            hood.setPosition(servovar);
+
+            if (result.isValid() & !(limelight.getLatestResult() == null)) {
+                double pidPower = TurControllerL.calculate(result.getTx(), 0);
+
+                turret.setPower(pidPower);
+
+            } else if (!(result.isValid() & !(limelight.getLatestResult() == null))) {
+
+                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+
+                if (targetAngle > 177.45) {
+                    targetAngle = 177.45;
+
+                } else if (targetAngle < 0) {
+                    targetAngle = 0;
+
                 }
+
+                double currentTurretAngle = turret.getCurrentPosition() * (0.1339285) + Math.toDegrees(-currentH);
+
+                double pidPower = TurController.calculate(currentTurretAngle, targetAngle);
+
+                turret.setPower(pidPower);
+
+                telemetry.addData("Target Angle", targetAngle);
+                telemetry.addData("Current Angle", currentTurretAngle);
+                telemetry.addData("PID Output", pidPower);
+                telemetry.addData("distance", DistanceToGoal);
+                telemetry.addData("powervar", powervar);
+                telemetry.addData("servovar", servovar);
             } else {
-                TurController.setPID(P_tur, I_tur, D_tur);
-                double PIDturretP = TurController.calculate(ErrorInDegrees, 0);
-                turret.setPower(PIDturretP);
-            }
-            if (team == 1) { // red
-                if (currentX < 0) DisToGoalX = -currentX + 72;
-                else if (currentX > 0) DisToGoalX = currentX;
-
-                if (currentY < 0) DisToGoalY = -currentY + 72;
-                else if (currentY > 0) DisToGoalY = currentY;
-            }
-            if (team == 2) { // blue
-                if (currentX > 0) DisToGoalX = -currentX - 72;
-                else if (currentX < 0) DisToGoalX = currentX;
-
-                if (currentY > 0) DisToGoalY = -currentY - 72;
-                else if (currentY < 0) DisToGoalY = currentY;
+                turret.setPower(0);
             }
         }
-        double pinpoint_error = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+        if (team == 2) {
+            double DisToGoalX = 72 - currentX;
+            double DisToGoalY = 72 - currentY;
+            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-        packet.put("pinpoint_error", ErrorInDegrees);
-        packet.put("turretPos", turret.getCurrentPosition());
+            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
+
+            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
+
+            outakeL.setPower(-powervar);
+            outakeR.setPower(powervar);
+            hood.setPosition(servovar);
+
+            if (result.isValid() & !(limelight.getLatestResult() == null)) {
+
+
+
+            } else if (!(result.isValid() & !(limelight.getLatestResult() == null))) {
+
+                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+
+                if (targetAngle > 177.45) {
+                    targetAngle = 177.45;
+
+                } else if (targetAngle < 0) {
+                    targetAngle = 0;
+
+                }
+
+                double currentTurretAngle = turret.getCurrentPosition() * (0.1339285714285714) + Math.toDegrees(-currentH);
+
+                double pidPower = TurController.calculate(currentTurretAngle, targetAngle);
+
+                turret.setPower(pidPower);
+
+                telemetry.addData("Target Angle", targetAngle);
+                telemetry.addData("Current Angle", currentTurretAngle);
+                telemetry.addData("PID Output", pidPower);
+                telemetry.addData("distance", DistanceToGoal);
+                telemetry.addData("powervar", powervar);
+                telemetry.addData("servovar", servovar);
+            } else {
+                turret.setPower(0);
+            }
+        }
         return true; //Error < .15 & Error > -.15;//Error Tolerance That Determines Shutoff
 
 
