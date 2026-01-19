@@ -45,7 +45,7 @@ public class BlueDepot extends LinearOpMode {
         ColorBay2 = 0;
         ColorBay3 = 0;
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57, -49, 0));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
@@ -58,9 +58,9 @@ public class BlueDepot extends LinearOpMode {
 
 
         //TODO:Init Everything cracka
-        Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+       // Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
 //                .stopAndAdd(new ColorSense(hardwareMap))
-                .waitSeconds(2)
+//                .waitSeconds(2)
 //                .stopAndAdd(new ColorSense("off"))
 //                .waitSeconds(1)
 //                .stopAndAdd(new ShootBall("Shoot1"))
@@ -69,60 +69,61 @@ public class BlueDepot extends LinearOpMode {
 //                .waitSeconds(1)
 //                .stopAndAdd(new ShootBall("Shoot3"))
 //                .waitSeconds(25)
-                .build();
+   //             .build();
 
-        Action Score = drive.actionBuilder((new Pose2d(-55, 54, 0)))// scoreing pos
-                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
-                .build();
-        Action lineUpOne = drive.actionBuilder(new Pose2d(-55, 54, 0))
-                .strafeToLinearHeading(new Vector2d(0, 40), 0)
-                .build();
-        Action lineONE = drive.actionBuilder(new Pose2d(-63, 32, 0))
-                .strafeToLinearHeading(new Vector2d(-48, 0), 0)
-                .build();
-        Action shootLineONe = drive.actionBuilder(new Pose2d(-48, 0, 0))
-                .strafeToLinearHeading(new Vector2d(-62, 32), 0)
-                .build();
-        Action LIneTWO = drive.actionBuilder(new Pose2d(-62, 32, 0))
-                .strafeToLinearHeading(new Vector2d(-48, 12.5), 0)
-                .build();
-        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48, 12.5, 0))
-                .strafeToLinearHeading(new Vector2d(-62, 32), 0)
-                .build();
-        Action LIentree = drive.actionBuilder(new Pose2d(-62, 32, 0))// 48 36 0
-                .strafeToLinearHeading(new Vector2d(-48, 36), 0)
-
-
-                .build();
-        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48, -36, 0))
-                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
-                .build();
-        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK = drive.actionBuilder(new Pose2d(-63, 32, 0))
-                .strafeToLinearHeading(new Vector2d(-40, 0), 0)
-                .build();
-
-
-//        Action one = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-//                .stopAndAdd(new ColorSense("off"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ShootBall("Shoot1"))
-//                .waitSeconds(1)
+//        Action Score = drive.actionBuilder((new Pose2d(-55, 54, 0)))// scoreing pos
+//                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
+//                .build();
+//        Action lineUpOne = drive.actionBuilder(new Pose2d(-55, 54, 0))
+//                .strafeToLinearHeading(new Vector2d(0, 40), 0)
+//                .build();
+//        Action lineONE = drive.actionBuilder(new Pose2d(-63, 32, 0))
+//                .strafeToLinearHeading(new Vector2d(-48, 0), 0)
+//                .build();
+//        Action shootLineONe = drive.actionBuilder(new Pose2d(-48, 0, 0))
+//                .strafeToLinearHeading(new Vector2d(-62, 32), 0)
+//                .build();
+//        Action LIneTWO = drive.actionBuilder(new Pose2d(-62, 32, 0))
+//                .strafeToLinearHeading(new Vector2d(-48, 12.5), 0)
+//                .build();
+//        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48, 12.5, 0))
+//                .strafeToLinearHeading(new Vector2d(-62, 32), 0)
+//                .build();
+//        Action LIentree = drive.actionBuilder(new Pose2d(-62, 32, 0))// 48 36 0
+//                .strafeToLinearHeading(new Vector2d(-48, 36), 0)
+//
 //
 //                .build();
-//        Action two = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-//                .stopAndAdd(new ShootBall("Shoot2"))
+//        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48, -36, 0))
+//                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
+//                .build();
+//        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK = drive.actionBuilder(new Pose2d(-63, 32, 0))
+//                .strafeToLinearHeading(new Vector2d(-40, 0), 0)
+//                .build();
+
+
+        Action one = drive.actionBuilder(new Pose2d(57, -49, 0))//move to park
+                .strafeToLinearHeading(new Vector2d(13,-25),0)
+
+                .waitSeconds(1)
+
+
+
+                .build();
+//        Action two = drive.actionBuilder(new Pose2d(13, -25, 0))//move to park
+//                .(new Vector2d(13,-40),0)
 //                .waitSeconds(1)
-//
-//                .build();
-//        Action three = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-//                .stopAndAdd(new ShootBall("Shoot3"))
-//                .waitSeconds(1)
-//
-//                .build();
-//        Action reset = drive.actionBuilder(new Pose2d(-64, -7, 0))
-//                .stopAndAdd(new ShootBall("Done"))
-//                .waitSeconds(4)
-//                .build();
+
+                //.build();
+        Action three = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
+
+                .waitSeconds(1)
+
+                .build();
+        Action reset = drive.actionBuilder(new Pose2d(-64, -7, 0))
+
+                .waitSeconds(4)
+                .build();
         Action Waiting = drive.actionBuilder(new Pose2d(-64, -7, 0))
                 .waitSeconds(5)
                 .build();
@@ -141,11 +142,12 @@ public class BlueDepot extends LinearOpMode {
         waitForStart();
         //TODO: Run auto
         Actions.runBlocking(new SequentialAction(
-                new SequentialAction(
-                        Detect,
-                        shootNow.shoot()
-                )
+              one
         ));
+        Actions.runBlocking(new SequentialAction(
+                //two
+                ));
+
 
 //        Actions.runBlocking(new SequentialAction(//place spec 1
 //                Detect,
