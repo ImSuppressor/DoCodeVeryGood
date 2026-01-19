@@ -41,8 +41,8 @@ public class BlueDepot extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         pattern = "none";
-        ColorBay1 = 1;
-        ColorBay2 = 2;
+        ColorBay1 = 0;
+        ColorBay2 = 0;
         ColorBay3 = 0;
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-64, -7, 0));
@@ -56,12 +56,10 @@ public class BlueDepot extends LinearOpMode {
         Limelight.setPollRateHz(50);
         Limelight.start();
 
-        ElapsedTime time2;
-
 
         //TODO:Init Everything cracka
         Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-                .stopAndAdd(new ColorSense(hardwareMap))
+//                .stopAndAdd(new ColorSense(hardwareMap))
                 .waitSeconds(2)
 //                .stopAndAdd(new ColorSense("off"))
 //                .waitSeconds(1)
@@ -73,35 +71,34 @@ public class BlueDepot extends LinearOpMode {
 //                .waitSeconds(25)
                 .build();
 
-        Action Score = drive.actionBuilder((new Pose2d(-55,54,0)))// scoreing pos
+        Action Score = drive.actionBuilder((new Pose2d(-55, 54, 0)))// scoreing pos
                 .strafeToLinearHeading(new Vector2d(-63, 32), 0)
                 .build();
-        Action lineUpOne = drive.actionBuilder(new Pose2d(-55,54,0))
+        Action lineUpOne = drive.actionBuilder(new Pose2d(-55, 54, 0))
                 .strafeToLinearHeading(new Vector2d(0, 40), 0)
                 .build();
-        Action lineONE = drive.actionBuilder(new Pose2d(-63,32,0))
-                .strafeToLinearHeading(new Vector2d(-48,0),0)
+        Action lineONE = drive.actionBuilder(new Pose2d(-63, 32, 0))
+                .strafeToLinearHeading(new Vector2d(-48, 0), 0)
                 .build();
-        Action shootLineONe = drive.actionBuilder(new Pose2d(-48,0,0))
-                .strafeToLinearHeading(new Vector2d(-62,32),0)
+        Action shootLineONe = drive.actionBuilder(new Pose2d(-48, 0, 0))
+                .strafeToLinearHeading(new Vector2d(-62, 32), 0)
                 .build();
-        Action LIneTWO = drive.actionBuilder(new Pose2d(-62,32,0))
-                .strafeToLinearHeading(new Vector2d(-48,12.5),0)
+        Action LIneTWO = drive.actionBuilder(new Pose2d(-62, 32, 0))
+                .strafeToLinearHeading(new Vector2d(-48, 12.5), 0)
                 .build();
-        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48,12.5,0))
-                .strafeToLinearHeading(new Vector2d(-62,32),0)
+        Action shooLIneTWo = drive.actionBuilder(new Pose2d(-48, 12.5, 0))
+                .strafeToLinearHeading(new Vector2d(-62, 32), 0)
                 .build();
-        Action LIentree = drive.actionBuilder(new Pose2d(-62,32,0))// 48 36 0
-                .strafeToLinearHeading(new Vector2d(-48,36),0)
+        Action LIentree = drive.actionBuilder(new Pose2d(-62, 32, 0))// 48 36 0
+                .strafeToLinearHeading(new Vector2d(-48, 36), 0)
 
 
-
                 .build();
-        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48,-36,0))
-                .strafeToLinearHeading(new Vector2d(-63,32),0)
+        Action ShootLINETHREe = drive.actionBuilder(new Pose2d(-48, -36, 0))
+                .strafeToLinearHeading(new Vector2d(-63, 32), 0)
                 .build();
-        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK =drive.actionBuilder(new Pose2d(-63,32,0))
-                .strafeToLinearHeading(new Vector2d(-40,0),0)
+        Action PAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRK = drive.actionBuilder(new Pose2d(-63, 32, 0))
+                .strafeToLinearHeading(new Vector2d(-40, 0), 0)
                 .build();
 
 
@@ -126,7 +123,7 @@ public class BlueDepot extends LinearOpMode {
 //                .stopAndAdd(new ShootBall("Done"))
 //                .waitSeconds(4)
 //                .build();
-        Action Waiting = drive.actionBuilder(new Pose2d(-64,-7,0))
+        Action Waiting = drive.actionBuilder(new Pose2d(-64, -7, 0))
                 .waitSeconds(5)
                 .build();
 
@@ -144,16 +141,9 @@ public class BlueDepot extends LinearOpMode {
         waitForStart();
         //TODO: Run auto
         Actions.runBlocking(new SequentialAction(
-//                shooterPID.spinUp(),
                 new SequentialAction(
                         Detect,
-shootNow.shoot()
-//                        turretPID.homeTurret(),
-//                        Waiting
-//                        one,
-//                        two,
-//                        three,
-//                        reset
+                        shootNow.shoot()
                 )
         ));
 
@@ -166,8 +156,6 @@ shootNow.shoot()
 //        ));
 //        Actions.runBlocking(shooterPID.spinUp());
     }
-
-
 
 
 //    public class ShootBall implements Action {
@@ -405,7 +393,8 @@ shootNow.shoot()
 //            }
 //            telemetry.addData("shootstate", ShootState);
 //            telemetry.addData("Pattern", pattern);
-////            telemetry.addData("time", time2.seconds());
+
+    /// /            telemetry.addData("time", time2.seconds());
 //            telemetry.update();
 //            return false;
 //
@@ -414,11 +403,11 @@ shootNow.shoot()
 
 
     public class ColorSense implements Action {
-    private final NormalizedColorSensor bay11, bay12, bay21, bay22, bay31, bay32;
-    private final DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
-    private final Limelight3A Limelight;
-    private boolean initialized = false;
-    private final ElapsedTime timer;
+        private final NormalizedColorSensor bay11, bay12, bay21, bay22, bay31, bay32;
+        private final DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
+        private final Limelight3A Limelight;
+        private boolean initialized = false;
+        private final ElapsedTime timer;
 
 
         public ColorSense(HardwareMap hwMap) {
@@ -444,23 +433,22 @@ shootNow.shoot()
                 ColorBay1 = 0;
                 ColorBay2 = 0;
                 ColorBay3 = 0;
-                pattern = "none";
                 timer.reset();
                 initialized = true; // Prevents this block from running again
             }
-                LLResult result = Limelight.getLatestResult();
-                for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
-                    if (pattern.equals("none")) {
-                        if (fiducial.getFiducialId() == 21) {
-                            pattern = "GPP";
-                        } else if (fiducial.getFiducialId() == 22) {
-                            pattern = "PGP";
-                        } else if (fiducial.getFiducialId() == 23) {
-                            pattern = "PPG";
-                        }
+            LLResult result = Limelight.getLatestResult();
+            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+                if (pattern.equals("none")) {
+                    if (fiducial.getFiducialId() == 21) {
+                        pattern = "GPP";
+                    } else if (fiducial.getFiducialId() == 22) {
+                        pattern = "PGP";
+                    } else if (fiducial.getFiducialId() == 23) {
+                        pattern = "PPG";
                     }
-                    telemetry.addData("pattern", pattern);
                 }
+                telemetry.addData("pattern", pattern);
+            }
             NormalizedRGBA colors11 = bay11.getNormalizedColors();
             NormalizedRGBA colors12 = bay12.getNormalizedColors();
             double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
@@ -478,8 +466,8 @@ shootNow.shoot()
             double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
             if (distance1 < 3) {
                 if (avgBlue1 > avgGreen1) {
-                   ColorBay1 = 1;
-                } else if (avgGreen1 > avgBlue1){
+                    ColorBay1 = 1;
+                } else if (avgGreen1 > avgBlue1) {
                     ColorBay1 = 2;
                 } else {
                     ColorBay1 = 0;
@@ -488,7 +476,7 @@ shootNow.shoot()
             if (distance2 < 3) {
                 if (avgBlue2 > avgGreen2) {
                     ColorBay2 = 1;
-                } else if (avgGreen2 > avgBlue2){
+                } else if (avgGreen2 > avgBlue2) {
                     ColorBay2 = 2;//bay 2 is stipud
                 } else {
                     ColorBay2 = 0;
@@ -497,18 +485,17 @@ shootNow.shoot()
             if (distance3 < 10) {
                 if (avgBlue3 > avgGreen3) {
                     ColorBay3 = 1;
-                } else if (avgGreen3 > avgBlue3){
+                } else if (avgGreen3 > avgBlue3) {
                     ColorBay3 = 2;
                 } else {
                     ColorBay3 = 0;
                 }
             }
-                telemetry.addData("Bay 3", ColorBay3);
-                telemetry.addData("Bay 2", ColorBay2);
-                telemetry.addData("Bay 1", ColorBay1);
-                telemetry.addData("time", timer.seconds());
-                telemetry.update();
-
+            telemetry.addData("Bay 3", ColorBay3);
+            telemetry.addData("Bay 2", ColorBay2);
+            telemetry.addData("Bay 1", ColorBay1);
+            telemetry.addData("time", timer.seconds());
+            telemetry.update();
 
 
             return timer.seconds() < .4;
@@ -516,9 +503,6 @@ shootNow.shoot()
 
 
     }
-
-
-
 }
 
 
