@@ -84,18 +84,17 @@ public class ShootNow {
                 initialized = true;
 
             }
+            double time = time2.seconds();
 
-            switch (pattern) {
+                if (pattern.equals("PPG")) {
 
-                case "PPG":
-
-                    if (time2.seconds() < cycle && !shooting1) {
+                    if (time < cycle && !shooting1) {
 
                         if (ColorBay1 == 1) {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting1 = true;
@@ -104,7 +103,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting1 = true;
@@ -113,20 +112,20 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting1 = true;
 
                         }
 
-                    } else if (time2.seconds() < 2 * cycle && time2.seconds() > cycle && !shooting2) {
+                    } else if (time < 2 * cycle && time > cycle && !shooting2) {
 
                         if (ColorBay1 == 1) {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting2 = true;
@@ -135,7 +134,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting2 = true;
@@ -144,20 +143,20 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
-                            shooting2= true;
+                            shooting2 = true;
 
                         }
 
-                    } else if (time2.seconds() < 3 * cycle && time2.seconds() > 2 * cycle && !shooting3) {
+                    } else if (time < 3 * cycle && time > 2 * cycle && !shooting3) {
 
                         if (ColorBay1 == 2) {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting3 = true;
@@ -166,7 +165,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting3 = true;
@@ -175,24 +174,23 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting3 = true;
 
                         }
                     }
-                    break;
+                }
+                else if (pattern.equals("PGP")) {
 
-                case "PGP":
-
-                    if (time2.seconds() < cycle && !shooting1) {
+                    if (time < cycle && !shooting1) {
 
                         if (ColorBay1 == 1) {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting1 = true;
@@ -201,7 +199,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting1 = true;
@@ -210,7 +208,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting1 = true;
@@ -218,13 +216,13 @@ public class ShootNow {
                         }
                     }
 
-                    if (time2.seconds() < 2 * cycle & time2.seconds() > cycle && !shooting2) {
+                    else if (time < 2 * cycle & time > cycle && !shooting2) {
 
                         if (ColorBay1 == 2) {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting2 = true;
@@ -233,7 +231,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting2 = true;
@@ -242,7 +240,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting2 = true;
@@ -250,13 +248,13 @@ public class ShootNow {
                         }
                     }
 
-                    if (time2.seconds() < 3 * cycle & time2.seconds() > 2 * cycle && !shooting3) {
+                    else if (time < 3 * cycle & time > 2 * cycle && !shooting3) {
 
                         if (ColorBay1 == 1) {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting3 = true;
@@ -265,7 +263,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting3 = true;
@@ -274,42 +272,42 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting3 = true;
 
                         }
                     }
-                    break;
+                }
 
-                case "GPP":
+                else if (pattern.equals("GPP")) {
 
-                    if (time2.seconds() < cycle && !shooting1) {
+                    if (time < cycle && !shooting1) {
 
                         if (ColorBay1 == 2) {
 
-                            Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.95);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting1 = true;
 
-                        } else if (ColorBay2 == 2) {
+                        } else if (ColorBay2 == 2 && !shooting1) {
 
-                            Bay1Boot.setPosition(ready);
-                            Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.95);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting1 = true;
 
-                        } else if (ColorBay3 == 2) {
+                        } else if (ColorBay3 == 2 && !shooting1) {
 
-                            Bay1Boot.setPosition(ready);
-                            Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.95);
+                            Bay2Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting1 = true;
@@ -317,31 +315,31 @@ public class ShootNow {
                         }
                     }
 
-                    if (time2.seconds() < 2 * cycle && time2.seconds() > cycle && !shooting2) {
+                    else if (time < 2 * cycle && time > cycle && !shooting2) {
 
                         if (ColorBay1 == 1) {
 
-                            Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.95);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting2 = true;
 
                         } else if (ColorBay2 == 1) {
 
-                            Bay1Boot.setPosition(ready);
-                            Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.95);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting2 = true;
 
                         } else if (ColorBay3 == 1) {
 
-                            Bay1Boot.setPosition(ready);
-                            Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.95);
+                            Bay2Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting2 = true;
@@ -349,40 +347,40 @@ public class ShootNow {
                         }
                     }
 
-                    if (time2.seconds() < 3 * cycle && time2.seconds() > 2 * cycle && !shooting3) {
+                    else if (time < 3 * cycle && time > 2 * cycle && !shooting3) {
 
                         if (ColorBay1 == 1) {
 
-                            Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(shoot);
+                            Bay2Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.95);
+                            Bay1Boot.setPosition(.575);
 
                             ColorBay1 = 0;
                             shooting3 = true;
 
                         } else if (ColorBay2 == 1) {
 
-                            Bay1Boot.setPosition(ready);
-                            Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.95);
+                            Bay2Boot.setPosition(.575);
 
                             ColorBay2 = 0;
                             shooting3 = true;
 
                         } else if (ColorBay3 == 1) {
 
-                            Bay1Boot.setPosition(ready);
-                            Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(shoot);
+                            Bay1Boot.setPosition(.95);
+                            Bay2Boot.setPosition(.95);
+                            Bay3Boot.setPosition(.575);
 
                             ColorBay3 = 0;
                             shooting3 = true;
 
                         }
                     }
-                    break;
-            }
-            return time2.seconds() < 3;
+                }
+
+            return time < 3;
         }
     }
     public Action shoot() {

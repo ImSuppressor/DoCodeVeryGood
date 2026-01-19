@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.tuning;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -18,6 +21,9 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -62,10 +68,25 @@ public class TurretTune extends OpMode {
     private DcMotorEx intake;
     private GoBildaPinpointDriver pinpoint;
     private Pose2D Pose2ding;
+    private NormalizedColorSensor bay11, bay12, bay21, bay22, bay31, bay32;
+    private DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
 
 
     @Override
     public void init() {
+        bay11 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
+        bay12 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
+        dist11 = hardwareMap.get(DistanceSensor.class, "Bay1.1");
+        dist12 = hardwareMap.get(DistanceSensor.class, "Bay1.2");
+        bay21 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
+        bay22 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
+        dist21 = hardwareMap.get(DistanceSensor.class, "Bay2.1");
+        dist22 = hardwareMap.get(DistanceSensor.class, "Bay2.2");
+        bay31 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
+        bay32 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
+        dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
+        dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
+
         Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,180);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
@@ -115,7 +136,7 @@ public class TurretTune extends OpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         limelight.start();
-        limelight.pipelineSwitch(2);
+        limelight.pipelineSwitch(1);
         limelight.setPollRateHz(50);
 
         servovar = .5;
@@ -378,6 +399,55 @@ public class TurretTune extends OpMode {
             }
 
         }
+        double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+        double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+        double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+
+        if (distance1 < 3) {
+            NormalizedRGBA colors11 = bay11.getNormalizedColors();
+            NormalizedRGBA colors12 = bay12.getNormalizedColors();
+            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
+            if (avgBlue1 > avgGreen1) {
+                ColorBay1 = 1;
+            } else if (avgGreen1 > avgBlue1) {
+                ColorBay1 = 2;
+            } else {
+                ColorBay1 = 0;
+            }
+        }
+        if (distance2 < 3) {
+            NormalizedRGBA colors21 = bay21.getNormalizedColors();
+            NormalizedRGBA colors22 = bay22.getNormalizedColors();
+            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+            if (avgBlue2 > avgGreen2) {
+                ColorBay2 = 1;
+            } else if (avgGreen2 > avgBlue2) {
+                ColorBay2 = 2;//bay 2 is stipud
+            } else {
+                ColorBay2 = 0;
+            }
+        }
+        if (distance3 < 10) {
+            NormalizedRGBA colors31 = bay31.getNormalizedColors();
+            NormalizedRGBA colors32 = bay32.getNormalizedColors();
+            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+            if (avgBlue3 > avgGreen3) {
+                ColorBay3 = 1;
+            } else if (avgGreen3 > avgBlue3) {
+                ColorBay3 = 2;
+            } else {
+                ColorBay3 = 0;
+            }
+        }
+        telemetry.addData("Bay 3", ColorBay3);
+        telemetry.addData("Bay 2", ColorBay2);
+        telemetry.addData("Bay 1", ColorBay1);
+        telemetry.addData("time", timer.seconds());
+        telemetry.update();
+
 
         telemetry.addData("X",currentX);
         telemetry.addData("Y",currentY);

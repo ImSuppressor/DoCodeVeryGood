@@ -22,6 +22,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
@@ -45,19 +46,30 @@ public class BlueDepot extends LinearOpMode {
         ColorBay2 = 0;
         ColorBay3 = 0;
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57, -49, 0));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57, -49, Math.toRadians(-45)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
         DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
+        DcMotorEx outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
+        DcMotorEx outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
 
+        outakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outakeL.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Servo hood = hardwareMap.get(Servo.class, "hood");
+        Servo hood = hardwareMap.get(Servo.class, "Hood");
+        Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
+        Servo Boot2 = hardwareMap.get(Servo.class, "Boot2");
+        Servo Boot3 = hardwareMap.get(Servo.class, "Boot3");
+        Boot1.setPosition(.95);
+        Boot2.setPosition(.95);
+        Boot3.setPosition(.95);
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -111,12 +123,14 @@ public class BlueDepot extends LinearOpMode {
 //                .build();
 
 
-        Action one = drive.actionBuilder(new Pose2d(57, -49, 0))//move to park
-                .stopAndAdd(new SetpowerforMotor(intake,.5))
-                .stopAndAdd(new Setpositionforservo(hood,.575))
-                .afterTime(1.0,new ColorSense(hardwareMap))
-                .afterTime(1.5,new SetpositionforMotor(turret,-617))
-                .strafeToLinearHeading(new Vector2d(24, -24), 0)
+        Action one = drive.actionBuilder(new Pose2d(57, -49, Math.toRadians(-45)))//move to park
+                .stopAndAdd(new SetpowerforMotor(outakeL,.55))
+                .stopAndAdd(new SetpowerforMotor(outakeR,.55))
+                .stopAndAdd(new Setpositionforservo(hood,.54))
+                .afterTime(.75,new ColorSense(hardwareMap))
+                .afterTime(1.1,new SetpositionforMotor(turret,-617))
+                .strafeToLinearHeading(new Vector2d(24, -24), Math.toRadians(-45))
+                .waitSeconds(1.5)
                 .build();
 //        Action two = drive.actionBuilder(new Pose2d(13, -25, 0))//move to park
 //                .(new Vector2d(13,-40),0)
@@ -150,11 +164,11 @@ public class BlueDepot extends LinearOpMode {
         waitForStart();
         //TODO: Run auto
         Actions.runBlocking(new SequentialAction(
-              one,
-                shootNow.shoot()
+              one
         ));
         Actions.runBlocking(new SequentialAction(
-                //two
+                shootNow.shoot(),
+                Waiting
                 ));
 
 
@@ -188,7 +202,7 @@ public class BlueDepot extends LinearOpMode {
                 init = true;
             }
             motor.setTargetPosition(position);
-            motor.setPower(.75);
+            motor.setPower(1);
             motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             return timer.seconds() < .5;
         }
@@ -272,22 +286,16 @@ public class BlueDepot extends LinearOpMode {
                 }
                 telemetry.addData("pattern", pattern);
             }
-            NormalizedRGBA colors11 = bay11.getNormalizedColors();
-            NormalizedRGBA colors12 = bay12.getNormalizedColors();
-            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
-            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
-            double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
-            NormalizedRGBA colors21 = bay21.getNormalizedColors();
-            NormalizedRGBA colors22 = bay22.getNormalizedColors();
-            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
-            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+
             double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
-            NormalizedRGBA colors31 = bay31.getNormalizedColors();
-            NormalizedRGBA colors32 = bay32.getNormalizedColors();
-            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
-            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+            double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
             double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+
             if (distance1 < 3) {
+                NormalizedRGBA colors11 = bay11.getNormalizedColors();
+                NormalizedRGBA colors12 = bay12.getNormalizedColors();
+                double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+                double avgGreen1 = (colors11.green + colors12.green) / 2.0;
                 if (avgBlue1 > avgGreen1) {
                     ColorBay1 = 1;
                 } else if (avgGreen1 > avgBlue1) {
@@ -297,6 +305,10 @@ public class BlueDepot extends LinearOpMode {
                 }
             }
             if (distance2 < 3) {
+                NormalizedRGBA colors21 = bay21.getNormalizedColors();
+                NormalizedRGBA colors22 = bay22.getNormalizedColors();
+                double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+                double avgGreen2 = (colors21.green + colors22.green) / 2.0;
                 if (avgBlue2 > avgGreen2) {
                     ColorBay2 = 1;
                 } else if (avgGreen2 > avgBlue2) {
@@ -306,6 +318,10 @@ public class BlueDepot extends LinearOpMode {
                 }
             }
             if (distance3 < 10) {
+                NormalizedRGBA colors31 = bay31.getNormalizedColors();
+                NormalizedRGBA colors32 = bay32.getNormalizedColors();
+                double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+                double avgGreen3 = (colors31.green + colors32.green) / 2.0;
                 if (avgBlue3 > avgGreen3) {
                     ColorBay3 = 1;
                 } else if (avgGreen3 > avgBlue3) {
