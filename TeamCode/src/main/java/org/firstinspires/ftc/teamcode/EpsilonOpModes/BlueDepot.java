@@ -49,6 +49,15 @@ public class BlueDepot extends LinearOpMode {
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
+        DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
+        DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
+
+        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        Servo hood = hardwareMap.get(Servo.class, "hood");
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -59,16 +68,11 @@ public class BlueDepot extends LinearOpMode {
 
         //TODO:Init Everything cracka
         Action Detect = drive.actionBuilder(new Pose2d(-64, -7, 0))//move to park
-//                .stopAndAdd(new ColorSense(hardwareMap))
-                .waitSeconds(2)
-//                .stopAndAdd(new ColorSense("off"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ShootBall("Shoot1"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ColorSense("Shoot2"))
-//                .waitSeconds(1)
-//                .stopAndAdd(new ShootBall("Shoot3"))
-//                .waitSeconds(25)
+                .stopAndAdd(new SetpowerforMotor(intake,.5))
+                .stopAndAdd(new Setpositionforservo(hood,.575))
+                .afterTime(1.0,new ColorSense(hardwareMap))
+                .afterTime(1.5,new SetpositionforMotor(turret,-617))
+                .strafeToLinearHeading(new Vector2d(24, -24), 0)
                 .build();
 
         Action Score = drive.actionBuilder((new Pose2d(-55, 54, 0)))// scoreing pos
@@ -158,248 +162,60 @@ public class BlueDepot extends LinearOpMode {
     }
 
 
-//    public class ShootBall implements Action {
-//        Servo Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
-//        Servo Bay2Boot = hardwareMap.get(Servo.class, "Boot2");
-//        Servo Bay3Boot = hardwareMap.get(Servo.class, "Boot3");
-//        double shoot;
-//        double ready;
-//        double cycle;
-//        String ShootState;
-//
-//        public ShootBall(String ShootState) {
-//            this.ShootState = ShootState;
-//            this.shoot = .6;
-//            this.ready = .95;
-//            this.cycle = 1;
-//        }
-//
-//        @Override
-//        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-//
-//            if (pattern.equals("PPG")) {
-//                if (ShootState.equals("Shoot1")) {
-//                    telemetry.addLine("ball1");
-//                    if (ColorBay1.equals("Purple1")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Purple1")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Purple1")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//                if (ShootState.equals("Shoot2")) {
-//                    telemetry.addLine("ball2");
-//
-//                    if (ColorBay1.equals("Purple2")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Purple2")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Purple2")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//                if (ShootState.equals("Shoot3")) {
-//                    telemetry.addLine("ball3");
-//                    if (ColorBay1.equals("Green1")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Green1")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Green1")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//            }
-//            if (pattern.equals("PGP")) {
-//                if (ShootState.equals("Shoot1")) {
-//
-//                    if (ColorBay1.equals("Purple1")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Purple1")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Purple1")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//                if (ShootState.equals("Shoot2")) {
-//
-//                    if (ColorBay1.equals("Green1")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Green1")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Green1")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//                if (ShootState.equals("Shoot3")) {
-//
-//                    if (ColorBay1.equals("Purple2")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Purple2")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Purple2")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//            }
-//
-//
-//            if (pattern.equals("GPP")) {
-//                if (ShootState.equals("Shoot1")) {
-//                    if (ColorBay1.equals("Green1")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Green1")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Green1")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//                if (ShootState.equals("Shoot2")) {
-//
-//                    if (ColorBay1.equals("Purple1")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Purple1")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Purple1")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//                if (ShootState.equals("Shoot3")) {
-//                    if (ColorBay1.equals("Purple2")) {
-//
-//                        Bay2Boot.setPosition(ready);
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay1Boot.setPosition(shoot);
-//                    } else if (ColorBay2.equals("Purple2")) {
-//                        Bay1Boot.setPosition(ready);
-//
-//                        Bay3Boot.setPosition(ready);
-//
-//                        Bay2Boot.setPosition(shoot);
-//                    } else if (ColorBay3.equals("Purple2")) {
-//                        Bay1Boot.setPosition(ready);
-//                        Bay2Boot.setPosition(ready);
-//
-//
-//                        Bay3Boot.setPosition(shoot);
-//                    }
-//                }
-//            }
-//
-//            if (ShootState.equals("Done")) {
-//                Bay1Boot.setPosition(ready);
-//                Bay2Boot.setPosition(ready);
-//                Bay3Boot.setPosition(ready);
-//////                            amshooting = false;
-////                ShootState = "none";
-////                return false;
-//            }
-//            telemetry.addData("shootstate", ShootState);
-//            telemetry.addData("Pattern", pattern);
+    public class SetpositionforMotor implements Action {
+        DcMotorEx motor;
+        int position;
+        ElapsedTime timer;
+        boolean init = false;
 
-    /// /            telemetry.addData("time", time2.seconds());
-//            telemetry.update();
-//            return false;
-//
-//        }
-//    }
+        public SetpositionforMotor(DcMotorEx s, int p) {
+            this.motor = s;
+            this.position = p;
+            this.timer = new ElapsedTime();
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (!init) {
+                timer.reset();
+                init = true;
+            }
+            motor.setTargetPosition(position);
+            motor.setPower(.75);
+            motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            return timer.seconds() < .5;
+        }
+    }
+    public class SetpowerforMotor implements Action {
+        DcMotorEx motor;
+        double power;
+
+        public SetpowerforMotor(DcMotorEx MotorToCall, double Power) {
+            this.motor = MotorToCall;
+            this.power = Power;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            motor.setPower(power);
+            return false;
+        }
+    }
+    public class Setpositionforservo implements Action {
+        Servo servo;
+        double position;
+
+        public Setpositionforservo(Servo s, double p) {
+            this.servo = s;
+            this.position = p;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            servo.setPosition(position);
+            return false;
+        }
+    }
 
 
     public class ColorSense implements Action {
