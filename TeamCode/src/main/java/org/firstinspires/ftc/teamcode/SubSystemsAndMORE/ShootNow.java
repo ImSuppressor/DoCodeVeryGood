@@ -57,6 +57,11 @@ public class ShootNow {
         private boolean shooting1 = false;
         private boolean shooting2 = false;
         private boolean shooting3 = false;
+        public double shoot = 0.6;
+
+        public double ready = 0.95;
+
+        public double cycle = 1.0;
 
         public Shoot() {
 
@@ -75,17 +80,10 @@ public class ShootNow {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
             if (!initialized) {
-
                 time2.reset();
                 initialized = true;
 
             }
-
-            double shoot = 0.6;
-
-            double ready = 0.95;
-
-            double cycle = 1.0;
 
             switch (pattern) {
 
