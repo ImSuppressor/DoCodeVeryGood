@@ -24,6 +24,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
 
 @Config
@@ -60,12 +61,18 @@ public class TurretTune extends OpMode {
     private  Servo Bay3Boot;
     private DcMotorEx intake;
     private GoBildaPinpointDriver pinpoint;
+    private Pose2D Pose2ding;
 
 
     @Override
     public void init() {
+        Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,180);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(-146,82, DistanceUnit.MM);
+        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.resetPosAndIMU();
+        pinpoint.setPosition(Pose2ding);
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotor.Direction.REVERSE);
@@ -87,7 +94,7 @@ public class TurretTune extends OpMode {
         normalSpeed = 0.8;
         turbo_speed = 1;
 
-        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+//        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
         outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
         outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
@@ -108,7 +115,7 @@ public class TurretTune extends OpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         limelight.start();
-        limelight.pipelineSwitch(1);
+        limelight.pipelineSwitch(2);
         limelight.setPollRateHz(50);
 
         servovar = .5;
@@ -128,6 +135,7 @@ public class TurretTune extends OpMode {
 
         team = 1;
     }
+    /// 165 degrees is turret
     private void Sticks(double speed) {
         // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
         // We negate this value so that the topmost position corresponds to maximum forward power.
@@ -141,6 +149,7 @@ public class TurretTune extends OpMode {
 
     @Override
     public void loop() {
+        pinpoint.update();
 
         if (gamepad1.right_trigger > 0) {
 
@@ -199,11 +208,11 @@ public class TurretTune extends OpMode {
 
         }
 
-        pinpoint.update();
+        Pose2D currentPos = pinpoint.getPosition();
 
-        double currentX = pinpoint.getPosX(DistanceUnit.INCH);
-        double currentY = pinpoint.getPosY(DistanceUnit.INCH);
-        double currentH = pinpoint.getHeading(AngleUnit.DEGREES);
+        double currentX = currentPos.getX(DistanceUnit.INCH);
+        double currentY = currentPos.getY(DistanceUnit.INCH);
+        double currentH = currentPos.getHeading(AngleUnit.DEGREES);
 
         LLResult result = limelight.getLatestResult();
 
@@ -217,8 +226,9 @@ public class TurretTune extends OpMode {
         if (team == 1) {
 
             double DisToGoalX = 72 - currentX;
-            double DisToGoalY = 72 - currentY;
-            double DistanceToGoal = Math.hypot(DisToGoalY,DisToGoalX);
+            double DisToGoalY = 72 + currentY;
+
+            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
             double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
 
@@ -227,20 +237,23 @@ public class TurretTune extends OpMode {
             outakeL.setPower(-powervar);
             outakeR.setPower(powervar);
             hood.setPosition(servovar);
+            telemetry.addData("Distx",DisToGoalX);
+            telemetry.addData("DistY",DisToGoalY);
+            telemetry.addData("Tx",result.getTx());
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
                 double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-                double currentPosDeg = turret.getCurrentPosition() * 0.1339285;
+                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) +7.5;
 
-                if (currentPosDeg <= 0 && pidPower < 0) {
+                if (currentPosDeg <= 7.5 && pidPower < 0) {
 
                     pidPower = 0;
 
                 }
 
-                else if (currentPosDeg >= 177.45 && pidPower > 0) {
+                else if (currentPosDeg >= 172.5 && pidPower > 0) {
 
                     pidPower = 0;
 
@@ -252,21 +265,21 @@ public class TurretTune extends OpMode {
 
             } else if (!(result.isValid()) & timer.seconds() > .5) {
 
-                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
+                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
 
-                double currentTurretAngle = turret.getCurrentPosition() * (0.1339285);
+                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
 
                 double rawTargetDeg = targetAngle + currentH;
 
-                double clampedTargetDeg = Math.max(0, Math.min(170, rawTargetDeg));
+                double clampedTargetDeg = Math.max(7.5, Math.min(172.5, rawTargetDeg));
 
                 double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
 
-                if (currentTurretAngle <= 0 && pidPower < 0) {
+                if (currentTurretAngle <= 7.5 && pidPower < 0) {
                     pidPower = 0;
                 }
 
-                if (currentTurretAngle >= 170 && pidPower > 0) {
+                if (currentTurretAngle >= 172.5 && pidPower > 0) {
                     pidPower = 0;
                 }
 
@@ -290,8 +303,9 @@ public class TurretTune extends OpMode {
 
         if (team == 2) {
 
-            double DisToGoalX = -(72 - currentX);
-            double DisToGoalY = 72 - currentY;
+            double DisToGoalX = 72 - currentX;
+            double DisToGoalY = 72 + currentY;
+
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
             double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
@@ -301,45 +315,53 @@ public class TurretTune extends OpMode {
             outakeL.setPower(-powervar);
             outakeR.setPower(powervar);
             hood.setPosition(servovar);
+            telemetry.addData("Distx",DisToGoalX);
+            telemetry.addData("DistY",DisToGoalY);
+            telemetry.addData("Tx",result.getTx());
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
                 double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-                double currentPosDeg = turret.getCurrentPosition() * 0.1339285;
+                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) -7.5;
 
-                if (currentPosDeg <= 0 && pidPower < 0) {
-
-                    pidPower = 0;
-
-                }
-
-                else if (currentPosDeg >= 177.45 && pidPower > 0) {
+                if (currentPosDeg >= -7.5 && pidPower < 0) {
 
                     pidPower = 0;
 
                 }
 
+                else if (currentPosDeg <= -172.5 && pidPower > 0) {
 
-            } else if (!(result.isValid() & !(limelight.getLatestResult() == null)) & timer.seconds() > .5) {
-
-                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
-
-                if (targetAngle < -177.45) {
-
-                    targetAngle = -177.45;
-
-                } else if (targetAngle > 0) {
-
-                    targetAngle = 0;
+                    pidPower = 0;
 
                 }
 
-                double currentTurretAngle = turret.getCurrentPosition() * (0.1339285714285714) + Math.toDegrees(-currentH);
-
-                double pidPower = TurController.calculate(currentTurretAngle, targetAngle);
 
                 turret.setPower(-pidPower);
+                telemetry.addData("DistToGoal",DistanceToGoal);
+
+            } else if (!(result.isValid()) & timer.seconds() > .5) {
+
+                double targetAngle = -Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+
+                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) - 7.5;
+
+                double rawTargetDeg = targetAngle + currentH;
+
+                double clampedTargetDeg = Math.max(-172.5, Math.min(-7.5, rawTargetDeg));
+
+                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+
+                if (currentTurretAngle <= 7.5 && pidPower < 0) {
+                    pidPower = 0;
+                }
+
+                if (currentTurretAngle >= 172.5 && pidPower > 0) {
+                    pidPower = 0;
+                }
+
+                turret.setPower(pidPower);
 
                 telemetry.addData("Target Angle", targetAngle);
                 telemetry.addData("Current Angle", currentTurretAngle);
@@ -347,6 +369,7 @@ public class TurretTune extends OpMode {
                 telemetry.addData("distance", DistanceToGoal);
                 telemetry.addData("powervar", powervar);
                 telemetry.addData("servovar", servovar);
+                telemetry.addData("DistToGoal",DistanceToGoal);
 
             } else {
 
@@ -358,10 +381,11 @@ public class TurretTune extends OpMode {
 
         telemetry.addData("X",currentX);
         telemetry.addData("Y",currentY);
-        telemetry.addData("Distx",DisToGoalX);
-        telemetry.addData("DistY",DisToGoalY);
-        telemetry.addData("Tx",result.getTx());
         telemetry.addData("time",timer.seconds());
+        telemetry.addData("currentX",currentX);
+        telemetry.addData("currentY",currentY);
+        telemetry.addData("currentH",currentH);
+        telemetry.addData("currentPos",currentPos);
         telemetry.update();
 
     }

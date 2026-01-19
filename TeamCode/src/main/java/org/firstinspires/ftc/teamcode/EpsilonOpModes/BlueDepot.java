@@ -146,10 +146,10 @@ public class BlueDepot extends LinearOpMode {
         Actions.runBlocking(new SequentialAction(
 //                shooterPID.spinUp(),
                 new SequentialAction(
-//                        Detect,
-//                        shootNow.shoot(),
-                        turretPID.homeTurret(),
-                        Waiting
+                        Detect,
+shootNow.shoot()
+//                        turretPID.homeTurret(),
+//                        Waiting
 //                        one,
 //                        two,
 //                        three,
@@ -418,7 +418,7 @@ public class BlueDepot extends LinearOpMode {
     private final DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
     private final Limelight3A Limelight;
     private boolean initialized = false;
-    private ElapsedTime timer;
+    private final ElapsedTime timer;
 
 
         public ColorSense(HardwareMap hwMap) {
