@@ -144,7 +144,7 @@ public class BlueDepot extends LinearOpMode {
         Action Waiting = drive.actionBuilder(new Pose2d(-64, -7, 0))
                 .waitSeconds(1)
                 .build();
-        Action serest = drive.actionBuilder(new Pose2d(-64, -7, 0))
+        Action ServoReset = drive.actionBuilder(new Pose2d(-64, -7, 0))
                 .stopAndAdd(new SetpowerforMotor(intake,0))
                 .stopAndAdd(new Setpositionforservo(Boot1,.95))
                 .stopAndAdd(new Setpositionforservo(Boot2,.95))
@@ -195,17 +195,15 @@ public class BlueDepot extends LinearOpMode {
                 Waiting,
                 shootNow.shoot()
         ));
-//        Actions.runBlocking(new SequentialAction(
-//        ));
         Actions.runBlocking(new SequentialAction(
-               serest
+               ServoReset
                 ));
         Actions.runBlocking(new SequentialAction(
 
                 lineUP1
         ));
         Actions.runBlocking(new SequentialAction(
-                serest
+                ServoReset
         ));
         Actions.runBlocking(new SequentialAction(
                 IN,
@@ -222,7 +220,7 @@ public class BlueDepot extends LinearOpMode {
         ));
         Actions.runBlocking(new SequentialAction(
                GoLine2,
-                serest
+                ServoReset
         ));
         Actions.runBlocking(new SequentialAction(
                 IN,
@@ -233,7 +231,7 @@ public class BlueDepot extends LinearOpMode {
         ));
         Actions.runBlocking(new SequentialAction(
                 shootNow.shoot(),
-                serest
+                ServoReset
 
         ));
         Actions.runBlocking(new SequentialAction(
@@ -249,7 +247,7 @@ public class BlueDepot extends LinearOpMode {
         ));
         Actions.runBlocking(new SequentialAction(
                 shootNow.shoot(),
-                serest
+                ServoReset
 
         ));
         Actions.runBlocking(new SequentialAction(
