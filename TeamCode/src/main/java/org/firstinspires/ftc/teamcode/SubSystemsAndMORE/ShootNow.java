@@ -57,11 +57,11 @@ public class ShootNow {
         private boolean shooting1 = false;
         private boolean shooting2 = false;
         private boolean shooting3 = false;
-        public double shoot = 0.6;
+        public double shoot = .5;
 
         public double ready = 0.95;
 
-        public double cycle = 1.0;
+        public double cycle =5;
 
         public Shoot() {
 
@@ -72,6 +72,7 @@ public class ShootNow {
             Bay2Boot = hwMap.get(Servo.class, "Boot2");
 
             Bay3Boot = hwMap.get(Servo.class, "Boot3");
+
 
         }
 
@@ -94,7 +95,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.5);
 
                             ColorBay1 = 0;
                             shooting1 = true;
@@ -103,7 +104,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.5);
 
                             ColorBay2 = 0;
                             shooting1 = true;
@@ -112,7 +113,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(.5);
 
                             ColorBay3 = 0;
                             shooting1 = true;
@@ -125,7 +126,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.5);
 
                             ColorBay1 = 0;
                             shooting2 = true;
@@ -134,7 +135,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.5);
 
                             ColorBay2 = 0;
                             shooting2 = true;
@@ -143,7 +144,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(.5);
 
                             ColorBay3 = 0;
                             shooting2 = true;
@@ -156,7 +157,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.5);
 
                             ColorBay1 = 0;
                             shooting3 = true;
@@ -165,7 +166,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.5);
 
                             ColorBay2 = 0;
                             shooting3 = true;
@@ -174,7 +175,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(.5);
 
                             ColorBay3 = 0;
                             shooting3 = true;
@@ -190,7 +191,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.5);
 
                             ColorBay1 = 0;
                             shooting1 = true;
@@ -199,7 +200,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.5);
 
                             ColorBay2 = 0;
                             shooting1 = true;
@@ -208,7 +209,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(.5);
 
                             ColorBay3 = 0;
                             shooting1 = true;
@@ -222,7 +223,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.5);
 
                             ColorBay1 = 0;
                             shooting2 = true;
@@ -231,7 +232,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.5);
 
                             ColorBay2 = 0;
                             shooting2 = true;
@@ -240,7 +241,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(.5);
 
                             ColorBay3 = 0;
                             shooting2 = true;
@@ -254,7 +255,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.5);
 
                             ColorBay1 = 0;
                             shooting3 = true;
@@ -263,7 +264,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay3Boot.setPosition(ready);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.5);
 
                             ColorBay2 = 0;
                             shooting3 = true;
@@ -272,7 +273,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(ready);
                             Bay2Boot.setPosition(ready);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(.5);
 
                             ColorBay3 = 0;
                             shooting3 = true;
@@ -289,7 +290,7 @@ public class ShootNow {
 
                             Bay2Boot.setPosition(.95);
                             Bay3Boot.setPosition(.95);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(shoot);
 
                             ColorBay1 = 0;
                             shooting1 = true;
@@ -298,7 +299,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(.95);
                             Bay3Boot.setPosition(.95);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(shoot);
 
                             ColorBay2 = 0;
                             shooting1 = true;
@@ -307,7 +308,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(.95);
                             Bay2Boot.setPosition(.95);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(shoot);
 
                             ColorBay3 = 0;
                             shooting1 = true;
@@ -315,13 +316,13 @@ public class ShootNow {
                         }
                     }
 
-                    else if (time < 2 * cycle && time > cycle && !shooting2) {
+                    else if (time < 10 * cycle && time > cycle && !shooting2) {
 
                         if (ColorBay1 == 1) {
 
                             Bay2Boot.setPosition(.95);
                             Bay3Boot.setPosition(.95);
-                            Bay1Boot.setPosition(.575);
+                            Bay1Boot.setPosition(shoot);
 
                             ColorBay1 = 0;
                             shooting2 = true;
@@ -330,7 +331,7 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(.95);
                             Bay3Boot.setPosition(.95);
-                            Bay2Boot.setPosition(.575);
+                            Bay2Boot.setPosition(shoot);
 
                             ColorBay2 = 0;
                             shooting2 = true;
@@ -339,7 +340,8 @@ public class ShootNow {
 
                             Bay1Boot.setPosition(.95);
                             Bay2Boot.setPosition(.95);
-                            Bay3Boot.setPosition(.575);
+                            Bay3Boot.setPosition(shoot);
+
 
                             ColorBay3 = 0;
                             shooting2 = true;
@@ -347,31 +349,31 @@ public class ShootNow {
                         }
                     }
 
-                    else if (time < 3 * cycle && time > 2 * cycle && !shooting3) {
+                    else if (time < 15 * cycle && time > 2 * cycle && !shooting3) {
 
                         if (ColorBay1 == 1) {
 
-                            Bay2Boot.setPosition(.95);
-                            Bay3Boot.setPosition(.95);
-                            Bay1Boot.setPosition(.575);
+                            Bay2Boot.setPosition(.8);
+                            Bay3Boot.setPosition(.8);
+                            Bay1Boot.setPosition(.4);
 
                             ColorBay1 = 0;
                             shooting3 = true;
 
                         } else if (ColorBay2 == 1) {
 
-                            Bay1Boot.setPosition(.95);
-                            Bay3Boot.setPosition(.95);
-                            Bay2Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.8);
+                            Bay3Boot.setPosition(.8);
+                            Bay2Boot.setPosition(.4);
 
                             ColorBay2 = 0;
                             shooting3 = true;
 
                         } else if (ColorBay3 == 1) {
 
-                            Bay1Boot.setPosition(.95);
-                            Bay2Boot.setPosition(.95);
-                            Bay3Boot.setPosition(.575);
+                            Bay1Boot.setPosition(.8);
+                            Bay2Boot.setPosition(.8);
+                            Bay3Boot.setPosition(.4);
 
                             ColorBay3 = 0;
                             shooting3 = true;
@@ -380,7 +382,7 @@ public class ShootNow {
                     }
                 }
 
-            return time < 3;
+            return time < 2;
         }
     }
     public Action shoot() {

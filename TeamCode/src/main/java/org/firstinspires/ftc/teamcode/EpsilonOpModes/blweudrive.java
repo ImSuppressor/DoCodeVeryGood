@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode.tuning;
+package org.firstinspires.ftc.teamcode.EpsilonOpModes;
+
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
@@ -31,12 +32,13 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
 
 @Config
 @TeleOp
-public class TurretTune extends OpMode {
+public class blweudrive extends OpMode {
     MecanumDrive drive;
     private PIDController TurController;
     private PIDController TurControllerL;
@@ -93,6 +95,7 @@ public class TurretTune extends OpMode {
         dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
+
         Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,180);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
@@ -103,6 +106,7 @@ public class TurretTune extends OpMode {
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotor.Direction.REVERSE);
+
 
         Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
         Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
@@ -125,6 +129,7 @@ public class TurretTune extends OpMode {
 
         outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
         outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
+        outakeL.setDirection(DcMotorSimple.Direction.REVERSE);
 
         turret = hardwareMap.get(DcMotorEx.class,"turret");
 
@@ -192,7 +197,29 @@ public class TurretTune extends OpMode {
             intake.setPower(0);
 
         }
-
+        if ( gamepad1. square){
+            outakeL.setPower(.55);
+            outakeR.setPower(.55);
+        }
+        if (gamepad1. triangle) {
+            outakeR.setPower(.63);
+            outakeL.setPower(.63);
+            hood.setPosition(.64);
+        }
+        if( gamepad1.circle){
+            outakeL.setPower(.725);
+            outakeR.setPower(.725
+            );
+            hood.setPosition(.9);
+        }
+        if ( gamepad1.a){
+            outakeL.setPower(0);
+            outakeR.setPower(0);
+            hood.setPosition(.54);
+        }
+        if (gamepad1.right_bumper){
+            intake.setPower(.8);
+        }
         if (gamepad1.dpad_left) {
 
             Bay1Boot.setPosition(.575);
@@ -257,16 +284,16 @@ public class TurretTune extends OpMode {
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
-
-            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
-
-            outakeL.setPower(-powervar);
-            outakeR.setPower(powervar);
-            hood.setPosition(servovar);
-            telemetry.addData("Distx",DisToGoalX);
-            telemetry.addData("DistY",DisToGoalY);
-            telemetry.addData("Tx",result.getTx());
+//            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
+//
+//            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
+//
+//            outakeL.setPower(-powervar);
+//            outakeR.setPower(powervar);
+//            hood.setPosition(servovar);
+//            telemetry.addData("Distx",DisToGoalX);
+//            telemetry.addData("DistY",DisToGoalY);
+//            telemetry.addData("Tx",result.getTx());
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
