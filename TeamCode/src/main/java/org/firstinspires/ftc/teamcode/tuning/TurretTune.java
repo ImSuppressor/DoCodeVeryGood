@@ -380,11 +380,11 @@ public class TurretTune extends OpMode {
 
                 double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
 
-                if (currentTurretAngle <= 7.5 && pidPower < 0) {
+                if (currentTurretAngle >= -7.5 && pidPower < 0) {
                     pidPower = 0;
                 }
 
-                if (currentTurretAngle >= 172.5 && pidPower > 0) {
+                if (currentTurretAngle <= -172.5 && pidPower > 0) {
                     pidPower = 0;
                 }
 
