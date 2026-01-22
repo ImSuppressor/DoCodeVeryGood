@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.EpsilonOpModes;
 
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
@@ -11,13 +10,11 @@ import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -29,17 +26,14 @@ import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
-import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
 
 @Config
 @TeleOp
-public class blweudrive extends OpMode {
+public class DriveCode extends OpMode {
     MecanumDrive drive;
     private PIDController TurController;
     private PIDController TurControllerL;
@@ -79,6 +73,18 @@ public class blweudrive extends OpMode {
     private NormalizedColorSensor bay31;
     private NormalizedColorSensor bay32;
     private DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
+    private boolean initialized = false;
+    private boolean shooting1 = false;
+    private boolean shooting2 = false;
+    private boolean shooting3 = false;
+    public double shoot = .5;
+
+    public double ready = 0.95;
+
+    public double cycle = .5;
+    public double cycleDown = .25;
+    public double ball1, ball2, ball3;
+    public boolean Boot1, Boot2, Boot3 = false;
 
 
     @Override
@@ -166,7 +172,23 @@ public class blweudrive extends OpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        team = 1;
+        if (pattern.equals("PPG")) {
+            ball1 = 1;
+            ball2 = 1;
+            ball3 = 2;
+
+        } else if (pattern.equals("PGP")) {
+            ball1 = 1;
+            ball2 = 2;
+            ball3 = 1;
+
+        } else if (pattern.equals("GPP")) {
+            ball1 = 2;
+            ball2 = 1;
+            ball3 = 1;
+
+        }
+
     }
     /// 165 degrees is turret
     private void Sticks(double speed) {
@@ -179,16 +201,6 @@ public class blweudrive extends OpMode {
         bl.setPower(speed * gamepad1.right_stick_x + (-speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
         br.setPower(-speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
     }
-    private boolean initialized = false;
-    private boolean shooting1 = false;
-    private boolean shooting2 = false;
-    private boolean shooting3 = false;
-    public double shoot = .5;
-
-    public double ready = 0.95;
-
-    public double cycle = .5;
-    public double cycleDown = .25;
 
     @Override
     public void loop() {
@@ -493,16 +505,68 @@ public class blweudrive extends OpMode {
                 ColorBay3 = 0;
             }
         }
+
+        //ShootPurple
+        if (gamepad1.dpad_left && !Boot1 && !Boot2 && !Boot3) {
+            if (ColorBay1 == 1) {
+                Bay1Boot.setPosition(shoot);
+                ColorBay1 = 0;
+                timer.reset();
+                Boot1 = true;
+
+            } else if (ColorBay2 == 1) {
+                Bay2Boot.setPosition(shoot);
+                ColorBay2 = 0;
+                timer.reset();
+                Boot2 = true;
+
+            } else if (ColorBay3 == 1) {
+                Bay3Boot.setPosition(shoot);
+                ColorBay3 = 0;
+                timer.reset();
+                Boot3 = true;
+
+            }
+        }
+        //ShootGreen
+        if (gamepad1.dpad_right && !Boot1 && !Boot2 && !Boot3) {
+            if (ColorBay1 == 2) {
+                Bay1Boot.setPosition(shoot);
+                ColorBay1 = 0;
+                timer.reset();
+                Boot1 = true;
+
+            } else if (ColorBay2 == 2) {
+                Bay2Boot.setPosition(shoot);
+                ColorBay2 = 0;
+                timer.reset();
+                Boot2 = true;
+
+            } else if (ColorBay3 == 2) {
+                Bay3Boot.setPosition(shoot);
+                ColorBay3 = 0;
+                timer.reset();
+                Boot3 = true;
+
+            }
+        }
+        //Reset Boot Arms
+        if (timer.seconds() < cycle && timer.seconds() > (cycle-cycleDown) && (Boot1 || Boot2 || Boot3)) {
+            Bay1Boot.setPosition(ready);
+            Bay2Boot.setPosition(ready);
+            Bay3Boot.setPosition(ready);
+        } else if (timer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
+            Boot1 = false;
+            Boot2 = false;
+            Boot3 = false;
+
+
+        }
+
         telemetry.addData("Bay 3", ColorBay3);
         telemetry.addData("Bay 2", ColorBay2);
         telemetry.addData("Bay 1", ColorBay1);
         telemetry.addData("time", timer.seconds());
-        telemetry.update();
-
-
-        telemetry.addData("X",currentX);
-        telemetry.addData("Y",currentY);
-        telemetry.addData("time",timer.seconds());
         telemetry.addData("currentX",currentX);
         telemetry.addData("currentY",currentY);
         telemetry.addData("currentH",currentH);
