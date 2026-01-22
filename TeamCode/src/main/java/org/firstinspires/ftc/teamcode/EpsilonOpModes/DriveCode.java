@@ -574,7 +574,7 @@ public class DriveCode extends OpMode {
             Boot3 = false;
         }
         //SequencedShot
-        if (gamepad1.dpad_down || SequenceShoot) {
+        if (gamepad1.dpad_down || SequenceShoot == true) {
             if (!initialized) {
                 timer2.reset();
                 SequenceShoot = true;
