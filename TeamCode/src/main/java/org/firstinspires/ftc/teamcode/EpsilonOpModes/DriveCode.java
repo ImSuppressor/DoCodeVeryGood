@@ -80,6 +80,7 @@ public class DriveCode extends OpMode {
     private boolean shooting3 = false;
     public double shoot = .5;
 
+
     public double ready = 0.95;
 
     public double cycle = .5;
@@ -87,6 +88,7 @@ public class DriveCode extends OpMode {
     public double ball1, ball2, ball3;
     public boolean Boot1, Boot2, Boot3 = false;
     public boolean SequenceShoot = false;
+
 
 
     @Override
@@ -104,7 +106,7 @@ public class DriveCode extends OpMode {
         dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
-
+        team = 1;
         Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,172.5);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
@@ -133,6 +135,8 @@ public class DriveCode extends OpMode {
 
         normalSpeed = 0.8;
         turbo_speed = 1;
+        timer2 = new ElapsedTime();
+
 
 //        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
@@ -173,6 +177,7 @@ public class DriveCode extends OpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        pattern="PPG";
 
         if (pattern.equals("PPG")) {
             ball1 = 1;
@@ -190,6 +195,8 @@ public class DriveCode extends OpMode {
             ball3 = 1;
 
         }
+
+
 
     }
     /// 165 degrees is turret
@@ -251,38 +258,38 @@ public class DriveCode extends OpMode {
         }
         if (gamepad1.right_bumper){
             intake.setPower(.8);
-        }
-        if (gamepad1.dpad_left) {
 
-            Bay1Boot.setPosition(.575);
-
-            Bay2Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
-
-        }
-        else if (gamepad1.dpad_right) {
-
-            Bay2Boot.setPosition(.55);
-
-            Bay1Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
-
-        }
-        else if (gamepad1.dpad_down) {
-
-            Bay3Boot.setPosition(.575);
-
-            Bay1Boot.setPosition(.95);
-            Bay2Boot.setPosition(.95);
-
-        }
-        else {
-
-            Bay1Boot.setPosition(.95);
-            Bay2Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
+//        if (gamepad1.dpad_left) {
+//
+//            Bay1Boot.setPosition(.575);
+//
+//            Bay2Boot.setPosition(.95);
+//            Bay3Boot.setPosition(.95);
+//
+//        }
+//        else if (gamepad1.dpad_right) {
+//
+//            Bay2Boot.setPosition(.55);
+//
+//            Bay1Boot.setPosition(.95);
+//            Bay3Boot.setPosition(.95);
+//
+//        }
+//        else if (gamepad1.dpad_down) {
+//
+//            Bay3Boot.setPosition(.575);
+//
+//            Bay1Boot.setPosition(.95);
+//            Bay2Boot.setPosition(.95);
 
         }
+//        //else {
+//
+//            Bay1Boot.setPosition(.95);
+//            Bay2Boot.setPosition(.95);
+//            Bay3Boot.setPosition(.95);
+//
+//        }
 
         if (gamepad1.right_bumper) {
 
@@ -393,6 +400,7 @@ public class DriveCode extends OpMode {
             double DisToGoalY = 72 + currentY;
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
+
 
             double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
 
