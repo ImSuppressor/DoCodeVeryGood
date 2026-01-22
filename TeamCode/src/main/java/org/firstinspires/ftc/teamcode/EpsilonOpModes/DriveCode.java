@@ -84,7 +84,9 @@ public class DriveCode extends OpMode {
     public double cycle = .5;
     public double cycleDown = .25;
     public double ball1, ball2, ball3;
-    public boolean Boot1, Boot2, Boot3 = false;
+    public boolean Boot1 = false;
+    public boolean Boot2 = false;
+    public boolean Boot3 = false;
     public boolean SequenceShoot = false;
 
 
@@ -577,8 +579,8 @@ public class DriveCode extends OpMode {
                 timer2.reset();
                 SequenceShoot = true;
             }
-            time = timer2.seconds();
-            if (time < (cycle) && !shooting1) {
+
+            if (timer2.seconds() < (cycle) && !shooting1) {
 
                 if (ColorBay1 == ball1) {
 
@@ -621,12 +623,12 @@ public class DriveCode extends OpMode {
 
                     }
                 }
-            } else if (time > (cycle-cycleDown) && time < cycle) {
+            } else if (timer2.seconds() > (cycle-cycleDown) && timer2.seconds() < cycle) {
                 Bay1Boot.setPosition(ready);
                 Bay2Boot.setPosition(ready);
                 Bay3Boot.setPosition(ready);
 
-            } else if (time < 2 * cycle && time > cycle && !shooting2) {
+            } else if (timer2.seconds() < 2 * cycle && timer2.seconds() > cycle && !shooting2) {
 
                 if (ColorBay1 == ball2) {
 
@@ -670,12 +672,12 @@ public class DriveCode extends OpMode {
                     }
                 }
 
-            }  else if (time > ((2*cycle)-cycleDown) && time < 2*cycle) {
+            }  else if (timer2.seconds() > ((2*cycle)-cycleDown) && timer2.seconds() < 2*cycle) {
                 Bay1Boot.setPosition(ready);
                 Bay2Boot.setPosition(ready);
                 Bay3Boot.setPosition(ready);
 
-            } else if (time < 3 * cycle && time > 2 * cycle && !shooting3) {
+            } else if (timer2.seconds() < 3 * cycle && timer2.seconds() > 2 * cycle && !shooting3) {
 
                 if (ColorBay1 == ball3) {
 
@@ -719,13 +721,13 @@ public class DriveCode extends OpMode {
                     }
                 }
             }
-        }
-        if (time > 3*cycle && initialized) {
-            shooting1 = false;
-            shooting2 = false;
-            shooting3 = false;
-            initialized = false;
-            SequenceShoot = false;
+            if (timer2.seconds() > 3*cycle && initialized) {
+                shooting1 = false;
+                shooting2 = false;
+                shooting3 = false;
+                initialized = false;
+                SequenceShoot = false;
+            }
         }
 
         telemetry.addData("Bay 3", ColorBay3);
