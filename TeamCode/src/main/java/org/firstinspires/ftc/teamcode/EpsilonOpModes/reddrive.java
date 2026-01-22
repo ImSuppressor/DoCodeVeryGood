@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.EpsilonOpModes;
 
 
@@ -5,7 +6,6 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.tel
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -39,7 +39,7 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
 
 @Config
 @TeleOp
-public class blweudrive extends OpMode {
+public class reddrive extends OpMode {
     MecanumDrive drive;
     private PIDController TurController;
     private PIDController TurControllerL;
@@ -97,7 +97,7 @@ public class blweudrive extends OpMode {
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
 
-        Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,172.5);
+        Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,7.5);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
@@ -115,9 +115,9 @@ public class blweudrive extends OpMode {
 
         timer = new ElapsedTime();
 
-        P_tur = 0.1;//ticks per degree
+        P_tur = -0.1;//ticks per degree
         I_tur = 0;
-        D_tur = 0.001;//power given
+        D_tur = -0.001;//power given
 
         P_tur_Lim = .03;
         I_tur_Lim = 0.0015;
@@ -166,7 +166,7 @@ public class blweudrive extends OpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        team = 1;
+        team = 2;
     }
     /// 165 degrees is turret
     private void Sticks(double speed) {
@@ -179,27 +179,10 @@ public class blweudrive extends OpMode {
         bl.setPower(speed * gamepad1.right_stick_x + (-speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
         br.setPower(-speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
     }
-    private boolean initialized = false;
-    private boolean shooting1 = false;
-    private boolean shooting2 = false;
-    private boolean shooting3 = false;
-    public double shoot = .5;
-
-    public double ready = 0.95;
-
-    public double cycle = .5;
-    public double cycleDown = .25;
 
     @Override
     public void loop() {
         pinpoint.update();
-//        if ( bay11 == 1&&gamepad1.dpad_left) {
-//            Bay1Boot.setPosition(.535);
-//            bay11 = 0;
-//            Bay1Boot = true;
-//            timer.reset();
-//        }
-
 
         if (gamepad1.right_trigger > 0) {
 
@@ -302,16 +285,16 @@ public class blweudrive extends OpMode {
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-//            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
-//
-//            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
-//
-//            outakeL.setPower(-powervar);
-//            outakeR.setPower(powervar);
-//            hood.setPosition(servovar);
-//            telemetry.addData("Distx",DisToGoalX);
-//            telemetry.addData("DistY",DisToGoalY);
-//            telemetry.addData("Tx",result.getTx());
+            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
+
+            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
+
+            outakeL.setPower(-powervar);
+            outakeR.setPower(powervar);
+            hood.setPosition(servovar);
+            telemetry.addData("Distx",DisToGoalX);
+            telemetry.addData("DistY",DisToGoalY);
+            telemetry.addData("Tx",result.getTx());
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
@@ -425,11 +408,11 @@ public class blweudrive extends OpMode {
 
                 double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
 
-                if (currentTurretAngle <= 7.5 && pidPower < 0) {
+                if (currentTurretAngle >= -7.5 && pidPower < 0) {
                     pidPower = 0;
                 }
 
-                if (currentTurretAngle >= 172.5 && pidPower > 0) {
+                if (currentTurretAngle <= -172.5 && pidPower > 0) {
                     pidPower = 0;
                 }
 

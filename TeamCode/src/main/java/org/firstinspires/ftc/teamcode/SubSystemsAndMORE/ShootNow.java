@@ -62,7 +62,7 @@ public class ShootNow {
         public double ready = 0.95;
 
         public double cycle = .5;
-        public double cycleDown = .15;
+        public double cycleDown = .25;
 
         public Shoot() {
 
