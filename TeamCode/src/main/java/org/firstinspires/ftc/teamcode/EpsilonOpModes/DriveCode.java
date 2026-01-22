@@ -60,6 +60,7 @@ public class DriveCode extends OpMode {
     private DcMotor bl;
     private DcMotor br;
     private ElapsedTime timer;
+    private ElapsedTime timer2;
     private  Servo Bay1Boot;
     private  Servo Bay2Boot;
     private  Servo Bay3Boot;
@@ -85,6 +86,7 @@ public class DriveCode extends OpMode {
     public double cycleDown = .25;
     public double ball1, ball2, ball3;
     public boolean Boot1, Boot2, Boot3 = false;
+    public boolean SequenceShoot = false;
 
 
     @Override
@@ -559,8 +561,162 @@ public class DriveCode extends OpMode {
             Boot1 = false;
             Boot2 = false;
             Boot3 = false;
+        }
+        //SequencedShot
+        if (gamepad1.dpad_down || SequenceShoot == true) {
+            if (!initialized) {
+                timer2.reset();
+                SequenceShoot = true;
+            }
+            time = timer2.seconds();
+            if (time < (cycle) && !shooting1) {
 
+                if (ColorBay1 == ball1) {
 
+                    Bay1Boot.setPosition(shoot);
+
+                    ColorBay1 = 0;
+                    shooting1 = true;
+
+                } else if (ColorBay2 == ball1) {
+
+                    Bay2Boot.setPosition(shoot);
+
+                    ColorBay2 = 0;
+                    shooting1 = true;
+
+                } else if (ColorBay3 == ball1) {
+
+                    Bay3Boot.setPosition(shoot);
+
+                    ColorBay3 = 0;
+                    shooting1 = true;
+
+                } else {
+                    if (!(ColorBay1 == 0)) {
+                        Bay1Boot.setPosition(shoot);
+
+                        ColorBay1 = 0;
+                        shooting1 = true;
+                    } else if (!(ColorBay2 == 0)) {
+                        Bay2Boot.setPosition(shoot);
+
+                        ColorBay2 = 0;
+                        shooting1 = true;
+
+                    } else if (!(ColorBay3 == 0)) {
+                        Bay3Boot.setPosition(shoot);
+
+                        ColorBay3 = 0;
+                        shooting1 = true;
+
+                    }
+                }
+            } else if (time > (cycle-cycleDown) && time < cycle) {
+                Bay1Boot.setPosition(ready);
+                Bay2Boot.setPosition(ready);
+                Bay3Boot.setPosition(ready);
+
+            } else if (time < 2 * cycle && time > cycle && !shooting2) {
+
+                if (ColorBay1 == ball2) {
+
+                    Bay1Boot.setPosition(shoot);
+
+                    ColorBay1 = 0;
+                    shooting2 = true;
+
+                } else if (ColorBay2 == ball2) {
+
+                    Bay2Boot.setPosition(shoot);
+
+                    ColorBay2 = 0;
+                    shooting2 = true;
+
+                } else if (ColorBay3 == ball2) {
+
+                    Bay3Boot.setPosition(shoot);
+
+                    ColorBay3 = 0;
+                    shooting2 = true;
+
+                } else {
+                    if (!(ColorBay1 == 0)) {
+                        Bay1Boot.setPosition(shoot);
+
+                        ColorBay1 = 0;
+                        shooting2 = true;
+                    } else if (!(ColorBay2 == 0)) {
+                        Bay2Boot.setPosition(shoot);
+
+                        ColorBay2 = 0;
+                        shooting2 = true;
+
+                    } else if (!(ColorBay3 == 0)) {
+                        Bay3Boot.setPosition(shoot);
+
+                        ColorBay3 = 0;
+                        shooting2 = true;
+
+                    }
+                }
+
+            }  else if (time > ((2*cycle)-cycleDown) && time < 2*cycle) {
+                Bay1Boot.setPosition(ready);
+                Bay2Boot.setPosition(ready);
+                Bay3Boot.setPosition(ready);
+
+            } else if (time < 3 * cycle && time > 2 * cycle && !shooting3) {
+
+                if (ColorBay1 == ball3) {
+
+                    Bay1Boot.setPosition(shoot);
+
+                    ColorBay1 = 0;
+                    shooting3 = true;
+
+                } else if (ColorBay2 == ball3) {
+
+                    Bay2Boot.setPosition(shoot);
+
+                    ColorBay2 = 0;
+                    shooting3 = true;
+
+                } else if (ColorBay3 == ball3) {
+
+                    Bay3Boot.setPosition(shoot);
+
+                    ColorBay3 = 0;
+                    shooting3 = true;
+
+                } else {
+                    if (!(ColorBay1 == 0)) {
+                        Bay1Boot.setPosition(shoot);
+
+                        ColorBay1 = 0;
+                        shooting3 = true;
+                    } else if (!(ColorBay2 == 0)) {
+                        Bay2Boot.setPosition(shoot);
+
+                        ColorBay2 = 0;
+                        shooting3 = true;
+
+                    } else if (!(ColorBay3 == 0)) {
+                        Bay3Boot.setPosition(shoot);
+
+                        ColorBay3 = 0;
+                        shooting3 = true;
+
+                    }
+                }
+            }
+        }
+        if (time > 3*cycle && initialized) {
+            shooting1 = false;
+            shooting2 = false;
+            shooting3 = false;
+            initialized = false;
+            SequenceShoot = false;
         }
 
         telemetry.addData("Bay 3", ColorBay3);
