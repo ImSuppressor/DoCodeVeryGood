@@ -79,8 +79,6 @@ public class DriveCode extends OpMode {
     private boolean shooting2 = false;
     private boolean shooting3 = false;
     public double shoot = .5;
-
-
     public double ready = 0.95;
 
     public double cycle = .5;
@@ -122,6 +120,9 @@ public class DriveCode extends OpMode {
         Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
         Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
         Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
+        Bay1Boot.setPosition(ready);
+        Bay2Boot.setPosition(ready);
+        Bay3Boot.setPosition(ready);
 
         timer = new ElapsedTime();
 
@@ -236,11 +237,11 @@ public class DriveCode extends OpMode {
             intake.setPower(0);
 
         }
-        if ( gamepad1. square){
+        if ( gamepad1.square){
             outakeL.setPower(.55);
             outakeR.setPower(.55);
         }
-        if (gamepad1. triangle) {
+        if (gamepad1.triangle) {
             outakeR.setPower(.63);
             outakeL.setPower(.63);
             hood.setPosition(.64);
@@ -251,7 +252,7 @@ public class DriveCode extends OpMode {
             );
             hood.setPosition(.9);
         }
-        if ( gamepad1.a){
+        if (gamepad1.a){
             outakeL.setPower(0);
             outakeR.setPower(0);
             hood.setPosition(.54);
@@ -561,11 +562,11 @@ public class DriveCode extends OpMode {
             }
         }
         //Reset Boot Arms
-        if (timer.seconds() < cycle && timer.seconds() > (cycle-cycleDown) && (Boot1 || Boot2 || Boot3)) {
+        if (timer.seconds() < cycle && (timer.seconds() > (cycle-cycleDown)) && Boot1 || Boot2 || Boot3) {
             Bay1Boot.setPosition(ready);
             Bay2Boot.setPosition(ready);
             Bay3Boot.setPosition(ready);
-        } else if (timer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
+        } else if (timer.seconds() > cycle && Boot1 || Boot2 || Boot3) {
             Boot1 = false;
             Boot2 = false;
             Boot3 = false;
