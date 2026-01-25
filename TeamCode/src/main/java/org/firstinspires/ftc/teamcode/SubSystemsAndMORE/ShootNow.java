@@ -29,6 +29,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.EpsilonOpModes.BlueDepot;
 
 
 public class ShootNow {
@@ -61,8 +62,8 @@ public class ShootNow {
 
         public double ready = 0.95;
 
-        public double cycle = .5;
-        public double cycleDown = .25;
+        public double cycle = 1;
+        public double cycleDown = .75;
 
         public Shoot() {
 
@@ -103,6 +104,7 @@ public class ShootNow {
                             shooting1 = true;
 
                         } else if (ColorBay2 == 1) {
+
 
                             Bay2Boot.setPosition(shoot);
 

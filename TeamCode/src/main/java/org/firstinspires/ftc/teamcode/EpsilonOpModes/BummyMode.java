@@ -132,6 +132,7 @@ public class BummyMode extends OpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        double cycleDown = .75;
 
         team = 1;
     }
@@ -170,24 +171,24 @@ public class BummyMode extends OpMode {
 
             Bay1Boot.setPosition(.575);
 
-            Bay2Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
+            Bay2Boot.setPosition(.97);
+            Bay3Boot.setPosition(.97);
 
         }
         else if (gamepad1.dpad_right) {
 
             Bay2Boot.setPosition(.55);
 
-            Bay1Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
+            Bay1Boot.setPosition(.97);
+            Bay3Boot.setPosition(.97);
 
         }
         else if (gamepad1.dpad_down) {
 
             Bay3Boot.setPosition(.575);
 
-            Bay1Boot.setPosition(.95);
-            Bay2Boot.setPosition(.95);
+            Bay1Boot.setPosition(.97);
+            Bay2Boot.setPosition(.97);
 
         }
         else {

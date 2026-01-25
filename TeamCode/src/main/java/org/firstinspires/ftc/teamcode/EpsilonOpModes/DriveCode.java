@@ -79,16 +79,16 @@ public class DriveCode extends OpMode {
     private boolean shooting2 = false;
     private boolean shooting3 = false;
     public double shoot = .5;
-    public double ready = 0.95;
+
+    public double ready = 0.97;
 
     public double cycle = .5;
-    public double cycleDown = .25;
+    public double cycleDown = .12;
     public double ball1, ball2, ball3;
     public boolean Boot1 = false;
     public boolean Boot2 = false;
     public boolean Boot3 = false;
     public boolean SequenceShoot = false;
-
 
 
     @Override
@@ -106,7 +106,7 @@ public class DriveCode extends OpMode {
         dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
-        team = 1;
+
         Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,172.5);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
@@ -114,6 +114,7 @@ public class DriveCode extends OpMode {
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.resetPosAndIMU();
         pinpoint.setPosition(Pose2ding);
+        team=1;
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotor.Direction.REVERSE);
@@ -122,9 +123,8 @@ public class DriveCode extends OpMode {
         Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
         Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
         Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
-        Bay1Boot.setPosition(ready);
-        Bay2Boot.setPosition(ready);
-        Bay3Boot.setPosition(ready);
+        Bay1Boot.setPosition(.94);
+        Bay2Boot.setPosition(.94);Bay3Boot.setPosition(.94);
 
         timer = new ElapsedTime();
 
@@ -138,8 +138,6 @@ public class DriveCode extends OpMode {
 
         normalSpeed = 0.8;
         turbo_speed = 1;
-        timer2 = new ElapsedTime();
-
 
 //        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
@@ -181,7 +179,6 @@ public class DriveCode extends OpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pattern="PPG";
-
         if (pattern.equals("PPG")) {
             ball1 = 1;
             ball2 = 1;
@@ -199,8 +196,6 @@ public class DriveCode extends OpMode {
 
         }
 
-
-
     }
     /// 165 degrees is turret
     private void Sticks(double speed) {
@@ -213,6 +208,7 @@ public class DriveCode extends OpMode {
         bl.setPower(speed * gamepad1.right_stick_x + (-speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
         br.setPower(-speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
     }
+
 
     @Override
     public void loop() {
@@ -239,11 +235,11 @@ public class DriveCode extends OpMode {
             intake.setPower(0);
 
         }
-        if ( gamepad1.square){
+        if ( gamepad1. square){
             outakeL.setPower(.55);
             outakeR.setPower(.55);
         }
-        if (gamepad1.triangle) {
+        if (gamepad1. triangle) {
             outakeR.setPower(.63);
             outakeL.setPower(.63);
             hood.setPosition(.64);
@@ -254,14 +250,14 @@ public class DriveCode extends OpMode {
             );
             hood.setPosition(.9);
         }
-        if (gamepad1.a){
+        if ( gamepad1.a){
             outakeL.setPower(0);
             outakeR.setPower(0);
             hood.setPosition(.54);
         }
         if (gamepad1.right_bumper){
             intake.setPower(.8);
-
+        }
 //        if (gamepad1.dpad_left) {
 //
 //            Bay1Boot.setPosition(.575);
@@ -284,9 +280,9 @@ public class DriveCode extends OpMode {
 //
 //            Bay1Boot.setPosition(.95);
 //            Bay2Boot.setPosition(.95);
-
-        }
-//        //else {
+//
+//        }
+//        else {
 //
 //            Bay1Boot.setPosition(.95);
 //            Bay2Boot.setPosition(.95);
@@ -404,7 +400,6 @@ public class DriveCode extends OpMode {
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-
             double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
 
             double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
@@ -520,7 +515,7 @@ public class DriveCode extends OpMode {
         }
 
         //ShootPurple
-        if (gamepad1.dpad_left && !Boot1 && !Boot2 && !Boot3) {
+        if (!shooting1&&!shooting2&&gamepad1.dpad_left && !Boot1 && !Boot2 && !Boot3) {
             if (ColorBay1 == 1) {
                 Bay1Boot.setPosition(shoot);
                 ColorBay1 = 0;
@@ -564,19 +559,19 @@ public class DriveCode extends OpMode {
             }
         }
         //Reset Boot Arms
-        if (timer.seconds() < cycle && (timer.seconds() > (cycle-cycleDown)) && Boot1 || Boot2 || Boot3) {
+        if (timer.seconds() < cycle && timer.seconds() > (cycle-cycleDown) && (Boot1 || Boot2 || Boot3)) {
             Bay1Boot.setPosition(ready);
             Bay2Boot.setPosition(ready);
             Bay3Boot.setPosition(ready);
-        } else if (timer.seconds() > cycle && Boot1 || Boot2 || Boot3) {
+        } else if (timer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
             Boot1 = false;
             Boot2 = false;
             Boot3 = false;
         }
         //SequencedShot
-        if (gamepad1.dpad_down || SequenceShoot == true) {
+        if (gamepad2.dpad_down || SequenceShoot == true) {
             if (!initialized) {
-                timer2.reset();
+              //  timer2.reset();
                 SequenceShoot = true;
             }
 
@@ -717,6 +712,7 @@ public class DriveCode extends OpMode {
 
                         ColorBay3 = 0;
                         shooting3 = true;
+                        timer.reset();
 
                     }
                 }
