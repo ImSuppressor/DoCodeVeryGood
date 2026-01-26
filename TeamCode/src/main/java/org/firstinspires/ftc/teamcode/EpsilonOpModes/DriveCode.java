@@ -69,7 +69,7 @@ public class DriveCode extends OpMode {
     private  Servo Bay2Boot;
     private  Servo Bay3Boot;
     private DcMotorEx intake;
-    private GoBildaPinpointDriver pinpoint;
+//    private GoBildaPinpointDriver pinpoint;
     private Pose2D Pose2ding;
     private NormalizedColorSensor bay11;
     private NormalizedColorSensor bay12;
@@ -112,12 +112,12 @@ public class DriveCode extends OpMode {
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
 
-        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        pinpoint.resetPosAndIMU();
-        pinpoint.setPosition(Pose2ding);
+//        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+//        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
+//        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
+//        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+//        pinpoint.resetPosAndIMU();
+//        pinpoint.setPosition(Pose2ding);
 
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
