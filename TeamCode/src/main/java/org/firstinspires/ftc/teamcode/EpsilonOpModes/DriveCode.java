@@ -10,6 +10,7 @@ import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
@@ -61,6 +62,7 @@ public class DriveCode extends OpMode {
     private DcMotor br;
     private ElapsedTime timer;
     private ElapsedTime timer2;
+    private ElapsedTime BooterTimer;
     private  Servo Bay1Boot;
     private  Servo Bay2Boot;
     private  Servo Bay3Boot;
@@ -107,14 +109,14 @@ public class DriveCode extends OpMode {
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
 
-        Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,172.5);
+        Pose2ding = new Pose2D(DistanceUnit.INCH,60,10,AngleUnit.DEGREES,85);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
         pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         pinpoint.resetPosAndIMU();
         pinpoint.setPosition(Pose2ding);
-        team=1;
+
 
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setDirection(DcMotor.Direction.REVERSE);
@@ -127,7 +129,8 @@ public class DriveCode extends OpMode {
         Bay2Boot.setPosition(.94);Bay3Boot.setPosition(.94);
 
         timer = new ElapsedTime();
-
+        BooterTimer = new ElapsedTime();
+        timer2 = new ElapsedTime();
         P_tur = 0.1;//ticks per degree
         I_tur = 0;
         D_tur = 0.001;//power given
@@ -322,17 +325,6 @@ public class DriveCode extends OpMode {
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-//            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
-//
-//            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
-//
-//            outakeL.setPower(-powervar);
-//            outakeR.setPower(powervar);
-//            hood.setPosition(servovar);
-//            telemetry.addData("Distx",DisToGoalX);
-//            telemetry.addData("DistY",DisToGoalY);
-//            telemetry.addData("Tx",result.getTx());
-
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
                 double pidPower = TurControllerL.calculate(result.getTx(), 0);
@@ -400,16 +392,7 @@ public class DriveCode extends OpMode {
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
 
-            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
-
-            outakeL.setPower(-powervar);
-            outakeR.setPower(powervar);
-            hood.setPosition(servovar);
-            telemetry.addData("Distx",DisToGoalX);
-            telemetry.addData("DistY",DisToGoalY);
-            telemetry.addData("Tx",result.getTx());
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
@@ -519,19 +502,19 @@ public class DriveCode extends OpMode {
             if (ColorBay1 == 1) {
                 Bay1Boot.setPosition(shoot);
                 ColorBay1 = 0;
-                timer.reset();
+                BooterTimer.reset();
                 Boot1 = true;
 
             } else if (ColorBay2 == 1) {
                 Bay2Boot.setPosition(shoot);
                 ColorBay2 = 0;
-                timer.reset();
+                BooterTimer.reset();
                 Boot2 = true;
 
             } else if (ColorBay3 == 1) {
                 Bay3Boot.setPosition(shoot);
                 ColorBay3 = 0;
-                timer.reset();
+                BooterTimer.reset();
                 Boot3 = true;
 
             }
@@ -541,29 +524,29 @@ public class DriveCode extends OpMode {
             if (ColorBay1 == 2) {
                 Bay1Boot.setPosition(shoot);
                 ColorBay1 = 0;
-                timer.reset();
+                BooterTimer.reset();
                 Boot1 = true;
 
             } else if (ColorBay2 == 2) {
                 Bay2Boot.setPosition(shoot);
                 ColorBay2 = 0;
-                timer.reset();
+                BooterTimer.reset();
                 Boot2 = true;
 
             } else if (ColorBay3 == 2) {
                 Bay3Boot.setPosition(shoot);
                 ColorBay3 = 0;
-                timer.reset();
+                BooterTimer.reset();
                 Boot3 = true;
 
             }
         }
         //Reset Boot Arms
-        if (timer.seconds() < cycle && timer.seconds() > (cycle-cycleDown) && (Boot1 || Boot2 || Boot3)) {
+        if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle-cycleDown) && (Boot1 || Boot2 || Boot3)) {
             Bay1Boot.setPosition(ready);
             Bay2Boot.setPosition(ready);
             Bay3Boot.setPosition(ready);
-        } else if (timer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
+        } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
             Boot1 = false;
             Boot2 = false;
             Boot3 = false;
@@ -734,6 +717,7 @@ public class DriveCode extends OpMode {
         telemetry.addData("currentY",currentY);
         telemetry.addData("currentH",currentH);
         telemetry.addData("currentPos",currentPos);
+        telemetry.addData("team",team);
         telemetry.update();
 
     }

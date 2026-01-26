@@ -273,7 +273,7 @@ public class ShootNow {
                     }
                 }
 
-                else if (pattern.equals("GPP")) {
+                else if((pattern.equals("GPP"))||pattern.equals("21")) {
 
                     if (time < cycle && !shooting1) {
 

@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBa
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
 import androidx.annotation.NonNull;
 
@@ -65,6 +66,7 @@ public class BlueDepot extends LinearOpMode {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        team=1;
 
         Servo hood = hardwareMap.get(Servo.class, "Hood");
         Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
@@ -122,16 +124,15 @@ public class BlueDepot extends LinearOpMode {
                 .stopAndAdd(new Setpositionforservo(Boot3,.97))
                 .build();
         Action Grab2 = drive.actionBuilder(new Pose2d(35,10,0))
-                .strafeToLinearHeading(new Vector2d(80,20),0)
+                .strafeToLinearHeading(new Vector2d(70,20),0)
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .build();
-        Action backup = drive.actionBuilder(new Pose2d(80,20,0))
+        Action backup = drive.actionBuilder(new Pose2d(77,20,0))
                 .strafeToLinearHeading(new Vector2d(65,20),0)
                 .build();
         Action Score2 = drive.actionBuilder(new Pose2d(65,20,0))
                 .afterTime(.75,new ColorSense(hardwareMap))
                 .stopAndAdd(new SetpowerforMotor(intake,0))
-
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
                         .build();
         Action GoLIne3 = drive.actionBuilder(new Pose2d(24,-24,-45))
@@ -169,7 +170,8 @@ public class BlueDepot extends LinearOpMode {
 
                 .build();
         Action PAARRK = drive.actionBuilder(new Pose2d(24,-24,-45))
-                .strafeToLinearHeading(new Vector2d(60,10),Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(60,10),Math.toRadians(-90))
+                //.afterTime(1.1,new SetpositionforMotor(turret,-900))
                         .build();
 
 
@@ -235,6 +237,10 @@ public class BlueDepot extends LinearOpMode {
         ));
         Actions.runBlocking(new SequentialAction(
                 shootNow.shoot()
+
+        ));
+        Actions.runBlocking(new SequentialAction(
+               PAARRK
 
         ));
 

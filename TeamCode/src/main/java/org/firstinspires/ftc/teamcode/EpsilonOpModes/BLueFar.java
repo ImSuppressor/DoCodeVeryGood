@@ -47,7 +47,7 @@ public class BLueFar extends LinearOpMode {
         ColorBay2 = 0;
         ColorBay3 = 0;
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, -3, Math.toRadians(0)));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, 0, Math.toRadians(90)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
@@ -65,13 +65,14 @@ public class BLueFar extends LinearOpMode {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Servo hood = hardwareMap.get(Servo.class, "Hood");
+        Servo
+                hood = hardwareMap.get(Servo.class, "Hood");
         Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
         Servo Boot2 = hardwareMap.get(Servo.class, "Boot2");
         Servo Boot3 = hardwareMap.get(Servo.class, "Boot3");
-        Boot1.setPosition(.95);
-        Boot2.setPosition(.95);
-        Boot3.setPosition(.95);
+        Boot1.setPosition(.97);
+        Boot2.setPosition(.97);
+        Boot3.setPosition(.97);
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -81,14 +82,79 @@ public class BLueFar extends LinearOpMode {
 
 
         //TODO:Init Everything cracka
-        Action Scorepre = drive.actionBuilder(new Pose2d(-72, -3, Math.toRadians(0)))//move to park
-                .stopAndAdd(new SetpowerforMotor(outakeL,.75))
-                .stopAndAdd(new SetpowerforMotor(outakeR,.75))
-                .stopAndAdd(new Setpositionforservo(hood,.7))
+        Action Get1 = drive.actionBuilder(new Pose2d(-72, 0, Math.toRadians(90)))//move to park
+                .stopAndAdd(new SetpowerforMotor(intake,1))
                 .afterTime(.75,new ColorSense(hardwareMap))
-                .afterTime(1.1,new SetpositionforMotor(turret,-617))
-                .strafeToLinearHeading(new Vector2d(-70, -70), Math.toRadians(-45))
+                //.afterTime(1.1,new SetpositionforMotor(turret,-617))
+                .strafeToLinearHeading(new Vector2d(-70, 70), Math.toRadians(90))
                 //.waitSeconds(1.5)
+                .build();
+        Action get11 = drive.actionBuilder(new Pose2d(-72,72, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-67, 67),180)
+                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .build();
+        Action get21 = drive.actionBuilder(new Pose2d(-67, 67, Math.toRadians(195)))
+                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .strafeTo(new Vector2d(-70, 70))
+                .build();
+        Action scoreWall =drive.actionBuilder(new Pose2d(-72,72, Math.toRadians(195)))
+                .strafeToLinearHeading(new Vector2d(-72, 0),Math.toRadians(90))
+
+                .build();
+        Action overfill =drive.actionBuilder(new Pose2d(-72,0, Math.toRadians(195)))
+                .strafeToLinearHeading(new Vector2d(-38.5, 65),Math.toRadians(5))
+                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .build();
+        Action intakeove =drive.actionBuilder(new Pose2d(-38.5,65, Math.toRadians(195)))
+                .turn(Math.toRadians(-45))
+                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .waitSeconds(4)
+                .build();
+
+
+
+
+
+
+
+
+        Action Waiting = drive.actionBuilder(new Pose2d(-72, 10, 0))
+
+                .afterTime(.25,new SetpositionforMotor(turret,1150))
+                .stopAndAdd(new SetpowerforMotor(outakeL,.75)).stopAndAdd(new SetpowerforMotor(outakeR,.75))
+                .waitSeconds(2)
+                .build();
+        Action shooot = drive.actionBuilder(new Pose2d(-72, 10, 90))
+                .afterTime(.01,new Setpositionforservo(Boot1,.535))
+                .afterTime(.3,new Setpositionforservo(Boot1,.97))
+                .afterTime(.8,new Setpositionforservo(Boot2,.535))
+                .afterTime(1,new Setpositionforservo(Boot2,.97))
+                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
+                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+                //fail safe thing
+                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
+                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
+                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
+                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
+                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
+                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+
+                .build();
+        Action shotv2 = drive.actionBuilder(new Pose2d(-72, 10, 90))
+                .afterTime(.01,new Setpositionforservo(Boot1,.535))
+                .afterTime(.3,new Setpositionforservo(Boot1,.97))
+                .afterTime(.8,new Setpositionforservo(Boot2,.535))
+                .afterTime(1,new Setpositionforservo(Boot2,.97))
+                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
+                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+                //fail safe thing
+                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
+                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
+                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
+                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
+                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
+                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+
                 .build();
 
 
@@ -108,8 +174,38 @@ public class BLueFar extends LinearOpMode {
         waitForStart();
         //TODO: Run auto
         Actions.runBlocking(new SequentialAction(
-                Scorepre
+                Waiting
         ));
+        Actions.runBlocking(new SequentialAction(
+              shooot
+        ));
+        Actions.runBlocking(new SequentialAction(
+              Get1
+        ));
+        Actions.runBlocking(new SequentialAction(
+                get11
+        ));
+        Actions.runBlocking(new SequentialAction(
+                get21
+        ));
+        Actions.runBlocking(new SequentialAction(
+              scoreWall
+        ));
+        Actions.runBlocking(new SequentialAction(
+                shotv2
+        ));
+        Actions.runBlocking(new SequentialAction(
+              overfill
+        ));
+        Actions.runBlocking(new SequentialAction(
+
+        ));
+        Actions.runBlocking(new SequentialAction(
+
+        ));
+
+
+
 
 
 
