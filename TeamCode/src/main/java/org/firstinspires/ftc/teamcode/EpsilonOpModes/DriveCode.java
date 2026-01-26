@@ -4,12 +4,14 @@ package org.firstinspires.ftc.teamcode.EpsilonOpModes;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
@@ -95,6 +97,7 @@ public class DriveCode extends OpMode {
 
     @Override
     public void init() {
+        drive = new MecanumDrive(hardwareMap, LastPose);
         bay11 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
         bay12 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
         dist11 = hardwareMap.get(DistanceSensor.class, "Bay1.1");
@@ -109,7 +112,6 @@ public class DriveCode extends OpMode {
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
 
 
-        Pose2ding = new Pose2D(DistanceUnit.INCH,60,10,AngleUnit.DEGREES,85);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
@@ -215,7 +217,7 @@ public class DriveCode extends OpMode {
 
     @Override
     public void loop() {
-        pinpoint.update();
+        drive.updatePoseEstimate();
 //        if ( bay11 == 1&&gamepad1.dpad_left) {
 //            Bay1Boot.setPosition(.535);
 //            bay11 = 0;
@@ -303,11 +305,11 @@ public class DriveCode extends OpMode {
 
         }
 
-        Pose2D currentPos = pinpoint.getPosition();
+        Pose2d currentPos = drive.localizer.getPose();
 
-        double currentX = currentPos.getX(DistanceUnit.INCH);
-        double currentY = currentPos.getY(DistanceUnit.INCH);
-        double currentH = currentPos.getHeading(AngleUnit.DEGREES);
+        double currentX = currentPos.position.x;
+        double currentY = currentPos.position.y;
+        double currentH = currentPos.heading.toDouble();
 
         LLResult result = limelight.getLatestResult();
 

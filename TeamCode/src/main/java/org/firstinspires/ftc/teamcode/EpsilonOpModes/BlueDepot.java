@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.EpsilonOpModes;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
@@ -48,6 +49,7 @@ public class BlueDepot extends LinearOpMode {
         ColorBay1 = 0;
         ColorBay2 = 0;
         ColorBay3 = 0;
+        team=1;
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57, -49, Math.toRadians(-45)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
@@ -66,7 +68,6 @@ public class BlueDepot extends LinearOpMode {
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        team=1;
 
         Servo hood = hardwareMap.get(Servo.class, "Hood");
         Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
@@ -188,6 +189,7 @@ public class BlueDepot extends LinearOpMode {
         }
 
         waitForStart();
+        try {
         //TODO: Run auto
         Actions.runBlocking(new SequentialAction(
               Scorepre,shootNow.shoot(),speed
@@ -244,6 +246,11 @@ public class BlueDepot extends LinearOpMode {
 
         ));
 
+    } finally {
+            drive.updatePoseEstimate();
+            LastPose = drive.localizer.getPose();
+
+        }
     }
 
 
