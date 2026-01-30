@@ -257,16 +257,6 @@ public class TurretTune extends OpMode {
 
             double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-            double powervar = -(.0000000336305)*Math.pow(DistanceToGoal,4)+0.000013082*Math.pow(DistanceToGoal,3)-0.0018165*Math.pow(DistanceToGoal,2)+0.109416*(DistanceToGoal)-1.92276;
-
-            double servovar = .0000000919818*Math.pow(DistanceToGoal,4) - 0.0000339204*Math.pow(DistanceToGoal,3)+0.004539*Math.pow(DistanceToGoal,2)-0.25738*DistanceToGoal+5.71927;
-
-            outakeL.setPower(-powervar);
-            outakeR.setPower(powervar);
-            hood.setPosition(servovar);
-            telemetry.addData("Distx",DisToGoalX);
-            telemetry.addData("DistY",DisToGoalY);
-            telemetry.addData("Tx",result.getTx());
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 

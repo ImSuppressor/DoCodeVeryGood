@@ -1,0 +1,581 @@
+package org.firstinspires.ftc.teamcode.EpsilonOpModes;
+
+
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
+
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+
+@Config
+@TeleOp
+public class LeagueDrive extends OpMode {
+    MecanumDrive drive;
+    private PIDController TurController;
+    private PIDController TurControllerL;
+    double P_tur;
+    double I_tur;
+    double D_tur;
+    double P_tur_Lim;
+    double I_tur_Lim;
+    double D_tur_Lim;
+    double normalSpeed;
+    double turbo_speed;
+
+    private DcMotorEx turret;
+    private Limelight3A limelight;
+    private Servo hood;
+    private double DisToGoalX;
+    private double DisToGoalY;
+    private DcMotorEx outakeL;
+    private DcMotorEx outakeR;
+    public double powervar;
+    public double servovar;
+    private DcMotor fl;
+    private DcMotor fr;
+    private DcMotor bl;
+    private DcMotor br;
+    private ElapsedTime timer;
+    private ElapsedTime timer2;
+    private ElapsedTime BooterTimer;
+    private  Servo Bay1Boot;
+    private  Servo Bay2Boot;
+    private  Servo Bay3Boot;
+    private DcMotorEx intake;
+    //    private GoBildaPinpointDriver pinpoint;
+    private Pose2D Pose2ding;
+    private NormalizedColorSensor bay11;
+    private NormalizedColorSensor bay12;
+    private NormalizedColorSensor bay21;
+    private NormalizedColorSensor bay22;
+    private NormalizedColorSensor bay31;
+    private NormalizedColorSensor bay32;
+    private DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
+    private boolean initialized = false;
+    private boolean shooting1 = false;
+    private boolean shooting2 = false;
+    private boolean shooting3 = false;
+    public double shoot = .5;
+public double far =-165;
+    public double ready = 0.97;
+
+    public double cycle = .5;
+    public double cycleDown = .12;
+    public double ball1, ball2, ball3;
+    public boolean Boot1 = false;
+    public boolean Boot2 = false;
+    public boolean Boot3 = false;
+    public boolean SequenceShoot = false;
+
+
+    @Override
+    public void init() {
+        drive = new MecanumDrive(hardwareMap, LastPose);
+        bay11 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
+        bay12 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
+        dist11 = hardwareMap.get(DistanceSensor.class, "Bay1.1");
+        dist12 = hardwareMap.get(DistanceSensor.class, "Bay1.2");
+        bay21 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
+        bay22 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
+        dist21 = hardwareMap.get(DistanceSensor.class, "Bay2.1");
+        dist22 = hardwareMap.get(DistanceSensor.class, "Bay2.2");
+        bay31 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
+        bay32 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
+        dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
+        dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
+
+
+//        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+//        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
+//        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
+//        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+//        pinpoint.resetPosAndIMU();
+//        pinpoint.setPosition(Pose2ding);
+
+
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake.setDirection(DcMotor.Direction.REVERSE);
+
+
+        Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
+        Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
+        Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
+        Bay1Boot.setPosition(.94);
+        Bay2Boot.setPosition(.94);Bay3Boot.setPosition(.94);
+
+        timer = new ElapsedTime();
+        BooterTimer = new ElapsedTime();
+//        timer2 = new ElapsedTime();
+//        P_tur = 0.1;//ticks per degree
+//        I_tur = 0;
+//        D_tur = 0.001;//power given
+//
+//        P_tur_Lim = .03;
+//        I_tur_Lim = 0.0015;
+//        D_tur_Lim = .001;
+
+        normalSpeed = 1;
+        turbo_speed = 1;
+
+//        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+
+        outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
+        outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
+        outakeL.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        turret = hardwareMap.get(DcMotorEx.class,"turret");
+
+        limelight = hardwareMap.get(Limelight3A.class,"limelight");
+
+        hood = hardwareMap.get(Servo.class,"Hood");
+
+        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+       turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        TurController = new PIDController(P_tur, I_tur, D_tur);
+        TurControllerL = new PIDController(P_tur_Lim, I_tur_Lim, D_tur_Lim);
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        limelight.start();
+        limelight.pipelineSwitch(1);
+        limelight.setPollRateHz(50);
+
+        servovar = .5;
+        hood.setPosition(servovar);
+        turret.setTargetPosition(-500);
+
+        fl = hardwareMap.get(DcMotorEx.class,"fl");
+        fr = hardwareMap.get(DcMotorEx.class,"fr");
+        bl = hardwareMap.get(DcMotorEx.class,"bl");
+        br = hardwareMap.get(DcMotorEx.class,"br");
+
+        bl.setDirection(DcMotorEx.Direction.REVERSE);
+        fl.setDirection(DcMotorEx.Direction.REVERSE);
+        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+      //  pattern="PPG";
+//        if (pattern.equals("PPG")) {
+//            ball1 = 1;
+//            ball2 = 1;
+//            ball3 = 2;
+//
+//        } else if (pattern.equals("PGP")) {
+//            ball1 = 1;
+//            ball2 = 2;
+//            ball3 = 1;
+//
+//        } else if (pattern.equals("GPP")) {
+//            ball1 = 2;
+//            ball2 = 1;
+//            ball3 = 1;
+//
+//        }
+
+    }
+    /// 165 degrees is turret
+    private void Sticks(double speed) {
+        // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
+        // We negate this value so that the topmost position corresponds to maximum forward power.
+        fl.setPower(speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
+        fr.setPower(-speed * gamepad1.right_stick_x + (-(speed * gamepad1.left_stick_x) - speed * gamepad1.left_stick_y));
+        // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
+        // We negate this value so that the topmost position corresponds to maximum forward power.
+        bl.setPower(speed * gamepad1.right_stick_x + (-speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
+        br.setPower(-speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
+    }
+
+
+    @Override
+    public void loop() {
+
+        Sticks(gamepad1.right_bumper ? turbo_speed : normalSpeed);
+
+
+        double targetBay1 = ready;
+        double targetBay2 = ready;
+        double targetBay3 = ready;
+
+
+        double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+        double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+        double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+
+        if (distance1 < 3 && !Boot1) {
+            ColorBay1 = (bay11.getNormalizedColors().blue > bay11.getNormalizedColors().green) ? 1 : 2;
+        }
+        if (distance2 < 3 && !Boot2) {
+            ColorBay2 = (bay21.getNormalizedColors().blue > bay21.getNormalizedColors().green) ? 1 : 2;
+        }
+        if (distance3 < 10 && !Boot3) {
+            ColorBay3 = (bay31.getNormalizedColors().blue > bay31.getNormalizedColors().green) ? 1 : 2;
+        }
+
+
+
+
+
+
+
+
+
+
+        if (gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
+            if (ColorBay1 == 1) {
+                Boot1 = true;
+                ColorBay1 = 0;
+                BooterTimer.reset();
+            }
+            else if (ColorBay2 == 1) {
+                Boot2 = true;
+                ColorBay2 = 0;
+                BooterTimer.reset();
+            }
+            else if (ColorBay3 == 1) {
+                Boot3 = true;
+                ColorBay3 = 0;
+                BooterTimer.reset();
+            }
+        }
+
+            // Green
+        else if (gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
+            if (ColorBay1 == 2) {
+                Boot1 = true;
+                ColorBay1 = 0;
+                BooterTimer.reset();
+            }
+            else if (ColorBay2 == 2) {
+                Boot2 = true;
+                ColorBay2 = 0;
+                BooterTimer.reset();
+            }
+            else if (ColorBay3 == 2) {
+                Boot3 = true;
+                ColorBay3 = 0;
+                BooterTimer.reset();
+            }
+        }
+
+
+        if (Boot1 || Boot2 || Boot3) {
+            if (BooterTimer.seconds() < (cycle - cycleDown)) {
+                if (Boot1) targetBay1 = shoot;
+                if (Boot2) targetBay2 = shoot;
+                if (Boot3) targetBay3 = shoot;
+            }
+            else if (BooterTimer.seconds() >= cycle) {
+
+                Boot1 = false; Boot2 = false; Boot3 = false;
+            }
+        }
+
+
+        if (gamepad1.dpad_left) {
+            targetBay1 = 0.55;
+            ColorBay1 = 0;
+        }
+        if (gamepad1.dpad_right) {
+            targetBay2 = 0.55;
+            ColorBay2 = 0;
+        }
+        if (gamepad1.dpad_down) {
+            targetBay3 = 0.55;
+            ColorBay3 = 0;
+        }
+
+        Bay1Boot.setPosition(targetBay1);
+        Bay2Boot.setPosition(targetBay2);
+        Bay3Boot.setPosition(targetBay3);
+
+
+        if (gamepad1.square) {
+            outakeL.setPower(0.55); outakeR.setPower(0.55); hood.setPosition(0.85);
+
+
+
+        } else if (gamepad1.triangle) {
+            outakeL.setPower(0.63); outakeR.setPower(0.63); hood.setPosition(0.8);
+
+        } else if (gamepad1.circle) {
+            outakeL.setPower(0.725); outakeR.setPower(0.725); hood.setPosition(0.95);
+
+        } else if (gamepad1.a) {
+            outakeL.setPower(0); outakeR.setPower(0); hood.setPosition(0.5);
+        }
+
+
+        boolean allBaysFull = (ColorBay1 != 0 && ColorBay2 != 0 && ColorBay3 != 0);
+
+        if (gamepad1.right_trigger > 0 && !allBaysFull) {
+
+            intake.setPower(1);
+        }
+        else if (gamepad1.left_trigger > 0) {
+
+            ColorBay1 = 0;
+            ColorBay2 = 0;
+            ColorBay3 = 0;
+            intake.setPower(-1);
+        }
+        else {
+            intake.setPower(0);
+        }
+
+        if (distance1 < 3&& !Boot1 && !shooting1) {
+            NormalizedRGBA colors11 = bay11.getNormalizedColors();
+            NormalizedRGBA colors12 = bay12.getNormalizedColors();
+            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
+            if (avgBlue1 > avgGreen1) {
+                ColorBay1 = 1;
+            } else if (avgGreen1 > avgBlue1) {
+                ColorBay1 = 2;
+            } else {
+                ColorBay1 = 0;
+            }
+        }
+        if (distance2 < 3&& !Boot1 && !shooting1) {
+            NormalizedRGBA colors21 = bay21.getNormalizedColors();
+            NormalizedRGBA colors22 = bay22.getNormalizedColors();
+            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+            if (avgBlue2 > avgGreen2) {
+                ColorBay2 = 1;
+            } else if (avgGreen2 > avgBlue2) {
+                ColorBay2 = 2;//bay 2 is stipud
+            } else {
+                ColorBay2 = 0;
+            }
+        }
+        if (distance3 < 10 && !Boot1 && !shooting1) {
+            NormalizedRGBA colors31 = bay31.getNormalizedColors();
+            NormalizedRGBA colors32 = bay32.getNormalizedColors();
+            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+            if (avgBlue3 > avgGreen3) {
+                ColorBay3 = 1;
+            } else if (avgGreen3 > avgBlue3) {
+                ColorBay3 = 2;
+            } else {
+                ColorBay3 = 0;
+            }
+        }
+
+        //ShootPurple
+
+        //SequencedShot
+//        if (gamepad2.dpad_down && !SequenceShoot) {
+//            if (!initialized) {
+//                shooting1 = false;
+//                shooting2 = false;
+//                shooting3 = false;
+//                BooterTimer.reset();
+//                SequenceShoot = true;
+//            }
+//            if (BooterTimer.seconds() < (cycle) && !shooting1) {
+//
+//                if (ColorBay1 == ball1) {
+//
+//                    Bay1Boot.setPosition(shoot);
+//
+//                    ColorBay1 = 0;
+//                    shooting1 = true;
+//
+//                } else if (ColorBay2 == ball1) {
+//
+//                    Bay2Boot.setPosition(shoot);
+//
+//                    ColorBay2 = 0;
+//                    shooting1 = true;
+//
+//                } else if (ColorBay3 == ball1) {
+//
+//                    Bay3Boot.setPosition(shoot);
+//
+//                    ColorBay3 = 0;
+//                    shooting1 = true;
+//
+//                } else {
+//                    if (!(ColorBay1 == 0)) {
+//                        Bay1Boot.setPosition(shoot);
+//
+//                        ColorBay1 = 0;
+//                        shooting1 = true;
+//                    } else if (!(ColorBay2 == 0)) {
+//                        Bay2Boot.setPosition(shoot);
+//
+//                        ColorBay2 = 0;
+//                        shooting1 = true;
+//
+//                    } else if (!(ColorBay3 == 0)) {
+//                        Bay3Boot.setPosition(shoot);
+//
+//                        ColorBay3 = 0;
+//                        shooting1 = true;
+//
+//                    }
+//                }
+//            } else if (BooterTimer.seconds() > (cycle-cycleDown) && BooterTimer.seconds() < cycle) {
+//                Bay1Boot.setPosition(ready);
+//                Bay2Boot.setPosition(ready);
+//                Bay3Boot.setPosition(ready);
+//
+//            } else if (BooterTimer.seconds() < 2 * cycle && BooterTimer.seconds() > cycle && !shooting2) {
+//
+//                if (ColorBay1 == ball2) {
+//
+//                    Bay1Boot.setPosition(shoot);
+//
+//                    ColorBay1 = 0;
+//                    shooting2 = true;
+//
+//                } else if (ColorBay2 == ball2) {
+//
+//                    Bay2Boot.setPosition(shoot);
+//
+//                    ColorBay2 = 0;
+//                    shooting2 = true;
+//
+//                } else if (ColorBay3 == ball2) {
+//
+//                    Bay3Boot.setPosition(shoot);
+//
+//                    ColorBay3 = 0;
+//                    shooting2 = true;
+//
+//                } else {
+//                    if (!(ColorBay1 == 0)) {
+//                        Bay1Boot.setPosition(shoot);
+//
+//                        ColorBay1 = 0;
+//                        shooting2 = true;
+//                    } else if (!(ColorBay2 == 0)) {
+//                        Bay2Boot.setPosition(shoot);
+//
+//                        ColorBay2 = 0;
+//                        shooting2 = true;
+//
+//                    } else if (!(ColorBay3 == 0)) {
+//                        Bay3Boot.setPosition(shoot);
+//
+//                        ColorBay3 = 0;
+//                        shooting2 = true;
+//
+//                    }
+//                }
+
+//            }  else if (BooterTimer.seconds() > ((2*cycle)-cycleDown) && BooterTimer.seconds() < 2*cycle) {
+//                Bay1Boot.setPosition(ready);
+//                Bay2Boot.setPosition(ready);
+//                Bay3Boot.setPosition(ready);
+//
+//            } else if (BooterTimer.seconds() < 3 * cycle && BooterTimer.seconds() > 2 * cycle && !shooting3) {
+//
+//                if (ColorBay1 == ball3) {
+//
+//                    Bay1Boot.setPosition(shoot);
+//
+//                    ColorBay1 = 0;
+//                    shooting3 = true;
+//
+//                } else if (ColorBay2 == ball3) {
+//
+//                    Bay2Boot.setPosition(shoot);
+//
+//                    ColorBay2 = 0;
+//                    shooting3 = true;
+//
+//                } else if (ColorBay3 == ball3) {
+//
+//                    Bay3Boot.setPosition(shoot);
+//
+//                    ColorBay3 = 0;
+//                    shooting3 = true;
+//
+//                } else {
+//                    if (!(ColorBay1 == 0)) {
+//                        Bay1Boot.setPosition(shoot);
+//
+//                        ColorBay1 = 0;
+//                        shooting3 = true;
+//                    } else if (!(ColorBay2 == 0)) {
+//                        Bay2Boot.setPosition(shoot);
+//
+//                        ColorBay2 = 0;
+//                        shooting3 = true;
+//
+//                    } else if (!(ColorBay3 == 0)) {
+//                        Bay3Boot.setPosition(shoot);
+//
+//                        ColorBay3 = 0;
+//                        shooting3 = true;
+//                        BooterTimer.reset();
+//
+//                    }
+//                }
+//            }
+//            if (BooterTimer.seconds() > 3*cycle && initialized) {
+//                shooting1 = false;
+//                shooting2 = false;
+//                shooting3 = false;
+//                initialized = false;
+//                SequenceShoot = false;
+//            }
+//        }
+        
+
+        telemetry.addData("Bay 3", ColorBay3);
+        telemetry.addData("Bay 2", ColorBay2);
+        telemetry.addData("Bay 1", ColorBay1);
+        telemetry.addData("time", timer.seconds());
+//        telemetry.addData("currentX",currentX);
+//        telemetry.addData("currentY",currentY);
+//        telemetry.addData("currentH",currentH);
+//        telemetry.addData("currentPos",currentPos);
+        telemetry.addData("Intake Status", allBaysFull ?"Full" : "Empty");
+        telemetry.addData("team",team);
+        telemetry.addData("ticks",turret);
+        telemetry.update();
+
+
+
+
+    }
+
+}
+

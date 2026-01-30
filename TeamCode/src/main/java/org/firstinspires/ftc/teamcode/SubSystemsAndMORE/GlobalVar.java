@@ -27,7 +27,7 @@ public class GlobalVar {
 
         //TODO only put if gives errors
 
-//        LastPose = new Pose2d(0,0,0);
+     //   LastPose = new Pose2d(0,0,0);
 
     }
 }

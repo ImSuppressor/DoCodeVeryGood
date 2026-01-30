@@ -208,8 +208,23 @@ public class BummyMode extends OpMode {
             Sticks(normalSpeed);
 
         }
-
-//        Pose2D currentPos = pinpoint.getPosition();
+        if(gamepad1.a){
+            hood.setPosition(.75);
+        }
+        if (gamepad1.b){
+            hood.setPosition(1);
+        }
+        if(gamepad1.x){
+            hood.setPosition(.45);
+        }
+        if (gamepad1.dpad_up){
+            outakeL.setPower(-.535);
+            outakeR.setPower(.535);
+        }
+        if (gamepad1.right_bumper){
+            outakeL.setPower(0);
+            outakeR.setPower(0);
+        }
 //
 //        double currentX = currentPos.getX(DistanceUnit.INCH);
 //        double currentY = currentPos.getY(DistanceUnit.INCH);
@@ -222,9 +237,7 @@ public class BummyMode extends OpMode {
 //            timer.reset();
 //
 //        }
-            outakeL.setPower(-.5);
-            outakeR.setPower(.5);
-            hood.setPosition(.5);
+
     }
 
 }

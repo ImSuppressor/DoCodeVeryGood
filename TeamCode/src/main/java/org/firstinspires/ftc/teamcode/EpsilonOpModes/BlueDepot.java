@@ -49,7 +49,7 @@ public class BlueDepot extends LinearOpMode {
         ColorBay1 = 0;
         ColorBay2 = 0;
         ColorBay3 = 0;
-        team=1;
+        team=1    ;
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57, -49, Math.toRadians(-45)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
@@ -78,6 +78,7 @@ public class BlueDepot extends LinearOpMode {
         Boot3.setPosition(.97);
 
 
+
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
         Limelight.pipelineSwitch(0);
@@ -87,11 +88,11 @@ public class BlueDepot extends LinearOpMode {
 
         //TODO:Init Everything cracka
         Action Scorepre = drive.actionBuilder(new Pose2d(57, -49, Math.toRadians(-45)))//move to park
-                .stopAndAdd(new SetpowerforMotor(outakeL,.575))
-                .stopAndAdd(new SetpowerforMotor(outakeR,.55))
-                .stopAndAdd(new Setpositionforservo(hood,.45))
-                .afterTime(.75,new ColorSense(hardwareMap))
-                .afterTime(1.1,new SetpositionforMotor(turret,-617))
+                .stopAndAdd(new SetpowerforMotor(outakeL,.535))
+                .stopAndAdd(new SetpowerforMotor(outakeR,.535))
+                .stopAndAdd(new Setpositionforservo(hood,.75))
+                .afterTime(1,new ColorSense(hardwareMap))
+                .afterTime(1.1,new SetpositionforMotor(turret,-725))
                 .strafeToLinearHeading(new Vector2d(24, -24), Math.toRadians(-45))
                 //.waitSeconds(1.5)
                 .build();
@@ -113,26 +114,28 @@ public class BlueDepot extends LinearOpMode {
                 .stopAndAdd(new SetpowerforMotor(drive.rightFront, 1))
                 .build();
         Action score1 = drive.actionBuilder(new Pose2d(65, -12, 0))
-                .afterTime(.75,new ColorSense(hardwareMap))
+                .afterTime(0.25,new SetpositionforMotor(turret,-750))
+                .afterTime(1,new ColorSense(hardwareMap))
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
                 .stopAndAdd(new SetpowerforMotor(intake,0))
                 .build();
         Action GoLine2 = drive.actionBuilder(new Pose2d(24, -24, -45))
-                .strafeToLinearHeading(new Vector2d(35,10),Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(35,15),Math.toRadians(0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .stopAndAdd(new Setpositionforservo(Boot1,.97))
                 .stopAndAdd(new Setpositionforservo(Boot2,.97))
                 .stopAndAdd(new Setpositionforservo(Boot3,.97))
                 .build();
-        Action Grab2 = drive.actionBuilder(new Pose2d(35,10,0))
-                .strafeToLinearHeading(new Vector2d(70,20),0)
+        Action Grab2 = drive.actionBuilder(new Pose2d(35,12.5,0))
+                .strafeToLinearHeading(new Vector2d(70,12.5),0)
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .build();
-        Action backup = drive.actionBuilder(new Pose2d(77,20,0))
+        Action backup = drive.actionBuilder(new Pose2d(77,12.5,0))
                 .strafeToLinearHeading(new Vector2d(65,20),0)
                 .build();
         Action Score2 = drive.actionBuilder(new Pose2d(65,20,0))
-                .afterTime(.75,new ColorSense(hardwareMap))
+               // .afterTime(0.25,new SetpositionforMotor(turret,-775))
+                .afterTime(1.1,new ColorSense(hardwareMap))
                 .stopAndAdd(new SetpowerforMotor(intake,0))
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
                         .build();
@@ -143,7 +146,7 @@ public class BlueDepot extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(90,32),0)
                 .build();
         Action Score3 = drive.actionBuilder(new Pose2d(90,32,0))
-                .afterTime(.75,new ColorSense(hardwareMap))
+                .afterTime(1.1,new ColorSense(hardwareMap))
                 .stopAndAdd(new SetpowerforMotor(intake,0))
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
                 .build();
@@ -171,11 +174,20 @@ public class BlueDepot extends LinearOpMode {
 
                 .build();
         Action PAARRK = drive.actionBuilder(new Pose2d(24,-24,-45))
-                .strafeToLinearHeading(new Vector2d(60,10),Math.toRadians(-90))
+                .afterTime(0.25,new SetpositionforMotor(turret,-750))
+                .strafeToLinearHeading(new Vector2d(60,10),Math.toRadians(-180))
                 //.afterTime(1.1,new SetpositionforMotor(turret,-900))
                         .build();
 
+        Action failsafe_thang = drive.actionBuilder(new Pose2d(24,-24,-45))
+                .afterTime(.01,new BlueDepot.Setpositionforservo(Boot1,.535))
+                .afterTime(.3,new BlueDepot.Setpositionforservo(Boot1,.97))
+                .afterTime(.8,new BlueDepot.Setpositionforservo(Boot2,.535))
+                .afterTime(1,new BlueDepot.Setpositionforservo(Boot2,.97))
+                .afterTime(1.5,new BlueDepot.Setpositionforservo(Boot3,.535))
+                .afterTime(1.8,new BlueDepot.Setpositionforservo(Boot3,.97))
 
+                .build();
 
         while (!isStopRequested() && !opModeIsActive()) {
             LLResult result = Limelight.getLatestResult();
@@ -192,11 +204,14 @@ public class BlueDepot extends LinearOpMode {
         try {
         //TODO: Run auto
         Actions.runBlocking(new SequentialAction(
-              Scorepre,shootNow.shoot(),speed
+              Scorepre,shootNow.shoot()
         ));
         Actions.runBlocking(new SequentialAction(
                 ServoReset
         ));
+            Actions.runBlocking(new SequentialAction(
+                    failsafe_thang
+            ));
         Actions.runBlocking(new SequentialAction(
                 lineUP1
         ));
@@ -215,7 +230,7 @@ public class BlueDepot extends LinearOpMode {
                score1
         ));
         Actions.runBlocking(new SequentialAction(
-                shootNow.shoot()
+                shootNow.shoot(),failsafe_thang
         ));
 
         Actions.runBlocking(new SequentialAction(
@@ -238,7 +253,7 @@ public class BlueDepot extends LinearOpMode {
                 Score2
         ));
         Actions.runBlocking(new SequentialAction(
-                shootNow.shoot()
+                shootNow.shoot(),failsafe_thang
 
         ));
         Actions.runBlocking(new SequentialAction(

@@ -3,7 +3,9 @@ package org.firstinspires.ftc.teamcode.EpsilonOpModes;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
 import androidx.annotation.NonNull;
 
@@ -11,17 +13,54 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
-import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.ProfileAccelConstraint;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShooterPID;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
+
+
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
+
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.lynx.commands.core.LynxI2cConfigureChannelCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -43,15 +82,16 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 import java.util.Arrays;
 
-@Autonomous(name="BlueFar", preselectTeleOp = "DriveCode")
-public class BLueFar extends LinearOpMode {
-//8717
+@Autonomous(name="BZ_blue", preselectTeleOp = "Drive26")
+public class BZ_Blue extends LinearOpMode {
+
     @Override
     public void runOpMode() throws InterruptedException {
         pattern = "none";
         ColorBay1 = 0;
         ColorBay2 = 0;
         ColorBay3 = 0;
+        team=1    ;
 
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, 0, Math.toRadians(90)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
@@ -71,14 +111,15 @@ public class BLueFar extends LinearOpMode {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Servo
-                hood = hardwareMap.get(Servo.class, "Hood");
+        Servo hood = hardwareMap.get(Servo.class, "Hood");
         Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
         Servo Boot2 = hardwareMap.get(Servo.class, "Boot2");
         Servo Boot3 = hardwareMap.get(Servo.class, "Boot3");
         Boot1.setPosition(.97);
         Boot2.setPosition(.97);
         Boot3.setPosition(.97);
+
+
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -88,114 +129,108 @@ public class BLueFar extends LinearOpMode {
 
 
         //TODO:Init Everything cracka
-        Action shoot1 = drive.actionBuilder(new Pose2d(-45, 50, Math.toRadians(90)))//move to park
-
-                .afterTime(.75,new ColorSense(hardwareMap))
-
-                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
-
-                //.waitSeconds(1.5)
+        // BZ_Blue
+        Action wait =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
+                .waitSeconds(5)
                 .build();
-        Action Grab3 =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .stopAndAdd(new SetpowerforMotor(outakeL,.85)).stopAndAdd(new SetpowerforMotor(outakeR,.85))
-                .strafeToLinearHeading(new Vector2d(-45,20),Math.toRadians(90))
-
-                .build();
-        Action intakespike =drive.actionBuilder(new Pose2d(-45,20,Math.toRadians(90)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-45,50),Math.toRadians(90))
-                .build();
-        Action Wallpickup =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-44,65),Math.toRadians(180))
-                .build();
-        Action PICKUP =drive.actionBuilder(new Pose2d(-44,65,Math.toRadians(180)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
-
-                .strafeToLinearHeading(
-                        new Vector2d(-72, 70), Math.toRadians(175),
-                        new MinVelConstraint(Arrays.asList(
-                                new TranslationalVelConstraint(15.0), //
-                                new AngularVelConstraint(Math.PI / 2) //
-                        ))
-
-                )
+        Action Waiting =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
+                .afterTime(.1, new BZ_Blue.Setpositionforservo(hood, .9))
+                .afterTime(.1, new BZ_Blue.SetpositionforMotor(turret, -165 ))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(outakeL, .87))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(outakeR, .87))
                 .waitSeconds(1.5)
+
                 .build();
 
+        Action Wallpickup =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-48,65),Math.toRadians(180))
+                .build();
+        Action PICKUP = drive.actionBuilder(new Pose2d(-48,65,Math.toRadians(180)))
+               .stopAndAdd(new SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-72, 70), Math.toRadians(175),
+        new MinVelConstraint(Arrays.asList(
+                new TranslationalVelConstraint(15.0), //
+                new AngularVelConstraint(Math.PI / 2) //
+        )))
 
-
+                .build();
         Action Shooh =drive.actionBuilder(new Pose2d(-72,70,Math.toRadians(175)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
                 .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
 
-                .waitSeconds(1)
                 .build();
-
-        Action Waiting = drive.actionBuilder(new Pose2d(-72, 0, 0))
-                .afterTime(.2,new BLueFar.Setpositionforservo(hood,.9))
-             .afterTime(.25,new SetpositionforMotor(turret,-165))
-               .stopAndAdd(new SetpowerforMotor(outakeL,.85)).stopAndAdd(new SetpowerforMotor(outakeR,.85))
-                .waitSeconds(2)
+        Action dumpline =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-68,58),Math.toRadians(385))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+                .waitSeconds(2.5)
                 .build();
-        Action park = drive.actionBuilder(new Pose2d(-72, 0, 90))
-                .strafeToLinearHeading(new Vector2d(-65,40),Math.toRadians(-45))
-               // .stopAndAdd(new SetpowerforMotor(outakeL,.2)).stopAndAdd(new SetpowerforMotor(outakeR,.75))
-               // .waitSeconds(2)
+        Action dumpUp =drive.actionBuilder(new Pose2d(-68,58,Math.toRadians(385)))
+                .strafeToLinearHeading(new Vector2d(-62,58),Math.toRadians(385))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
                 .build();
-
-
+        Action dumpBackup =drive.actionBuilder(new Pose2d(-62,58,Math.toRadians(360)))
+                .strafeToLinearHeading(new Vector2d(-68,58),Math.toRadians(360))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+                .build();
+        Action scoredump = drive.actionBuilder(new Pose2d(-68,58,Math.toRadians(385)))
+                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+                .build();
+        Action Park = drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-50,0),Math.toRadians(90))
+                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,0))
+                .build();
         Action shotv1 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.01,new Setpositionforservo(Boot1,.535))
-                .afterTime(.3,new Setpositionforservo(Boot1,.97))
-                .afterTime(.8,new Setpositionforservo(Boot2,.535))
-                .afterTime(1,new Setpositionforservo(Boot2,.97))
-                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
-                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+                .afterTime(.01,new BZ_Blue.Setpositionforservo(Boot1,.535))
+                .afterTime(.3,new BZ_Blue.Setpositionforservo(Boot1,.97))
+                .afterTime(.8,new BZ_Blue.Setpositionforservo(Boot2,.535))
+                .afterTime(1,new BZ_Blue.Setpositionforservo(Boot2,.97))
+                .afterTime(1.5,new BZ_Blue.Setpositionforservo(Boot3,.535))
+                .afterTime(1.8,new BZ_Blue.Setpositionforservo(Boot3,.97))
                 //fail safe thing
-                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
-                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
-                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
-                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
-                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
-                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+                .afterTime(1.9,new BZ_Blue.Setpositionforservo(Boot1,.535))
+                .afterTime(2.1,new BZ_Blue.Setpositionforservo(Boot1,.97))
+                .afterTime(2.3,new BZ_Blue.Setpositionforservo(Boot2,.535))
+                .afterTime(2.5,new BZ_Blue.Setpositionforservo(Boot2,.97))
+                .afterTime(2.7,new BZ_Blue.Setpositionforservo(Boot3,.535))
+                .afterTime(2.9,new BZ_Blue.Setpositionforservo(Boot3,.97))
 
                 .build();
-                //.build();
+        //.build();
         Action shotv2 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.01,new Setpositionforservo(Boot1,.535))
-                .afterTime(.3,new Setpositionforservo(Boot1,.97))
-                .afterTime(.8,new Setpositionforservo(Boot2,.535))
-                .afterTime(1,new Setpositionforservo(Boot2,.97))
-                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
-                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+                .afterTime(.01,new BZ_Blue.Setpositionforservo(Boot1,.535))
+                .afterTime(.3,new BZ_Blue.Setpositionforservo(Boot1,.97))
+                .afterTime(.8,new BZ_Blue.Setpositionforservo(Boot2,.535))
+                .afterTime(1,new BZ_Blue.Setpositionforservo(Boot2,.97))
+                .afterTime(1.5,new BZ_Blue.Setpositionforservo(Boot3,.535))
+                .afterTime(1.8,new BZ_Blue.Setpositionforservo(Boot3,.97))
                 //fail safe thing
-                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
-                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
-                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
-                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
-                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
-                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+                .afterTime(1.9,new BZ_Blue.Setpositionforservo(Boot1,.535))
+                .afterTime(2.1,new BZ_Blue.Setpositionforservo(Boot1,.97))
+                .afterTime(2.3,new BZ_Blue.Setpositionforservo(Boot2,.535))
+                .afterTime(2.5,new BZ_Blue.Setpositionforservo(Boot2,.97))
+                .afterTime(2.7,new BZ_Blue.Setpositionforservo(Boot3,.535))
+                .afterTime(2.9,new BZ_Blue.Setpositionforservo(Boot3,.97))
 
                 .build();
         Action shotv3 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.01,new Setpositionforservo(Boot1,.535))
-                .afterTime(.3,new Setpositionforservo(Boot1,.97))
-                .afterTime(.8,new Setpositionforservo(Boot2,.535))
-                .afterTime(1,new Setpositionforservo(Boot2,.97))
-                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
-                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+                .afterTime(.01,new BZ_Blue.Setpositionforservo(Boot1,.535))
+                .afterTime(.3,new BZ_Blue.Setpositionforservo(Boot1,.97))
+                .afterTime(.8,new BZ_Blue.Setpositionforservo(Boot2,.535))
+                .afterTime(1,new BZ_Blue.Setpositionforservo(Boot2,.97))
+                .afterTime(1.5,new BZ_Blue.Setpositionforservo(Boot3,.535))
+                .afterTime(1.8,new BZ_Blue.Setpositionforservo(Boot3,.97))
                 //fail safe thing
-                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
-                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
-                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
-                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
-                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
-                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+                .afterTime(1.9,new BZ_Blue.Setpositionforservo(Boot1,.535))
+                .afterTime(2.1,new BZ_Blue.Setpositionforservo(Boot1,.97))
+                .afterTime(2.3,new BZ_Blue.Setpositionforservo(Boot2,.535))
+                .afterTime(2.5,new BZ_Blue.Setpositionforservo(Boot2,.97))
+                .afterTime(2.7,new BZ_Blue.Setpositionforservo(Boot3,.535))
+                .afterTime(2.9,new BZ_Blue.Setpositionforservo(Boot3,.97))
 
                 .build();
-
-
 
 
 
@@ -211,56 +246,89 @@ public class BLueFar extends LinearOpMode {
         }
 
         waitForStart();
-        //TODO: Run auto
-        Actions.runBlocking(new SequentialAction(
-                Waiting,shotv1
-        ));
-        Actions.runBlocking(new SequentialAction(
-                Grab3
-        ));
-        Actions.runBlocking(new SequentialAction(
-                intakespike
-        ));
-        Actions.runBlocking(new SequentialAction(
-              shoot1
-        ));
-        Actions.runBlocking(new SequentialAction(
-                shotv2
-        ));
-        Actions.runBlocking(new SequentialAction(
-               Wallpickup
-        ));
-        Actions.runBlocking(new SequentialAction(
-                PICKUP
-        ));
-        Actions.runBlocking(new SequentialAction(
-               Shooh
-        ));
-        Actions.runBlocking(new SequentialAction(
-                shotv3
-        ));
-        Actions.runBlocking(new SequentialAction(
-               park
-        ));
+        try {
+            Actions.runBlocking(
+                 Waiting
+            );
+            Actions.runBlocking(
+                    shotv1
+            );
+            Actions.runBlocking(
+                    dumpline
+            );
+            Actions.runBlocking(
+                    dumpUp
+            );
+            Actions.runBlocking(
+                    dumpBackup
+            );
+            Actions.runBlocking(
+                   scoredump
+            );
+            Actions.runBlocking(
+                    shotv2
+            );
+            Actions.runBlocking(
+                    Wallpickup
+            );
+            Actions.runBlocking(
+                    PICKUP
+            );
+
+            Actions.runBlocking(
+                    Shooh
+            );
+            Actions.runBlocking(
+                    shotv3
+            );
+            Actions.runBlocking(
+                    Park
+            );
+            Actions.runBlocking(
+                    wait
+            );
 
 
 
 
+//            //TODO: Run auto THis stuff works
+//            Actions.runBlocking(
+//                    Waiting
+//            );
+//            Actions.runBlocking(
+//                    shotv1
+//            );
+//Actions.runBlocking(
+//
+//        Wallpickup
+//);
+//            Actions.runBlocking(
+//                    PICKUP
+//            );
+//            Actions.runBlocking(
+//                    Shooh
+//            );
+//            Actions.runBlocking(
+//                    shotv2
+//            );
+//            Actions.runBlocking(
+//                    dumpline
+//            );
+////             Actions.runBlocking(
+////                    dumpBackup
+////            );
+//            Actions.runBlocking(
+//                    scoredump
+//            );Actions.runBlocking(
+//                    shotv3
+//            );
 
 
+        } finally {
+            drive.updatePoseEstimate();
+            LastPose = drive.localizer.getPose();
 
-
-
-
-
-//        Actions.runBlocking(new SequentialAction(//place spec 1
-//                Detect,
-//                one,
-//                two,
-//                three,
-//                reset
-//        ));
-//        Actions.runBlocking(shooterPID.spinUp());
+        }
     }
 
 

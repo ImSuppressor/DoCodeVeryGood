@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBa
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
 
 import androidx.annotation.NonNull;
+import androidx.vectordrawable.graphics.drawable.PathInterpolatorCompat;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -43,9 +44,9 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 import java.util.Arrays;
 
-@Autonomous(name="BlueFar", preselectTeleOp = "DriveCode")
-public class BLueFar extends LinearOpMode {
-//8717
+@Autonomous(name="RedFar", preselectTeleOp = "Drive26")
+public class redFAR extends LinearOpMode {
+
     @Override
     public void runOpMode() throws InterruptedException {
         pattern = "none";
@@ -53,14 +54,14 @@ public class BLueFar extends LinearOpMode {
         ColorBay2 = 0;
         ColorBay3 = 0;
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, 0, Math.toRadians(90)));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, 0, Math.toRadians(-90)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
         DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
         DcMotorEx outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
-        DcMotorEx outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
+        DcMotorEx outakeR = hardwareMap.get(DcMotorEx.class, "outakeR"  );
 
         outakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         outakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -71,8 +72,7 @@ public class BLueFar extends LinearOpMode {
         turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        Servo
-                hood = hardwareMap.get(Servo.class, "Hood");
+        Servo hood = hardwareMap.get(Servo.class, "Hood");
         Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
         Servo Boot2 = hardwareMap.get(Servo.class, "Boot2");
         Servo Boot3 = hardwareMap.get(Servo.class, "Boot3");
@@ -88,80 +88,80 @@ public class BLueFar extends LinearOpMode {
 
 
         //TODO:Init Everything cracka
-        Action shoot1 = drive.actionBuilder(new Pose2d(-45, 50, Math.toRadians(90)))//move to park
 
-                .afterTime(.75,new ColorSense(hardwareMap))
 
-                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
+                Action shoot1 = drive.actionBuilder(new Pose2d(-45, -50, Math.toRadians(-90))) // Y flipped, Heading flipped
+                .afterTime(.75, new ColorSense(hardwareMap))
+                .afterTime(1.1, new redFAR.Setpositionforservo(hood, .9))
+                .strafeToLinearHeading(new Vector2d(-72, 0), Math.toRadians(-90))
+                .build();
 
-                //.waitSeconds(1.5)
+        Action Grab3 = drive.actionBuilder(new Pose2d(-72, 0, Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-45, -20), Math.toRadians(-90))
                 .build();
-        Action Grab3 =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .stopAndAdd(new SetpowerforMotor(outakeL,.85)).stopAndAdd(new SetpowerforMotor(outakeR,.85))
-                .strafeToLinearHeading(new Vector2d(-45,20),Math.toRadians(90))
 
+        Action intakespike = drive.actionBuilder(new Pose2d(-45, -20, Math.toRadians(-90)))
+                .stopAndAdd(new SetpowerforMotor(intake, 1))
+                .strafeToLinearHeading(new Vector2d(-45, -50), Math.toRadians(-90))
                 .build();
-        Action intakespike =drive.actionBuilder(new Pose2d(-45,20,Math.toRadians(90)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-45,50),Math.toRadians(90))
+
+        Action Wallpickup = drive.actionBuilder(new Pose2d(-72, 0, Math.toRadians(-90)))
+                .stopAndAdd(new SetpowerforMotor(intake, 1))
+                .strafeToLinearHeading(new Vector2d(-44, -65), Math.toRadians(180)) // 180 stays 180 (mirrors to itself)
                 .build();
-        Action Wallpickup =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-44,65),Math.toRadians(180))
-                .build();
-        Action PICKUP =drive.actionBuilder(new Pose2d(-44,65,Math.toRadians(180)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
+
+        Action PICKUP = drive.actionBuilder(new Pose2d(-44, -65, Math.toRadians(-90)))
+                .stopAndAdd(new SetpowerforMotor(intake, 1))
 
                 .strafeToLinearHeading(
-                        new Vector2d(-72, 70), Math.toRadians(175),
+                        new Vector2d(-60, -65), Math.toRadians(180),
                         new MinVelConstraint(Arrays.asList(
-                                new TranslationalVelConstraint(15.0), //
+                                new TranslationalVelConstraint(5.0), //
                                 new AngularVelConstraint(Math.PI / 2) //
-                        ))
-
+                        )),
+                        new ProfileAccelConstraint(-5.0, 5.0) // Slow down the takeoff/braking
                 )
                 .waitSeconds(1.5)
                 .build();
 
-
-
-        Action Shooh =drive.actionBuilder(new Pose2d(-72,70,Math.toRadians(175)))
-                .stopAndAdd(new SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
-
+        Action Shooh = drive.actionBuilder(new Pose2d(-60, -65, Math.toRadians(180)))
+                .stopAndAdd(new SetpowerforMotor(intake, 1))
+                .strafeToLinearHeading(new Vector2d(-72, 0), Math.toRadians(-90))
                 .waitSeconds(1)
                 .build();
 
-        Action Waiting = drive.actionBuilder(new Pose2d(-72, 0, 0))
-                .afterTime(.2,new BLueFar.Setpositionforservo(hood,.9))
-             .afterTime(.25,new SetpositionforMotor(turret,-165))
-               .stopAndAdd(new SetpowerforMotor(outakeL,.85)).stopAndAdd(new SetpowerforMotor(outakeR,.85))
+        Action Waiting = drive.actionBuilder(new Pose2d(-72, -10, 0))
+                .afterTime(.2, new redFAR.Setpositionforservo(hood, 1))
+                .afterTime(.25, new SetpositionforMotor(turret, 165 )) // Check if turret direction needs negation
+                .stopAndAdd(new SetpowerforMotor(outakeL, .9))
+                .stopAndAdd(new SetpowerforMotor(outakeR, .9))
                 .waitSeconds(2)
                 .build();
-        Action park = drive.actionBuilder(new Pose2d(-72, 0, 90))
-                .strafeToLinearHeading(new Vector2d(-65,40),Math.toRadians(-45))
-               // .stopAndAdd(new SetpowerforMotor(outakeL,.2)).stopAndAdd(new SetpowerforMotor(outakeR,.75))
-               // .waitSeconds(2)
+
+        Action park = drive.actionBuilder(new Pose2d(-72, 0, -90))
+                .strafeToLinearHeading(new Vector2d(-65, -40), Math.toRadians(45)) // Flipped -45 to 45
+                .build();
+
+        Action shotv1 = drive.actionBuilder(new Pose2d(-72, -10, -90))
+                .afterTime(.01, new Setpositionforservo(Boot1, .535))
+                .afterTime(.3,  new Setpositionforservo(Boot1, .97))
+                .afterTime(.8,  new Setpositionforservo(Boot2, .535))
+                .afterTime(1,   new Setpositionforservo(Boot2, .97))
+                .afterTime(1.5, new Setpositionforservo(Boot3, .535))
+                .afterTime(1.8, new Setpositionforservo(Boot3, .97))
+                // fail safe
+                .afterTime(1.9, new Setpositionforservo(Boot1, .535))
+                .afterTime(2.1, new Setpositionforservo(Boot1, .97))
+                .afterTime(2.3, new Setpositionforservo(Boot2, .535))
+                .afterTime(2.5, new Setpositionforservo(Boot2, .97))
+                .afterTime(2.7, new Setpositionforservo(Boot3, .535))
+                .afterTime(2.9, new Setpositionforservo(Boot3, .97))
                 .build();
 
 
-        Action shotv1 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.01,new Setpositionforservo(Boot1,.535))
-                .afterTime(.3,new Setpositionforservo(Boot1,.97))
-                .afterTime(.8,new Setpositionforservo(Boot2,.535))
-                .afterTime(1,new Setpositionforservo(Boot2,.97))
-                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
-                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
-                //fail safe thing
-                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
-                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
-                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
-                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
-                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
-                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+        // Note: shotv2 and shotv3 should be updated to Red start poses as well
 
-                .build();
-                //.build();
+
         Action shotv2 = drive.actionBuilder(new Pose2d(-72, 10, 90))
                 .afterTime(.01,new Setpositionforservo(Boot1,.535))
                 .afterTime(.3,new Setpositionforservo(Boot1,.97))
@@ -169,6 +169,7 @@ public class BLueFar extends LinearOpMode {
                 .afterTime(1,new Setpositionforservo(Boot2,.97))
                 .afterTime(1.5,new Setpositionforservo(Boot3,.535))
                 .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+
                 //fail safe thing
                 .afterTime(1.9,new Setpositionforservo(Boot1,.535))
                 .afterTime(2.1,new Setpositionforservo(Boot1,.97))
@@ -176,7 +177,6 @@ public class BLueFar extends LinearOpMode {
                 .afterTime(2.5,new Setpositionforservo(Boot2,.97))
                 .afterTime(2.7,new Setpositionforservo(Boot3,.535))
                 .afterTime(2.9,new Setpositionforservo(Boot3,.97))
-
                 .build();
         Action shotv3 = drive.actionBuilder(new Pose2d(-72, 10, 90))
                 .afterTime(.01,new Setpositionforservo(Boot1,.535))
@@ -185,6 +185,7 @@ public class BLueFar extends LinearOpMode {
                 .afterTime(1,new Setpositionforservo(Boot2,.97))
                 .afterTime(1.5,new Setpositionforservo(Boot3,.535))
                 .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+
                 //fail safe thing
                 .afterTime(1.9,new Setpositionforservo(Boot1,.535))
                 .afterTime(2.1,new Setpositionforservo(Boot1,.97))
@@ -192,9 +193,7 @@ public class BLueFar extends LinearOpMode {
                 .afterTime(2.5,new Setpositionforservo(Boot2,.97))
                 .afterTime(2.7,new Setpositionforservo(Boot3,.535))
                 .afterTime(2.9,new Setpositionforservo(Boot3,.97))
-
                 .build();
-
 
 
 
@@ -222,25 +221,25 @@ public class BLueFar extends LinearOpMode {
                 intakespike
         ));
         Actions.runBlocking(new SequentialAction(
-              shoot1
+                shoot1
         ));
         Actions.runBlocking(new SequentialAction(
                 shotv2
         ));
         Actions.runBlocking(new SequentialAction(
-               Wallpickup
+                Wallpickup
         ));
         Actions.runBlocking(new SequentialAction(
                 PICKUP
         ));
         Actions.runBlocking(new SequentialAction(
-               Shooh
+                Shooh
         ));
         Actions.runBlocking(new SequentialAction(
                 shotv3
         ));
         Actions.runBlocking(new SequentialAction(
-               park
+                park
         ));
 
 
