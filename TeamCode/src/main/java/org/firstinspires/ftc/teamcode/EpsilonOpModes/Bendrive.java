@@ -88,7 +88,7 @@ public class Bendrive extends LinearOpMode {
 
         //TODO:Init Everything cracka
         Action Scorepre = drive.actionBuilder(new Pose2d(57, -49, Math.toRadians(-45)))//move to park
-                .stopAndAdd(new SetpowerforMotor(outakeL,.535))
+//                .stopAndAdd(new SetpowerforMotor(outakeL,.535))
                // .stopAndAdd(new SetpowerforMotor(outakeR,.535))
                 //.stopAndAdd(new Setpositionforservo(hood,.75))
                 //.afterTime(.75,new ColorSense(hardwareMap))

@@ -60,7 +60,7 @@ public class ShootNow {
         private boolean shooting3 = false;
         public double shoot = .5;
 
-        public double ready = 0.95;
+        public double ready = 0.94;
 
         public double cycle = 1;
         public double cycleDown = .75;

@@ -238,29 +238,28 @@ public class DriveCode extends OpMode {
 
             intake.setPower(-1);
 
-        }
-        else {
+        } else {
 
             intake.setPower(0);
 
         }
-        if ( gamepad1. square){
+        if (gamepad1.square) {
             outakeL.setPower(.55);
             outakeR.setPower(.55);
             hood.setPosition(.65);
         }
-        if (gamepad1. triangle) {
+        if (gamepad1.triangle) {
             outakeR.setPower(.63);
             outakeL.setPower(.63);
             hood.setPosition(.7);
         }
-        if( gamepad1.circle){
+        if (gamepad1.circle) {
             outakeL.setPower(.725);
             outakeR.setPower(.725
             );
             hood.setPosition(.9);
         }
-        if ( gamepad1.a){
+        if (gamepad1.a) {
             outakeL.setPower(0);
             outakeR.setPower(0);
             hood.setPosition(.54);
@@ -273,16 +272,14 @@ public class DriveCode extends OpMode {
             Bay2Boot.setPosition(.97);
             Bay3Boot.setPosition(.97);
 
-        }
-        else if (gamepad1.dpad_right) {
+        } else if (gamepad1.dpad_right) {
 
             Bay2Boot.setPosition(.55);
 
             Bay1Boot.setPosition(.97);
             Bay3Boot.setPosition(.97);
 
-        }
-        else if (gamepad1.dpad_down) {
+        } else if (gamepad1.dpad_down) {
 
             Bay3Boot.setPosition(.575);
 
@@ -314,86 +311,34 @@ public class DriveCode extends OpMode {
 
         }
 
-// 1. Set the Goal based on Team (Field Coordinates)
-// Assuming team 1 is Blue, team 2 is Red - adjust coordinates as needed
-        double targetX = (team == 1)? 10 : 72.0;
-        double targetY = (team == 1)? 60 : -72.0;
 
-// Calculate distance for telemetry
-        double DisToGoalX = targetX - currentX;
-        double DisToGoalY = targetY - currentY;
-        double distanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
+        if (team == 1) {
 
-        double pidPower = 0;
-        double currentTurretAngle = (turret.getCurrentPosition() * 0.1339285) + 7.5;
+            double DisToGoalX = 72 - currentX;
+            double DisToGoalY = 72 + currentY;
 
-// 2. Determine if we use Limelight (Vision) or Pinpoint (Odometry)
-        if (result.isValid() && limelight.getLatestResult() != null) {
-            // VISION MODE: Center the turret on the target crosshair
-            pidPower = TurControllerL.calculate(result.getTx(), 0);
+            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
 
-        } else if (timer.seconds() > 0.15) {
-            // ODOMETRY MODE: Math-based tracking
-            // Calculate angle from robot to goal in field space
-            double angleToGoalDeg = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
+            if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
-            // Convert robot heading from Radians to Degrees
-            double robotHeadingDeg = Math.toDegrees(currentH);
+                double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-            // Target is (Field Angle - Robot Heading)
-            double rawTargetDeg = angleToGoalDeg - robotHeadingDeg;
+                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
 
-            // IMPORTANT: Fix the clamping. Math.max(min_value, Math.min(max_value, input))
-            // This keeps the target strictly between your mechanical limits
-            double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+                if (currentPosDeg <= 7.5 && pidPower > 0) {
 
-            pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
-        }
+                    pidPower = 0;
 
-// 3. Mechanical Safety Guard
-// Final check to ensure PID doesn't try to drive the motor past physical stops
-        if (currentTurretAngle <= 7.5 && pidPower < 0) {
-            pidPower = 0;
-        } else if (currentTurretAngle >= 172.5 && pidPower > 0) {
-            pidPower = 0;
-        }
+                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
 
-// 4. Apply Power
-        turret.setPower(-pidPower);
+                    pidPower = 0;
 
-// 5. Telemetry for Debugging
-        telemetry.addData("Turret Mode", result.isValid() ? "Limelight" : "Pinpoint");
-        telemetry.addData("Distance to Goal", distanceToGoal);
-        telemetry.addData("Current Turret Deg", currentTurretAngle);
-//        if (team == 1) {
-//
-//            double DisToGoalX = 12 - currentX;
-//            double DisToGoalY = 82 + currentY;
-//
-//            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
-//
-//            if (result.isValid() & !(limelight.getLatestResult() == null)) {
-//
-//                double pidPower = TurControllerL.calculate(result.getTx(), 0);
-//
-//                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) +7.5;
-//
-//                if (currentPosDeg <= 7.5 && pidPower < 0) {
-//
-//                    pidPower = 0;
-//
-//                }
-//
-//                else if (currentPosDeg >= 172.5 && pidPower > 0) {
-//
-//                    pidPower = 0;
-//
-//                }
-//
-//
-//                turret.setPower(-pidPower);
-//                telemetry.addData("DistToGoal",DistanceToGoal);
-//
+                }
+
+
+                turret.setPower(-pidPower);
+                telemetry.addData("DistToGoal", DistanceToGoal);
+
 //            } else if (!(result.isValid()) & timer.seconds() > .5) {
 //
 //                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
@@ -422,379 +367,379 @@ public class DriveCode extends OpMode {
 //                telemetry.addData("distance", DistanceToGoal);
 //                telemetry.addData("powervar", powervar);
 //                telemetry.addData("servovar", servovar);
-//                telemetry.addData("DistToGoal",DistanceToGoal);
-//
-//            } else {
-//
-//                turret.setPower(0);
-//
-//            }
-//
-//        }
-//
-//        if (team == 2) {
-//
-//            double DisToGoalX = 72 - currentX;
-//            double DisToGoalY = 72 + currentY;
-//
-//            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
-//
-//
-//            if (result.isValid() & !(limelight.getLatestResult() == null)) {
-//
-//                double pidPower = TurControllerL.calculate(result.getTx(), 0);
-//
-//                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) +7.5;
-//
-//                if (currentPosDeg <= 7.5 && pidPower > 0) {
-//
-//                    pidPower = 0;
-//
-//                }
-//
-//                else if (currentPosDeg >= 172.5 && pidPower < 0) {
-//
-//                    pidPower = 0;
-//
-//                }
-//
-//
-//                turret.setPower(-pidPower);
-//                telemetry.addData("DistToGoal",DistanceToGoal);
-//
-//            } else if (!(result.isValid()) & timer.seconds() > .5) {
-//
-//                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
-//
-//                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
-//
-//                double rawTargetDeg = targetAngle + currentH;
-//
-//                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
-//
-//                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
-//
-//                if (currentTurretAngle <= 7.5 && pidPower > 0) {
-//                    pidPower = 0;
-//                }
-//
-//                if (currentTurretAngle >= 172.5 && pidPower < 0) {
-//                    pidPower = 0;
-//                }
-//
-//                turret.setPower(pidPower);
-//
-//                telemetry.addData("Target Angle", targetAngle);
-//                telemetry.addData("Current Angle", currentTurretAngle);
-//                telemetry.addData("PID Output", pidPower);
-//                telemetry.addData("distance", DistanceToGoal);
-//                telemetry.addData("powervar", powervar);
-//                telemetry.addData("servovar", servovar);
-//                telemetry.addData("DistToGoal",DistanceToGoal);
-//
-//            } else {
-//
-//                turret.setPower(0);
-//
-//            }
+//                telemetry.addData("DistToGoal", DistanceToGoal);
 
-     //   }
-
-        double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
-        double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
-        double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
-
-        if (distance1 < 3&& !Boot1 && !shooting1) {
-            NormalizedRGBA colors11 = bay11.getNormalizedColors();
-            NormalizedRGBA colors12 = bay12.getNormalizedColors();
-            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
-            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
-            if (avgBlue1 > avgGreen1) {
-                ColorBay1 = 1;
-            } else if (avgGreen1 > avgBlue1) {
-                ColorBay1 = 2;
             } else {
-                ColorBay1 = 0;
-            }
-        }
-        if (distance2 < 3&& !Boot1 && !shooting1) {
-            NormalizedRGBA colors21 = bay21.getNormalizedColors();
-            NormalizedRGBA colors22 = bay22.getNormalizedColors();
-            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
-            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
-            if (avgBlue2 > avgGreen2) {
-                ColorBay2 = 1;
-            } else if (avgGreen2 > avgBlue2) {
-                ColorBay2 = 2;//bay 2 is stipud
-            } else {
-                ColorBay2 = 0;
-            }
-        }
-        if (distance3 < 10 && !Boot1 && !shooting1) {
-            NormalizedRGBA colors31 = bay31.getNormalizedColors();
-            NormalizedRGBA colors32 = bay32.getNormalizedColors();
-            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
-            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
-            if (avgBlue3 > avgGreen3) {
-                ColorBay3 = 1;
-            } else if (avgGreen3 > avgBlue3) {
-                ColorBay3 = 2;
-            } else {
-                ColorBay3 = 0;
-            }
-        }
 
-        //ShootPurple
-        if (!shooting1&&!shooting2&&gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
-            if (ColorBay1 == 1) {
-                Bay1Boot.setPosition(shoot);
-                ColorBay1 = 0;
-                BooterTimer.reset();
-                Boot1 = true;
-
-            } else if (ColorBay2 == 1) {
-                Bay2Boot.setPosition(shoot);
-                ColorBay2 = 0;
-                BooterTimer.reset();
-                Boot2 = true;
-
-            } else if (ColorBay3 == 1) {
-                Bay3Boot.setPosition(shoot);
-                ColorBay3 = 0;
-                BooterTimer.reset();
-                Boot3 = true;
+                turret.setPower(0);
 
             }
+
         }
-        //ShootGreen
-        if (!shooting1&&!shooting2&&gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
-            if (ColorBay1 == 2) {
-                Bay1Boot.setPosition(shoot);
-                ColorBay1 = 0;
-                BooterTimer.reset();
-                Boot1 = true;
 
-            } else if (ColorBay2 == 2) {
-                Bay2Boot.setPosition(shoot);
-                ColorBay2 = 0;
-                BooterTimer.reset();
-                Boot2 = true;
+        if (team == 2) {
 
-            } else if (ColorBay3 == 2) {
-                Bay3Boot.setPosition(shoot);
-                ColorBay3 = 0;
-                BooterTimer.reset();
-                Boot3 = true;
+            double DisToGoalX = 72 - currentX;
+            double DisToGoalY = 72 + currentY;
 
-            }
-        }
-        //Reset Boot Arms
-        if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle-cycleDown) && (Boot1 || Boot2 || Boot3)) {
-            Bay1Boot.setPosition(ready);
-            Bay2Boot.setPosition(ready);
-            Bay3Boot.setPosition(ready);
-        } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
-            Boot1 = false;
-            Boot2 = false;
-            Boot3 = false;
-        }
-        //SequencedShot
-        if (gamepad2.dpad_down && !SequenceShoot) {
-            if (!initialized) {
-                shooting1 = false;
-                shooting2 = false;
-                shooting3 = false;
-                BooterTimer.reset();
-                SequenceShoot = true;
-            }
-            if (BooterTimer.seconds() < (cycle) && !shooting1) {
+            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
 
-                if (ColorBay1 == ball1) {
 
-                    Bay1Boot.setPosition(shoot);
+            if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
-                    ColorBay1 = 0;
-                    shooting1 = true;
+                double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-                } else if (ColorBay2 == ball1) {
+                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) +7.5;
 
-                    Bay2Boot.setPosition(shoot);
+                if (currentPosDeg <= 7.5 && pidPower > 0) {
 
-                    ColorBay2 = 0;
-                    shooting1 = true;
+                    pidPower = 0;
 
-                } else if (ColorBay3 == ball1) {
-
-                    Bay3Boot.setPosition(shoot);
-
-                    ColorBay3 = 0;
-                    shooting1 = true;
-
-                } else {
-                    if (!(ColorBay1 == 0)) {
-                        Bay1Boot.setPosition(shoot);
-
-                        ColorBay1 = 0;
-                        shooting1 = true;
-                    } else if (!(ColorBay2 == 0)) {
-                        Bay2Boot.setPosition(shoot);
-
-                        ColorBay2 = 0;
-                        shooting1 = true;
-
-                    } else if (!(ColorBay3 == 0)) {
-                        Bay3Boot.setPosition(shoot);
-
-                        ColorBay3 = 0;
-                        shooting1 = true;
-
-                    }
                 }
-            } else if (BooterTimer.seconds() > (cycle-cycleDown) && BooterTimer.seconds() < cycle) {
+
+                else if (currentPosDeg >= 172.5 && pidPower < 0) {
+
+                    pidPower = 0;
+
+                }
+
+
+                turret.setPower(-pidPower);
+                telemetry.addData("DistToGoal",DistanceToGoal);
+
+            } else if (!(result.isValid()) & timer.seconds() > .5) {
+
+                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+
+                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
+
+                double rawTargetDeg = targetAngle + currentH;
+
+                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+
+                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+
+                if (currentTurretAngle <= 7.5 && pidPower > 0) {
+                    pidPower = 0;
+                }
+
+                if (currentTurretAngle >= 172.5 && pidPower < 0) {
+                    pidPower = 0;
+                }
+
+                turret.setPower(pidPower);
+
+                telemetry.addData("Target Angle", targetAngle);
+                telemetry.addData("Current Angle", currentTurretAngle);
+                telemetry.addData("PID Output", pidPower);
+                telemetry.addData("distance", DistanceToGoal);
+                telemetry.addData("powervar", powervar);
+                telemetry.addData("servovar", servovar);
+                telemetry.addData("DistToGoal",DistanceToGoal);
+
+            } else {
+
+                turret.setPower(0);
+
+            }
+
+               }
+
+            double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+            double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+            double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+
+            if (distance1 < 3 && !Boot1 && !shooting1) {
+                NormalizedRGBA colors11 = bay11.getNormalizedColors();
+                NormalizedRGBA colors12 = bay12.getNormalizedColors();
+                double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+                double avgGreen1 = (colors11.green + colors12.green) / 2.0;
+                if (avgBlue1 > avgGreen1) {
+                    ColorBay1 = 1;
+                } else if (avgGreen1 > avgBlue1) {
+                    ColorBay1 = 2;
+                } else {
+                    ColorBay1 = 0;
+                }
+            }
+            if (distance2 < 3 && !Boot1 && !shooting1) {
+                NormalizedRGBA colors21 = bay21.getNormalizedColors();
+                NormalizedRGBA colors22 = bay22.getNormalizedColors();
+                double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+                double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+                if (avgBlue2 > avgGreen2) {
+                    ColorBay2 = 1;
+                } else if (avgGreen2 > avgBlue2) {
+                    ColorBay2 = 2;//bay 2 is stipud
+                } else {
+                    ColorBay2 = 0;
+                }
+            }
+            if (distance3 < 10 && !Boot1 && !shooting1) {
+                NormalizedRGBA colors31 = bay31.getNormalizedColors();
+                NormalizedRGBA colors32 = bay32.getNormalizedColors();
+                double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+                double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+                if (avgBlue3 > avgGreen3) {
+                    ColorBay3 = 1;
+                } else if (avgGreen3 > avgBlue3) {
+                    ColorBay3 = 2;
+                } else {
+                    ColorBay3 = 0;
+                }
+            }
+
+            //ShootPurple
+            if (!shooting1 && !shooting2 && gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
+                if (ColorBay1 == 1) {
+                    Bay1Boot.setPosition(shoot);
+                    ColorBay1 = 0;
+                    BooterTimer.reset();
+                    Boot1 = true;
+
+                } else if (ColorBay2 == 1) {
+                    Bay2Boot.setPosition(shoot);
+                    ColorBay2 = 0;
+                    BooterTimer.reset();
+                    Boot2 = true;
+
+                } else if (ColorBay3 == 1) {
+                    Bay3Boot.setPosition(shoot);
+                    ColorBay3 = 0;
+                    BooterTimer.reset();
+                    Boot3 = true;
+
+                }
+            }
+            //ShootGreen
+            if (!shooting1 && !shooting2 && gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
+                if (ColorBay1 == 2) {
+                    Bay1Boot.setPosition(shoot);
+                    ColorBay1 = 0;
+                    BooterTimer.reset();
+                    Boot1 = true;
+
+                } else if (ColorBay2 == 2) {
+                    Bay2Boot.setPosition(shoot);
+                    ColorBay2 = 0;
+                    BooterTimer.reset();
+                    Boot2 = true;
+
+                } else if (ColorBay3 == 2) {
+                    Bay3Boot.setPosition(shoot);
+                    ColorBay3 = 0;
+                    BooterTimer.reset();
+                    Boot3 = true;
+
+                }
+            }
+            //Reset Boot Arms
+            if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle - cycleDown) && (Boot1 || Boot2 || Boot3)) {
                 Bay1Boot.setPosition(ready);
                 Bay2Boot.setPosition(ready);
                 Bay3Boot.setPosition(ready);
+            } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
+                Boot1 = false;
+                Boot2 = false;
+                Boot3 = false;
+            }
+            //SequencedShot
+            if (gamepad2.dpad_down && !SequenceShoot) {
+                if (!initialized) {
+                    shooting1 = false;
+                    shooting2 = false;
+                    shooting3 = false;
+                    BooterTimer.reset();
+                    SequenceShoot = true;
+                }
+                if (BooterTimer.seconds() < (cycle) && !shooting1) {
 
-            } else if (BooterTimer.seconds() < 2 * cycle && BooterTimer.seconds() > cycle && !shooting2) {
+                    if (ColorBay1 == ball1) {
 
-                if (ColorBay1 == ball2) {
+                        Bay1Boot.setPosition(shoot);
 
-                    Bay1Boot.setPosition(shoot);
+                        ColorBay1 = 0;
+                        shooting1 = true;
 
-                    ColorBay1 = 0;
-                    shooting2 = true;
+                    } else if (ColorBay2 == ball1) {
 
-                } else if (ColorBay2 == ball2) {
+                        Bay2Boot.setPosition(shoot);
 
-                    Bay2Boot.setPosition(shoot);
+                        ColorBay2 = 0;
+                        shooting1 = true;
 
-                    ColorBay2 = 0;
-                    shooting2 = true;
+                    } else if (ColorBay3 == ball1) {
 
-                } else if (ColorBay3 == ball2) {
+                        Bay3Boot.setPosition(shoot);
 
-                    Bay3Boot.setPosition(shoot);
+                        ColorBay3 = 0;
+                        shooting1 = true;
 
-                    ColorBay3 = 0;
-                    shooting2 = true;
+                    } else {
+                        if (!(ColorBay1 == 0)) {
+                            Bay1Boot.setPosition(shoot);
 
-                } else {
-                    if (!(ColorBay1 == 0)) {
+                            ColorBay1 = 0;
+                            shooting1 = true;
+                        } else if (!(ColorBay2 == 0)) {
+                            Bay2Boot.setPosition(shoot);
+
+                            ColorBay2 = 0;
+                            shooting1 = true;
+
+                        } else if (!(ColorBay3 == 0)) {
+                            Bay3Boot.setPosition(shoot);
+
+                            ColorBay3 = 0;
+                            shooting1 = true;
+
+                        }
+                    }
+                } else if (BooterTimer.seconds() > (cycle - cycleDown) && BooterTimer.seconds() < cycle) {
+                    Bay1Boot.setPosition(ready);
+                    Bay2Boot.setPosition(ready);
+                    Bay3Boot.setPosition(ready);
+
+                } else if (BooterTimer.seconds() < 2 * cycle && BooterTimer.seconds() > cycle && !shooting2) {
+
+                    if (ColorBay1 == ball2) {
+
                         Bay1Boot.setPosition(shoot);
 
                         ColorBay1 = 0;
                         shooting2 = true;
-                    } else if (!(ColorBay2 == 0)) {
+
+                    } else if (ColorBay2 == ball2) {
+
                         Bay2Boot.setPosition(shoot);
 
                         ColorBay2 = 0;
                         shooting2 = true;
 
-                    } else if (!(ColorBay3 == 0)) {
+                    } else if (ColorBay3 == ball2) {
+
                         Bay3Boot.setPosition(shoot);
 
                         ColorBay3 = 0;
                         shooting2 = true;
 
+                    } else {
+                        if (!(ColorBay1 == 0)) {
+                            Bay1Boot.setPosition(shoot);
+
+                            ColorBay1 = 0;
+                            shooting2 = true;
+                        } else if (!(ColorBay2 == 0)) {
+                            Bay2Boot.setPosition(shoot);
+
+                            ColorBay2 = 0;
+                            shooting2 = true;
+
+                        } else if (!(ColorBay3 == 0)) {
+                            Bay3Boot.setPosition(shoot);
+
+                            ColorBay3 = 0;
+                            shooting2 = true;
+
+                        }
                     }
-                }
 
-            }  else if (BooterTimer.seconds() > ((2*cycle)-cycleDown) && BooterTimer.seconds() < 2*cycle) {
-                Bay1Boot.setPosition(ready);
-                Bay2Boot.setPosition(ready);
-                Bay3Boot.setPosition(ready);
+                } else if (BooterTimer.seconds() > ((2 * cycle) - cycleDown) && BooterTimer.seconds() < 2 * cycle) {
+                    Bay1Boot.setPosition(ready);
+                    Bay2Boot.setPosition(ready);
+                    Bay3Boot.setPosition(ready);
 
-            } else if (BooterTimer.seconds() < 3 * cycle && BooterTimer.seconds() > 2 * cycle && !shooting3) {
+                } else if (BooterTimer.seconds() < 3 * cycle && BooterTimer.seconds() > 2 * cycle && !shooting3) {
 
-                if (ColorBay1 == ball3) {
+                    if (ColorBay1 == ball3) {
 
-                    Bay1Boot.setPosition(shoot);
-
-                    ColorBay1 = 0;
-                    shooting3 = true;
-
-                } else if (ColorBay2 == ball3) {
-
-                    Bay2Boot.setPosition(shoot);
-
-                    ColorBay2 = 0;
-                    shooting3 = true;
-
-                } else if (ColorBay3 == ball3) {
-
-                    Bay3Boot.setPosition(shoot);
-
-                    ColorBay3 = 0;
-                    shooting3 = true;
-
-                } else {
-                    if (!(ColorBay1 == 0)) {
                         Bay1Boot.setPosition(shoot);
 
                         ColorBay1 = 0;
                         shooting3 = true;
-                    } else if (!(ColorBay2 == 0)) {
+
+                    } else if (ColorBay2 == ball3) {
+
                         Bay2Boot.setPosition(shoot);
 
                         ColorBay2 = 0;
                         shooting3 = true;
 
-                    } else if (!(ColorBay3 == 0)) {
+                    } else if (ColorBay3 == ball3) {
+
                         Bay3Boot.setPosition(shoot);
 
                         ColorBay3 = 0;
                         shooting3 = true;
-                        BooterTimer.reset();
 
+                    } else {
+                        if (!(ColorBay1 == 0)) {
+                            Bay1Boot.setPosition(shoot);
+
+                            ColorBay1 = 0;
+                            shooting3 = true;
+                        } else if (!(ColorBay2 == 0)) {
+                            Bay2Boot.setPosition(shoot);
+
+                            ColorBay2 = 0;
+                            shooting3 = true;
+
+                        } else if (!(ColorBay3 == 0)) {
+                            Bay3Boot.setPosition(shoot);
+
+                            ColorBay3 = 0;
+                            shooting3 = true;
+                            BooterTimer.reset();
+
+                        }
                     }
                 }
-            }
-            if (BooterTimer.seconds() > 3*cycle && initialized) {
-                shooting1 = false;
-                shooting2 = false;
-                shooting3 = false;
-                initialized = false;
-                SequenceShoot = false;
-            }
-        }
-        class SetpositionforMotor implements Action {
-            DcMotorEx motor;
-            int position;
-            ElapsedTime timer;
-            boolean init = false;
-
-            public SetpositionforMotor(DcMotorEx s, int p) {
-                this.motor = s;
-                this.position = p;
-                this.timer = new ElapsedTime();
-            }
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if (!init) {
-                    timer.reset();
-                    init = true;
+                if (BooterTimer.seconds() > 3 * cycle && initialized) {
+                    shooting1 = false;
+                    shooting2 = false;
+                    shooting3 = false;
+                    initialized = false;
+                    SequenceShoot = false;
                 }
-                motor.setTargetPosition(position);
-                motor.setPower(1);
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                return timer.seconds() < .5;
             }
+            class SetpositionforMotor implements Action {
+                DcMotorEx motor;
+                int position;
+                ElapsedTime timer;
+                boolean init = false;
+
+                public SetpositionforMotor(DcMotorEx s, int p) {
+                    this.motor = s;
+                    this.position = p;
+                    this.timer = new ElapsedTime();
+                }
+
+                @Override
+                public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                    if (!init) {
+                        timer.reset();
+                        init = true;
+                    }
+                    motor.setTargetPosition(position);
+                    motor.setPower(1);
+                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    return timer.seconds() < .5;
+                }
+            }
+
+
+            telemetry.addData("Bay 3", ColorBay3);
+            telemetry.addData("Bay 2", ColorBay2);
+            telemetry.addData("Bay 1", ColorBay1);
+            telemetry.addData("time", timer.seconds());
+            telemetry.addData("currentX", currentX);
+            telemetry.addData("currentY", currentY);
+            telemetry.addData("currentH", currentH);
+            telemetry.addData("currentPos", currentPos);
+            telemetry.addData("team", team);
+            telemetry.update();
+
+
         }
-
-
-        telemetry.addData("Bay 3", ColorBay3);
-        telemetry.addData("Bay 2", ColorBay2);
-        telemetry.addData("Bay 1", ColorBay1);
-        telemetry.addData("time", timer.seconds());
-        telemetry.addData("currentX",currentX);
-        telemetry.addData("currentY",currentY);
-        telemetry.addData("currentH",currentH);
-        telemetry.addData("currentPos",currentPos);
-        telemetry.addData("team",team);
-        telemetry.update();
-
 
     }
-
-}

@@ -14,6 +14,47 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShooterPID;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
+
+import java.util.Arrays;
+
+
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
+
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.MinVelConstraint;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -82,8 +123,8 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 import java.util.Arrays;
 
-@Autonomous(name="BZ_blue", preselectTeleOp = "LeagueDrive")
-public class BZ_Blue extends LinearOpMode {
+@Autonomous(name="BZ_red", preselectTeleOp = "LeagueDrive")
+public class BZ_red extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -93,7 +134,7 @@ public class BZ_Blue extends LinearOpMode {
         ColorBay3 = 0;
         team=1    ;
 
-        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, 0, Math.toRadians(90)));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-72, 0, Math.toRadians(-90)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
@@ -130,93 +171,103 @@ public class BZ_Blue extends LinearOpMode {
 
         //TODO:Init Everything cracka
         // BZ_Blue
-        Action wait =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
+        Action wait =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(-90)))
                 .waitSeconds(5)
                 .build();
-        Action Waiting =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .afterTime(.1, new BZ_Blue.Setpositionforservo(hood, .9))
-                .afterTime(.1, new BZ_Blue.SetpositionforMotor(turret, -45 ))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(outakeL, .87))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(outakeR, .87))
+        Action Waiting =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(-90)))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .afterTime(.1, new BZ_red.Setpositionforservo(hood, .775))
+                .afterTime(.1, new BZ_red.SetpositionforMotor(turret, 90))
+
                 .waitSeconds(5)
-                .build();
-
-        Action Wallpickup =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-48,65),Math.toRadians(180))
-                .build();
-        Action PICKUP = drive.actionBuilder(new Pose2d(-48,65,Math.toRadians(180)))
-               .stopAndAdd(new SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-72, 70), Math.toRadians(175),
-        new MinVelConstraint(Arrays.asList(
-                new TranslationalVelConstraint(15.0), //
-                new AngularVelConstraint(Math.PI / 2) //
-        )))
 
                 .build();
-        Action Shooh =drive.actionBuilder(new Pose2d(-72,70,Math.toRadians(175)))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
+
+        Action Wallpickup =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(-90)))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-45,-58),Math.toRadians(-180))
+                .build();
+        Action PICKUP = drive.actionBuilder(new Pose2d(-45,-58,Math.toRadians(-180)))
+                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-72, -70), Math.toRadians(-175),
+                        new MinVelConstraint(Arrays.asList(
+                                new TranslationalVelConstraint(15.0), //
+                                new AngularVelConstraint(Math.PI / 2) //
+                        )))
 
                 .build();
-        Action dumpline =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
-                .strafeToLinearHeading(new Vector2d(-68,58),Math.toRadians(385))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+        Action Shooh =drive.actionBuilder(new Pose2d(-72,-70,Math.toRadians(-175)))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(-90))
+                .stopAndAdd(new SetpowerforMotor(intake,0))
+                .build();
+        Action dumpline =drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(-90)))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(-68,-58),Math.toRadians(-385))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,1))
                 .waitSeconds(2.5)
                 .build();
-        Action dumpUp =drive.actionBuilder(new Pose2d(-68,58,Math.toRadians(385)))
-                .strafeToLinearHeading(new Vector2d(-62,58),Math.toRadians(385))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+        Action dumpUp =drive.actionBuilder(new Pose2d(-68,-58,Math.toRadians(-385)))
+                .strafeToLinearHeading(new Vector2d(-62,-58),Math.toRadians(-385))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,1))
                 .build();
-        Action dumpBackup =drive.actionBuilder(new Pose2d(-62,58,Math.toRadians(360)))
-                .strafeToLinearHeading(new Vector2d(-68,58),Math.toRadians(360))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+        Action dumpBackup =drive.actionBuilder(new Pose2d(-62,-58,Math.toRadians(-385)))
+                .strafeToLinearHeading(new Vector2d(-68,-58),Math.toRadians(-360))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,-1))
                 .build();
-        Action scoredump = drive.actionBuilder(new Pose2d(-68,58,Math.toRadians(385)))
-                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(90))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,1))
+        Action scoredump = drive.actionBuilder(new Pose2d(-68,-58,Math.toRadians(-385)))
+                .strafeToLinearHeading(new Vector2d(-72,0),Math.toRadians(-90))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,1))
                 .build();
-        Action Park = drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-60,40),Math.toRadians(90))
-                .stopAndAdd(new BZ_Blue.SetpowerforMotor(intake,0))
+        Action Park = drive.actionBuilder(new Pose2d(-72,0,Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-50,0),Math.toRadians(-90))
+                .stopAndAdd(new BZ_red.SetpowerforMotor(intake,0))
                 .build();
-        Action shotv1 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .stopAndAdd(new BZ_Blue.SetvelforMotor(outakeL,(2400)))
-                .stopAndAdd(new BZ_Blue.SetvelforMotor(outakeL,(2400)))
-                .stopAndAdd(new BZ_Blue.Setpositionforservo(Boot1,.5))
-                .afterTime(.75,new BZ_Blue.Setpositionforservo(Boot1,.94))
-                .afterTime(1.25,new BZ_Blue.Setpositionforservo(Boot2,.5))
-                .afterTime(1.75,new BZ_Blue.Setpositionforservo(Boot2,.94))
-                .afterTime(2.25,new BZ_Blue.Setpositionforservo(Boot3,.5))
-                .afterTime(2.75,new BZ_Blue.Setpositionforservo(Boot3,.94))
+        Action shotv1 = drive.actionBuilder(new Pose2d(-72, -10, -90))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.Setpositionforservo(Boot1,.5))
+                .afterTime(.75,new BZ_red.Setpositionforservo(Boot1,.94))
+                .afterTime(1.25,new BZ_red.Setpositionforservo(Boot2,.5))
+                .afterTime(1.75,new BZ_red.Setpositionforservo(Boot2,.94))
+                .afterTime(2.25,new BZ_red.Setpositionforservo(Boot3,.5))
+                .afterTime(2.75,new BZ_red.Setpositionforservo(Boot3,.94))
+                //fail safe thing
+
+                //fail safe thing
+
+
                 .build();
         //.build();
         Action shotv2 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .stopAndAdd(new BZ_Blue.SetvelforMotor(outakeL,(2400)))
-                .stopAndAdd(new BZ_Blue.SetvelforMotor(outakeL,(2400)))
-                .stopAndAdd(new BZ_Blue.Setpositionforservo(Boot1,.5))
-                .afterTime(.75,new BZ_Blue.Setpositionforservo(Boot1,.94))
-                .afterTime(1.25,new BZ_Blue.Setpositionforservo(Boot2,.5))
-                .afterTime(1.75,new BZ_Blue.Setpositionforservo(Boot2,.94))
-                .afterTime(2.25,new BZ_Blue.Setpositionforservo(Boot3,.5))
-                .afterTime(2.75,new BZ_Blue.Setpositionforservo(Boot3,.94))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.Setpositionforservo(Boot1,.5))
+                .afterTime(.75,new BZ_red.Setpositionforservo(Boot1,.94))
+                .afterTime(1.25,new BZ_red.Setpositionforservo(Boot2,.5))
+                .afterTime(1.75,new BZ_red.Setpositionforservo(Boot2,.94))
+                .afterTime(2.25,new BZ_red.Setpositionforservo(Boot3,.5))
+                .afterTime(2.75,new BZ_red.Setpositionforservo(Boot3,.94))
+                //fail safe thing
 
                 .build();
         Action shotv3 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .stopAndAdd(new BZ_Blue.SetvelforMotor(outakeL,(2400)))
-                .stopAndAdd(new BZ_Blue.SetvelforMotor(outakeL,(2400)))
-                .stopAndAdd(new BZ_Blue.Setpositionforservo(Boot1,.5))
-                .afterTime(.75,new BZ_Blue.Setpositionforservo(Boot1,.94))
-                .afterTime(1.25,new BZ_Blue.Setpositionforservo(Boot2,.5))
-                .afterTime(1.75,new BZ_Blue.Setpositionforservo(Boot2,.94))
-                .afterTime(2.25,new BZ_Blue.Setpositionforservo(Boot3,.5))
-                .afterTime(2.75,new BZ_Blue.Setpositionforservo(Boot3,.94))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.SetvelforMotor(outakeL,(2400)))
+                .stopAndAdd(new BZ_red.Setpositionforservo(Boot1,.5))
+                .afterTime(.75,new BZ_red.Setpositionforservo(Boot1,.94))
+                .afterTime(1.25,new BZ_red.Setpositionforservo(Boot2,.5))
+                .afterTime(1.75,new BZ_red.Setpositionforservo(Boot2,.94))
+                .afterTime(2.25,new BZ_red.Setpositionforservo(Boot3,.5))
+                .afterTime(2.75,new BZ_red.Setpositionforservo(Boot3,.94))
+                //fail safe thing
 
                 .build();
         Action aoks = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.1, new BZ_Blue.SetpositionforMotor(turret, -635  ))
+                .afterTime(.1, new BZ_red.SetpositionforMotor(turret, 635 ))
                 .build();
+
 
         while (!isStopRequested() && !opModeIsActive()) {
             LLResult result = Limelight.getLatestResult();
@@ -232,7 +283,7 @@ public class BZ_Blue extends LinearOpMode {
         waitForStart();
         try {
 //            Actions.runBlocking(
-//                 Waiting
+//                    Waiting
 //            );
 //            Actions.runBlocking(
 //                    shotv1
@@ -247,7 +298,7 @@ public class BZ_Blue extends LinearOpMode {
 //                    dumpBackup
 //            );
 //            Actions.runBlocking(
-//                   scoredump
+//                    scoredump
 //            );
 //            Actions.runBlocking(
 //                    shotv2
@@ -295,21 +346,18 @@ Actions.runBlocking(
             Actions.runBlocking(
                     shotv2
             );
-//            Actions.runBlocking(
-//                    dumpline
-//            );
+            Actions.runBlocking(
+                    dumpline
+            );
 //             Actions.runBlocking(
 //                    dumpBackup
-         //   );
-//            Actions.runBlocking(
-//                    scoredump
-//            ;Actions.runBlocking(
-//                    shotv3
 //            );
             Actions.runBlocking(
-                    Park
+                    scoredump
+            );Actions.runBlocking(
+                    shotv3
             );
-            Actions.runBlocking(
+            ;Actions.runBlocking(
                     aoks
             );
 

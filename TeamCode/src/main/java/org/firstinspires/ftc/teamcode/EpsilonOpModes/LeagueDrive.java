@@ -37,6 +37,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.PIDF;
 
 @Config
 @TeleOp
@@ -132,7 +133,9 @@ public double far =-165;
         Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
         Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
         Bay1Boot.setPosition(.94);
-        Bay2Boot.setPosition(.94);Bay3Boot.setPosition(.94);
+        Bay2Boot.setPosition(.94);
+        Bay3Boot.setPosition(.94);
+
 
         timer = new ElapsedTime();
         BooterTimer = new ElapsedTime();
@@ -145,14 +148,14 @@ public double far =-165;
 //        I_tur_Lim = 0.0015;
 //        D_tur_Lim = .001;
 
-        normalSpeed = 1;
+        normalSpeed = 0.8;
         turbo_speed = 1;
 
 //        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
 
         outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
         outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
-        outakeL.setDirection(DcMotorSimple.Direction.REVERSE);
+        outakeR.setDirection(DcMotorSimple.Direction.REVERSE);
 
         turret = hardwareMap.get(DcMotorEx.class,"turret");
 
@@ -161,7 +164,7 @@ public double far =-165;
         hood = hardwareMap.get(Servo.class,"Hood");
 
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-       turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//       turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         TurController = new PIDController(P_tur, I_tur, D_tur);
@@ -247,7 +250,20 @@ public double far =-165;
 
 
 
+        if (gamepad1.right_trigger > 0) {
 
+            intake.setPower(1);
+
+        } else if (gamepad1.left_trigger > 0) {
+
+            intake.setPower(-1);
+
+        }
+        else {
+
+            intake.setPower(0);
+
+        }
 
 
 
@@ -339,22 +355,22 @@ public double far =-165;
         }
 
 
-        boolean allBaysFull = (ColorBay1 != 0 && ColorBay2 != 0 && ColorBay3 != 0);
-
-        if (gamepad1.right_trigger > 0 && !allBaysFull) {
-
-            intake.setPower(1);
-        }
-        else if (gamepad1.left_trigger > 0) {
-
-            ColorBay1 = 0;
-            ColorBay2 = 0;
-            ColorBay3 = 0;
-            intake.setPower(-1);
-        }
-        else {
-            intake.setPower(0);
-        }
+//        boolean allBaysFull = (ColorBay1 != 0 && ColorBay2 != 0 && ColorBay3 != 0);
+//
+//        if (gamepad1.right_trigger > 0 && !allBaysFull) {
+//
+//            intake.setPower(1);
+//        }
+//        else if (gamepad1.left_trigger > 0) {
+//
+//            ColorBay1 = 0;
+//            ColorBay2 = 0;
+//            ColorBay3 = 0;
+//            intake.setPower(-1);
+//        }
+//        else {
+//            intake.setPower(0);
+//        }
 
         if (distance1 < 3&& !Boot1 && !shooting1) {
             NormalizedRGBA colors11 = bay11.getNormalizedColors();
@@ -567,7 +583,7 @@ public double far =-165;
 //        telemetry.addData("currentY",currentY);
 //        telemetry.addData("currentH",currentH);
 //        telemetry.addData("currentPos",currentPos);
-        telemetry.addData("Intake Status", allBaysFull ?"Full" : "Empty");
+       // telemetry.addData("Intake Status", allBaysFull ?"Full" : "Empty");
         telemetry.addData("team",team);
         telemetry.addData("ticks",turret);
         telemetry.update();

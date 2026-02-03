@@ -44,7 +44,7 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 import java.util.Arrays;
 
-@Autonomous(name="RedFar", preselectTeleOp = "Drive26")
+@Autonomous(name="RedFar", preselectTeleOp = "LeagueDrive")
 public class redFAR extends LinearOpMode {
 
     @Override
@@ -65,7 +65,9 @@ public class redFAR extends LinearOpMode {
 
         outakeL.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         outakeR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        outakeL.setDirection(DcMotorSimple.Direction.REVERSE);
+        outakeR.setDirection(DcMotorEx.Direction.REVERSE);
+        outakeR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        outakeL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -76,9 +78,9 @@ public class redFAR extends LinearOpMode {
         Servo Boot1 = hardwareMap.get(Servo.class, "Boot1");
         Servo Boot2 = hardwareMap.get(Servo.class, "Boot2");
         Servo Boot3 = hardwareMap.get(Servo.class, "Boot3");
-        Boot1.setPosition(.97);
-        Boot2.setPosition(.97);
-        Boot3.setPosition(.97);
+        Boot1.setPosition(.94);
+        Boot2.setPosition(.94);
+        Boot3.setPosition(.94);
 
         //TODO:Init
         Limelight3A Limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -90,10 +92,11 @@ public class redFAR extends LinearOpMode {
         //TODO:Init Everything cracka
 
 
-                Action shoot1 = drive.actionBuilder(new Pose2d(-45, -50, Math.toRadians(-90))) // Y flipped, Heading flipped
+        Action shoot1 = drive.actionBuilder(new Pose2d(-45, -50, Math.toRadians(-90))) // Y flipped, Heading flipped
                 .afterTime(.75, new ColorSense(hardwareMap))
                 .afterTime(1.1, new redFAR.Setpositionforservo(hood, .9))
                 .strafeToLinearHeading(new Vector2d(-72, 0), Math.toRadians(-90))
+
                 .build();
 
         Action Grab3 = drive.actionBuilder(new Pose2d(-72, 0, Math.toRadians(-90)))
@@ -132,30 +135,35 @@ public class redFAR extends LinearOpMode {
 
         Action Waiting = drive.actionBuilder(new Pose2d(-72, -10, 0))
                 .afterTime(.2, new redFAR.Setpositionforservo(hood, 1))
-                .afterTime(.25, new SetpositionforMotor(turret, 165 )) // Check if turret direction needs negation
-                .stopAndAdd(new SetpowerforMotor(outakeL, .9))
-                .stopAndAdd(new SetpowerforMotor(outakeR, .9))
+                .afterTime(.25, new SetpositionforMotor(turret, 100 )) // Check if turret direction needs negation
+//                .stopAndAdd(new redFAR.SetvelforMotor(outakeL,(2000)))
+//                .stopAndAdd(new redFAR.SetvelforMotor(outakeL,(2000)))
+
                 .waitSeconds(2)
                 .build();
 
         Action park = drive.actionBuilder(new Pose2d(-72, 0, -90))
-                .strafeToLinearHeading(new Vector2d(-65, -40), Math.toRadians(45)) // Flipped -45 to 45
+                .strafeToLinearHeading(new Vector2d(-65, -40), Math.toRadians(45))
+                .build();// Flipped -45 to 45
+        Action aoks = drive.actionBuilder(new Pose2d(-72, 10, 90))
+                .afterTime(.1, new redFAR.SetpositionforMotor(turret, 635 ))
                 .build();
 
+
         Action shotv1 = drive.actionBuilder(new Pose2d(-72, -10, -90))
-                .afterTime(.01, new Setpositionforservo(Boot1, .535))
-                .afterTime(.3,  new Setpositionforservo(Boot1, .97))
-                .afterTime(.8,  new Setpositionforservo(Boot2, .535))
-                .afterTime(1,   new Setpositionforservo(Boot2, .97))
-                .afterTime(1.5, new Setpositionforservo(Boot3, .535))
-                .afterTime(1.8, new Setpositionforservo(Boot3, .97))
+                .afterTime(.01, new Setpositionforservo(Boot1, .5))
+                .afterTime(.3,  new Setpositionforservo(Boot1, .94))
+                .afterTime(.8,  new Setpositionforservo(Boot2, .5))
+                .afterTime(1,   new Setpositionforservo(Boot2, .94))
+                .afterTime(1.5, new Setpositionforservo(Boot3, .5))
+                .afterTime(1.8, new Setpositionforservo(Boot3, .94))
                 // fail safe
-                .afterTime(1.9, new Setpositionforservo(Boot1, .535))
-                .afterTime(2.1, new Setpositionforservo(Boot1, .97))
-                .afterTime(2.3, new Setpositionforservo(Boot2, .535))
-                .afterTime(2.5, new Setpositionforservo(Boot2, .97))
-                .afterTime(2.7, new Setpositionforservo(Boot3, .535))
-                .afterTime(2.9, new Setpositionforservo(Boot3, .97))
+                .afterTime(1.9, new Setpositionforservo(Boot1, .5))
+                .afterTime(2.1, new Setpositionforservo(Boot1, .94))
+                .afterTime(2.3, new Setpositionforservo(Boot2, .5))
+                .afterTime(2.5, new Setpositionforservo(Boot2, .94))
+                .afterTime(2.7, new Setpositionforservo(Boot3, .5))
+                .afterTime(2.9, new Setpositionforservo(Boot3, .94))
                 .build();
 
 
@@ -163,84 +171,104 @@ public class redFAR extends LinearOpMode {
 
 
         Action shotv2 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.01,new Setpositionforservo(Boot1,.535))
-                .afterTime(.3,new Setpositionforservo(Boot1,.97))
-                .afterTime(.8,new Setpositionforservo(Boot2,.535))
-                .afterTime(1,new Setpositionforservo(Boot2,.97))
-                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
-                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
+                .afterTime(.01,new Setpositionforservo(Boot1,.5))
+                .afterTime(.3,new Setpositionforservo(Boot1,.94))
+                .afterTime(.8,new Setpositionforservo(Boot2,.5))
+                .afterTime(1,new Setpositionforservo(Boot2,.94))
+                .afterTime(1.5,new Setpositionforservo(Boot3,.5))
+                .afterTime(1.8,new Setpositionforservo(Boot3,.94))
 
                 //fail safe thing
-                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
-                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
-                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
-                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
-                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
-                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+                .afterTime(1.9,new Setpositionforservo(Boot1,.5))
+                .afterTime(2.1,new Setpositionforservo(Boot1,.94))
+                .afterTime(2.3,new Setpositionforservo(Boot2,.5))
+                .afterTime(2.5,new Setpositionforservo(Boot2,.94))
+                .afterTime(2.7,new Setpositionforservo(Boot3,.5))
+                .afterTime(2.9,new Setpositionforservo(Boot3,.94))
                 .build();
         Action shotv3 = drive.actionBuilder(new Pose2d(-72, 10, 90))
-                .afterTime(.01,new Setpositionforservo(Boot1,.535))
-                .afterTime(.3,new Setpositionforservo(Boot1,.97))
-                .afterTime(.8,new Setpositionforservo(Boot2,.535))
-                .afterTime(1,new Setpositionforservo(Boot2,.97))
-                .afterTime(1.5,new Setpositionforservo(Boot3,.535))
-                .afterTime(1.8,new Setpositionforservo(Boot3,.97))
-
+                .afterTime(.01,new Setpositionforservo(Boot1,.5))
+                .afterTime(.3,new Setpositionforservo(Boot1,.94))
+                .afterTime(.8,new Setpositionforservo(Boot2,.5))
+                .afterTime(1,new Setpositionforservo(Boot2,.94))
+                .afterTime(1.5,new Setpositionforservo(Boot3,.5))
+                .afterTime(1.8,new Setpositionforservo(Boot3,.94))
                 //fail safe thing
-                .afterTime(1.9,new Setpositionforservo(Boot1,.535))
-                .afterTime(2.1,new Setpositionforservo(Boot1,.97))
-                .afterTime(2.3,new Setpositionforservo(Boot2,.535))
-                .afterTime(2.5,new Setpositionforservo(Boot2,.97))
-                .afterTime(2.7,new Setpositionforservo(Boot3,.535))
-                .afterTime(2.9,new Setpositionforservo(Boot3,.97))
+                .afterTime(1.9,new Setpositionforservo(Boot1,.5))
+                .afterTime(2.1,new Setpositionforservo(Boot1,.94))
+                .afterTime(2.3,new Setpositionforservo(Boot2,.5))
+                .afterTime(2.5,new Setpositionforservo(Boot2,.94))
+                .afterTime(2.7,new Setpositionforservo(Boot3,.5))
+                .afterTime(2.9,new Setpositionforservo(Boot3,.94))
+                .build();
+        Action OutakeWheels = drive.actionBuilder(new Pose2d(0,0,0))
+                .stopAndAdd(new SetvelforMotor(outakeL,2200))
+                .stopAndAdd(new SetvelforMotor(outakeL,2200))
                 .build();
 
 
 
 
-        while (!isStopRequested() && !opModeIsActive()) {
-            LLResult result = Limelight.getLatestResult();
-            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
-                telemetry.addData("AprilTag", fiducial.getFiducialId());
-                telemetry.addData("Bay 3", ColorBay3);
-                telemetry.addData("Bay 2", ColorBay2);
-                telemetry.addData("Bay 1", ColorBay1);
-                telemetry.update();
-            }
-        }
+//        while (!isStopRequested() && !opModeIsActive()) {
+//            LLResult result = Limelight.getLatestResult();
+//            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+//                telemetry.addData("AprilTag", fiducial.getFiducialId());
+//                telemetry.addData("Bay 3", ColorBay3);
+//                telemetry.addData("Bay 2", ColorBay2);
+//                telemetry.addData("Bay 1", ColorBay1);
+//                telemetry.update();
+//            }
+//        }
 
         waitForStart();
         //TODO: Run auto
-        Actions.runBlocking(new SequentialAction(
-                Waiting,shotv1
-        ));
-        Actions.runBlocking(new SequentialAction(
-                Grab3
-        ));
-        Actions.runBlocking(new SequentialAction(
-                intakespike
-        ));
-        Actions.runBlocking(new SequentialAction(
-                shoot1
-        ));
-        Actions.runBlocking(new SequentialAction(
-                shotv2
-        ));
-        Actions.runBlocking(new SequentialAction(
-                Wallpickup
-        ));
-        Actions.runBlocking(new SequentialAction(
-                PICKUP
-        ));
-        Actions.runBlocking(new SequentialAction(
-                Shooh
-        ));
-        Actions.runBlocking(new SequentialAction(
-                shotv3
-        ));
-        Actions.runBlocking(new SequentialAction(
-                park
-        ));
+
+        Actions.runBlocking(new ParallelAction(
+                OutakeWheels,
+                new SequentialAction(
+                        Waiting,
+                        shotv1,
+                        Grab3,
+                        intakespike,
+                        shoot1,
+                        shotv2,
+                        Wallpickup,
+                        PICKUP,
+                        Shooh,
+                        shotv3,
+                        park,aoks
+
+                )));
+//        Actions.runBlocking(new SequentialAction(
+//                Waiting,shotv1
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                Grab3
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                intakespike
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                shoot1
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                shotv2
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                Wallpickup
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                PICKUP
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                Shooh
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                shotv3
+//        ));
+//        Actions.runBlocking(new SequentialAction(
+//                park
+//        ));
 
 
 
@@ -262,7 +290,21 @@ public class redFAR extends LinearOpMode {
 //        Actions.runBlocking(shooterPID.spinUp());
     }
 
+    public class SetvelforMotor implements Action {
+        DcMotorEx motor;
+        double vel;
 
+        public SetvelforMotor(DcMotorEx MotorToCall, double Vel) {
+            this.motor = MotorToCall;
+            this.vel = Vel;
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            motor.setVelocity(vel);
+            return false;
+        }
+    }
     public class SetpositionforMotor implements Action {
         DcMotorEx motor;
         int position;
@@ -273,6 +315,21 @@ public class redFAR extends LinearOpMode {
             this.motor = s;
             this.position = p;
             this.timer = new ElapsedTime();
+        }
+        public class SetvelforMotor implements Action {
+            DcMotorEx motor;
+            double vel;
+
+            public SetvelforMotor(DcMotorEx MotorToCall, double Vel) {
+                this.motor = MotorToCall;
+                this.vel = Vel;
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                motor.setVelocity(vel);
+                return false;
+            }
         }
 
         @Override
