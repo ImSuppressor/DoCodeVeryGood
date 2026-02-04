@@ -34,6 +34,10 @@ import org.firstinspires.ftc.teamcode.EpsilonOpModes.BlueDepot;
 
 public class ShootNow {
 
+
+
+    /// this is what is was before
+    /// private static final HardwareMap hwMap;
     private final HardwareMap hwMap;
 
     public ShootNow(HardwareMap hardwareMap) {
@@ -45,6 +49,7 @@ public class ShootNow {
     }
 
     public class Shoot implements Action {
+       // public static class Shoot implements Action {
 
         private final Servo Bay1Boot;
 
@@ -62,8 +67,8 @@ public class ShootNow {
 
         public double ready = 0.94;
 
-        public double cycle = 1;
-        public double cycleDown = .75;
+        public double cycle = .5;
+        public double cycleDown = .25;
 
         public Shoot() {
 
@@ -74,6 +79,14 @@ public class ShootNow {
             Bay2Boot = hwMap.get(Servo.class, "Boot2");
 
             Bay3Boot = hwMap.get(Servo.class, "Boot3");
+
+            /// this is what it was before
+
+//            Bay1Boot = hwMap.get(Servo.class, "Boot1");
+//
+//            Bay2Boot = hwMap.get(Servo.class, "Boot2");
+//
+//            Bay3Boot = hwMap.get(Servo.class, "Boot3");
 
 
         }
@@ -366,7 +379,7 @@ public class ShootNow {
                     }
                 }
 
-            return time < 3;
+            return time < 1.25;
         }
     }
     public Action shoot() {

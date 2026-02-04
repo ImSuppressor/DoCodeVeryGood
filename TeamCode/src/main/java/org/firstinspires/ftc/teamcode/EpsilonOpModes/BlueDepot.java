@@ -11,9 +11,12 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.AngularVelConstraint;
+import com.acmerobotics.roadrunner.MinVelConstraint;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.ams.AMSColorSensor;
@@ -39,6 +42,8 @@ import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShooterPID;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
+
+import java.util.Arrays;
 
 @Autonomous(name="BlueDepot", preselectTeleOp = "LeagueDrive")
 public class BlueDepot extends LinearOpMode {
@@ -90,8 +95,7 @@ public class BlueDepot extends LinearOpMode {
 
         //TODO:Init Everything cracka
         Action Scorepre = drive.actionBuilder(new Pose2d(57, -49, Math.toRadians(-45)))//move to park
-//                .stopAndAdd(new SetpowerforMotor(outakeL,.535))
-//                .stopAndAdd(new SetpowerforMotor(outakeR,.535))
+
 //                .stopAndAdd(new SetvelforMotor(outakeL,500))
 //                .stopAndAdd(new SetvelforMotor(outakeR,20))
                 .stopAndAdd(new Setpositionforservo(hood,.75))
@@ -101,8 +105,8 @@ public class BlueDepot extends LinearOpMode {
                 //.waitSeconds(1.5)
                 .build();
         Action OutakeWheels = drive.actionBuilder(new Pose2d(0,0,0))
-                .stopAndAdd(new SetvelforMotor(outakeL,1475))
-                .stopAndAdd(new SetvelforMotor(outakeL,1475))
+                .stopAndAdd(new SetvelforMotor(outakeL,1700))
+               .stopAndAdd(new SetvelforMotor(outakeR,1700))
                 .build();
 
         Action lineUP1 = drive.actionBuilder(new Pose2d(24, -24, -45))
@@ -112,48 +116,60 @@ public class BlueDepot extends LinearOpMode {
 
                 //.build();
         Action intakespike = drive.actionBuilder(new Pose2d(30, -12, 0))
-                .strafeToLinearHeading(new Vector2d(62.5,-12),0)
+                .strafeToLinearHeading(new Vector2d(67,-12),0)
                 .stopAndAdd(new SetpowerforMotor(intake,1))
                 .build();
 
-        Action score1 = drive.actionBuilder(new Pose2d(65, -12, 0))
+        Action score1 = drive.actionBuilder(new Pose2d(67, -12, 0))
                 .afterTime(0.25,new SetpositionforMotor(turret,-750))
-                .afterTime(1,new ColorSense(hardwareMap))
+                .afterTime(.75,new ColorSense(hardwareMap))
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
-                .stopAndAdd(new SetpowerforMotor(intake,-1))
                 .build();
 
         Action GoLine2 = drive.actionBuilder(new Pose2d(24, -24, -45))
-                .afterTime(1.5,new SetpowerforMotor(intake,0))
                 .strafeToLinearHeading(new Vector2d(35,15),Math.toRadians(0))
+                .afterTime(.1,new SetpowerforMotor(intake,0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .stopAndAdd(new Setpositionforservo(Boot1,.94))
                 .stopAndAdd(new Setpositionforservo(Boot2,.94))
                 .stopAndAdd(new Setpositionforservo(Boot3,.94))
                 .build();
         Action Grab2 = drive.actionBuilder(new Pose2d(35,12.5,0))
-                .strafeToLinearHeading(new Vector2d(70,12.5),0)
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
+                .strafeToLinearHeading(new Vector2d(75,12.5),Math.toRadians(0),
+        new MinVelConstraint(Arrays.asList(
+                new TranslationalVelConstraint(25), //
+                new AngularVelConstraint(Math.PI / 2) //
+        )))
                 .build();
-        Action backup = drive.actionBuilder(new Pose2d(77,12.5,0))
-                .strafeToLinearHeading(new Vector2d(65,20),0)
+        Action backup = drive.actionBuilder(new Pose2d(75,12.5,0))
+                .strafeToLinearHeading(new Vector2d(65,20),Math.toRadians(0))
                 .build();
         Action Score2 = drive.actionBuilder(new Pose2d(65,20,0))
-               // .afterTime(0.25,new SetpositionforMotor(turret,-775))
-                .afterTime(1.1,new ColorSense(hardwareMap))
-                .stopAndAdd(new SetpowerforMotor(intake,-1))
+                .afterTime(.5,new ColorSense(hardwareMap))
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
-                        .build();
+                .build();
         Action GoLIne3 = drive.actionBuilder(new Pose2d(24,-24,-45))
-                .strafeToLinearHeading(new Vector2d(24,40),Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(35,40),Math.toRadians(0))
+                .afterTime(.2,new SetpowerforMotor(intake,1))
                 .build();
-        Action Grab3 =drive.actionBuilder(new Pose2d(24,40,0))
-                .strafeToLinearHeading(new Vector2d(90,32),0)
+        Action Grab3 =drive.actionBuilder(new Pose2d(35,40,0))
+                .afterTime(.2,new SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(75,32),Math.toRadians(0),
+        new MinVelConstraint(Arrays.asList(
+                new TranslationalVelConstraint(25), //
+                new AngularVelConstraint(Math.PI / 2) //
+        )))
                 .build();
-        Action Score3 = drive.actionBuilder(new Pose2d(90,32,0))
+        Action backup2 = drive.actionBuilder(new Pose2d(75,32,0))
+                .strafeToLinearHeading(new Vector2d(50,32),Math.toRadians(0))
+                .afterTime(1,new SetpowerforMotor(intake,0))
+
+                .build();
+        Action Score3 = drive.actionBuilder(new Pose2d(50,32,0))
+                .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
                 .afterTime(1.1,new ColorSense(hardwareMap))
                 .stopAndAdd(new SetpowerforMotor(intake,0))
-                .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
                 .build();
         Action IN = drive.actionBuilder(new Pose2d(24, -24, -45))
                 .stopAndAdd(new SetpowerforMotor(intake,1))
@@ -171,11 +187,17 @@ public class BlueDepot extends LinearOpMode {
                 .stopAndAdd(new Setpositionforservo(Boot2,.94))
                 .stopAndAdd(new Setpositionforservo(Boot3,.94))
                 .build();
+        Action ServoReset2 = drive.actionBuilder(new Pose2d(-64, -7, 0))
+                .stopAndAdd(new SetpowerforMotor(intake,0))
+                .stopAndAdd(new Setpositionforservo(Boot1,.94))
+                .stopAndAdd(new Setpositionforservo(Boot2,.94))
+                .stopAndAdd(new Setpositionforservo(Boot3,.94))
+                .build();
 
 
 
         Action color = drive.actionBuilder(new Pose2d(-64, -7, 0))
-                .afterTime(.01,new ColorSense(hardwareMap))
+                .afterTime(.25,new ColorSense(hardwareMap))
 
                 .build();
         Action PAARRK = drive.actionBuilder(new Pose2d(24,-24,-45))
@@ -215,24 +237,29 @@ public class BlueDepot extends LinearOpMode {
                     Scorepre,
                     shootNow.shoot(),
                     ServoReset,
-                    failsafe_thang,
                     lineUP1,
                     ServoReset,
                     IN,
                     intakespike,
+                    color,
                     score1,
                     shootNow.shoot(),
-                    failsafe_thang,
                     ServoReset,
                     IN,
                     GoLine2,
                     IN,
                     Grab2,
                     backup,
+                    color,
                     Score2,
                     shootNow.shoot(),
-                    failsafe_thang,
-                    PAARRK
+                    ServoReset2,
+                    GoLIne3,
+                    IN,
+                    Grab3,
+                    backup2,
+                    Score3,
+                    shootNow.shoot()
             )));
 
 //            Actions.runBlocking(new SequentialAction(

@@ -38,6 +38,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Config
 @TeleOp
@@ -88,9 +92,11 @@ public class DriveCode extends OpMode {
     private boolean shooting2 = false;
     private boolean shooting3 = false;
     public double shoot = .5;
+    private List<Action> runningActions = new ArrayList<>();
+
 
     public double ready = 0.97;
-
+    private double interval = 0.35;
     public double cycle = .5;
     public double cycleDown = .12;
     public double ball1, ball2, ball3;
@@ -98,6 +104,10 @@ public class DriveCode extends OpMode {
     public boolean Boot2 = false;
     public boolean Boot3 = false;
     public boolean SequenceShoot = false;
+    private ShootNow shootNow;
+    private ElapsedTime intaketime = new ElapsedTime();
+    private boolean Full = false;
+    boolean wasFullLastLoop = false;
 
 
     @Override
@@ -115,8 +125,7 @@ public class DriveCode extends OpMode {
         bay32 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
         dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
-
-
+       shootNow = new ShootNow(hardwareMap);
 //        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 //        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
 //       pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
@@ -137,6 +146,7 @@ public class DriveCode extends OpMode {
         timer = new ElapsedTime();
         BooterTimer = new ElapsedTime();
         timer2 = new ElapsedTime();
+        intaketime = new ElapsedTime();
         P_tur = 0.1;//ticks per degree
         I_tur = 0;
         D_tur = 0.00125;//power given
@@ -228,7 +238,49 @@ public class DriveCode extends OpMode {
 //            Bay1Boot = true;
 //            timer.reset();
 //        }
+        double distance3 = dist11.getDistance(DistanceUnit.CM);;
+        double distance2 = dist21.getDistance(DistanceUnit.CM);;
+        double distance1 = dist31.getDistance(DistanceUnit.CM);
+        boolean Full = (distance1 < 3) && (distance2 < 3) && (distance3 < 10);
 
+        if (Full) {
+            if (!wasFullLastLoop) {
+                intaketime.reset();
+                wasFullLastLoop = true;// This only runs ONCE when the 3rd ball arrives
+            }
+        } else {
+            wasFullLastLoop = false;
+        }
+
+        // 4. Intake Control
+        if (gamepad1.right_trigger > 0) {
+            if (Full && intaketime.seconds() >= 0.5) {
+                intake.setPower(0);
+                // Optional: add a rumble so you know it's full
+                gamepad1.rumble(250);
+            } else {
+                intake.setPower(1);
+            }
+        } else if (gamepad1.left_trigger > 0) {
+            intake.setPower(-1);
+        } else {
+            intake.setPower(0);
+        }
+
+
+        if (gamepad1.dpad_up && runningActions.isEmpty()) {
+            runningActions.add(shootNow.shoot());
+        }
+        TelemetryPacket packet = new TelemetryPacket();
+        List<Action> nextActions = new ArrayList<>();
+        for (Action action : runningActions) {
+            if (action.run(packet)) {
+                nextActions.add(action);
+            }
+        }
+        if (runningActions.isEmpty()) {
+            // if it done work then put stuff in here
+        }
 
         if (gamepad1.right_trigger > 0) {
 
@@ -336,38 +388,39 @@ public class DriveCode extends OpMode {
                 }
 
 
+
                 turret.setPower(-pidPower);
                 telemetry.addData("DistToGoal", DistanceToGoal);
 
-//            } else if (!(result.isValid()) & timer.seconds() > .5) {
-//
-//                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
-//
-//                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
-//
-//                double rawTargetDeg = targetAngle + currentH;
-//
-//                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
-//
-//                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
-//
-//                if (currentTurretAngle <= 7.5 && pidPower < 0) {
-//                    pidPower = 0;
-//                }
-//
-//                if (currentTurretAngle >= 172.5 && pidPower > 0) {
-//                    pidPower = 0;
-//                }
+            } else if (!(result.isValid()) & timer.seconds() > .5) {
 
-//                turret.setPower(pidPower);
-//
-//                telemetry.addData("Target Angle", targetAngle);
-//                telemetry.addData("Current Angle", currentTurretAngle);
-//                telemetry.addData("PID Output", pidPower);
-//                telemetry.addData("distance", DistanceToGoal);
-//                telemetry.addData("powervar", powervar);
-//                telemetry.addData("servovar", servovar);
-//                telemetry.addData("DistToGoal", DistanceToGoal);
+                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
+
+                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
+
+                double rawTargetDeg = targetAngle + currentH;
+
+                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+
+                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+
+                if (currentTurretAngle <= 7.5 && pidPower < 0) {
+                    pidPower = 0;
+                }
+
+                if (currentTurretAngle >= 172.5 && pidPower > 0) {
+                    pidPower = 0;
+                }
+
+                turret.setPower(pidPower);
+
+                telemetry.addData("Target Angle", targetAngle);
+                telemetry.addData("Current Angle", currentTurretAngle);
+                telemetry.addData("PID Output", pidPower);
+                telemetry.addData("distance", DistanceToGoal);
+                telemetry.addData("powervar", powervar);
+                telemetry.addData("servovar", servovar);
+                telemetry.addData("DistToGoal", DistanceToGoal);
 
             } else {
 
@@ -382,22 +435,20 @@ public class DriveCode extends OpMode {
             double DisToGoalX = 72 - currentX;
             double DisToGoalY = 72 + currentY;
 
-            double DistanceToGoal = Math.hypot(DisToGoalX,DisToGoalY);
+            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
 
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
 
                 double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) +7.5;
+                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
 
                 if (currentPosDeg <= 7.5 && pidPower > 0) {
 
                     pidPower = 0;
 
-                }
-
-                else if (currentPosDeg >= 172.5 && pidPower < 0) {
+                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
 
                     pidPower = 0;
 
@@ -405,7 +456,7 @@ public class DriveCode extends OpMode {
 
 
                 turret.setPower(-pidPower);
-                telemetry.addData("DistToGoal",DistanceToGoal);
+                telemetry.addData("DistToGoal", DistanceToGoal);
 
             } else if (!(result.isValid()) & timer.seconds() > .5) {
 
@@ -435,7 +486,7 @@ public class DriveCode extends OpMode {
                 telemetry.addData("distance", DistanceToGoal);
                 telemetry.addData("powervar", powervar);
                 telemetry.addData("servovar", servovar);
-                telemetry.addData("DistToGoal",DistanceToGoal);
+                telemetry.addData("DistToGoal", DistanceToGoal);
 
             } else {
 
@@ -443,303 +494,194 @@ public class DriveCode extends OpMode {
 
             }
 
-               }
-
-            double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
-            double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
-            double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
-
-            if (distance1 < 3 && !Boot1 && !shooting1) {
-                NormalizedRGBA colors11 = bay11.getNormalizedColors();
-                NormalizedRGBA colors12 = bay12.getNormalizedColors();
-                double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
-                double avgGreen1 = (colors11.green + colors12.green) / 2.0;
-                if (avgBlue1 > avgGreen1) {
-                    ColorBay1 = 1;
-                } else if (avgGreen1 > avgBlue1) {
-                    ColorBay1 = 2;
-                } else {
-                    ColorBay1 = 0;
-                }
-            }
-            if (distance2 < 3 && !Boot1 && !shooting1) {
-                NormalizedRGBA colors21 = bay21.getNormalizedColors();
-                NormalizedRGBA colors22 = bay22.getNormalizedColors();
-                double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
-                double avgGreen2 = (colors21.green + colors22.green) / 2.0;
-                if (avgBlue2 > avgGreen2) {
-                    ColorBay2 = 1;
-                } else if (avgGreen2 > avgBlue2) {
-                    ColorBay2 = 2;//bay 2 is stipud
-                } else {
-                    ColorBay2 = 0;
-                }
-            }
-            if (distance3 < 10 && !Boot1 && !shooting1) {
-                NormalizedRGBA colors31 = bay31.getNormalizedColors();
-                NormalizedRGBA colors32 = bay32.getNormalizedColors();
-                double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
-                double avgGreen3 = (colors31.green + colors32.green) / 2.0;
-                if (avgBlue3 > avgGreen3) {
-                    ColorBay3 = 1;
-                } else if (avgGreen3 > avgBlue3) {
-                    ColorBay3 = 2;
-                } else {
-                    ColorBay3 = 0;
-                }
-            }
-
-            //ShootPurple
-            if (!shooting1 && !shooting2 && gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
-                if (ColorBay1 == 1) {
-                    Bay1Boot.setPosition(shoot);
-                    ColorBay1 = 0;
-                    BooterTimer.reset();
-                    Boot1 = true;
-
-                } else if (ColorBay2 == 1) {
-                    Bay2Boot.setPosition(shoot);
-                    ColorBay2 = 0;
-                    BooterTimer.reset();
-                    Boot2 = true;
-
-                } else if (ColorBay3 == 1) {
-                    Bay3Boot.setPosition(shoot);
-                    ColorBay3 = 0;
-                    BooterTimer.reset();
-                    Boot3 = true;
-
-                }
-            }
-            //ShootGreen
-            if (!shooting1 && !shooting2 && gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
-                if (ColorBay1 == 2) {
-                    Bay1Boot.setPosition(shoot);
-                    ColorBay1 = 0;
-                    BooterTimer.reset();
-                    Boot1 = true;
-
-                } else if (ColorBay2 == 2) {
-                    Bay2Boot.setPosition(shoot);
-                    ColorBay2 = 0;
-                    BooterTimer.reset();
-                    Boot2 = true;
-
-                } else if (ColorBay3 == 2) {
-                    Bay3Boot.setPosition(shoot);
-                    ColorBay3 = 0;
-                    BooterTimer.reset();
-                    Boot3 = true;
-
-                }
-            }
-            //Reset Boot Arms
-            if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle - cycleDown) && (Boot1 || Boot2 || Boot3)) {
-                Bay1Boot.setPosition(ready);
-                Bay2Boot.setPosition(ready);
-                Bay3Boot.setPosition(ready);
-            } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
-                Boot1 = false;
-                Boot2 = false;
-                Boot3 = false;
-            }
-            //SequencedShot
-            if (gamepad2.dpad_down && !SequenceShoot) {
-                if (!initialized) {
-                    shooting1 = false;
-                    shooting2 = false;
-                    shooting3 = false;
-                    BooterTimer.reset();
-                    SequenceShoot = true;
-                }
-                if (BooterTimer.seconds() < (cycle) && !shooting1) {
-
-                    if (ColorBay1 == ball1) {
-
-                        Bay1Boot.setPosition(shoot);
-
-                        ColorBay1 = 0;
-                        shooting1 = true;
-
-                    } else if (ColorBay2 == ball1) {
-
-                        Bay2Boot.setPosition(shoot);
-
-                        ColorBay2 = 0;
-                        shooting1 = true;
-
-                    } else if (ColorBay3 == ball1) {
-
-                        Bay3Boot.setPosition(shoot);
-
-                        ColorBay3 = 0;
-                        shooting1 = true;
-
-                    } else {
-                        if (!(ColorBay1 == 0)) {
-                            Bay1Boot.setPosition(shoot);
-
-                            ColorBay1 = 0;
-                            shooting1 = true;
-                        } else if (!(ColorBay2 == 0)) {
-                            Bay2Boot.setPosition(shoot);
-
-                            ColorBay2 = 0;
-                            shooting1 = true;
-
-                        } else if (!(ColorBay3 == 0)) {
-                            Bay3Boot.setPosition(shoot);
-
-                            ColorBay3 = 0;
-                            shooting1 = true;
-
-                        }
-                    }
-                } else if (BooterTimer.seconds() > (cycle - cycleDown) && BooterTimer.seconds() < cycle) {
-                    Bay1Boot.setPosition(ready);
-                    Bay2Boot.setPosition(ready);
-                    Bay3Boot.setPosition(ready);
-
-                } else if (BooterTimer.seconds() < 2 * cycle && BooterTimer.seconds() > cycle && !shooting2) {
-
-                    if (ColorBay1 == ball2) {
-
-                        Bay1Boot.setPosition(shoot);
-
-                        ColorBay1 = 0;
-                        shooting2 = true;
-
-                    } else if (ColorBay2 == ball2) {
-
-                        Bay2Boot.setPosition(shoot);
-
-                        ColorBay2 = 0;
-                        shooting2 = true;
-
-                    } else if (ColorBay3 == ball2) {
-
-                        Bay3Boot.setPosition(shoot);
-
-                        ColorBay3 = 0;
-                        shooting2 = true;
-
-                    } else {
-                        if (!(ColorBay1 == 0)) {
-                            Bay1Boot.setPosition(shoot);
-
-                            ColorBay1 = 0;
-                            shooting2 = true;
-                        } else if (!(ColorBay2 == 0)) {
-                            Bay2Boot.setPosition(shoot);
-
-                            ColorBay2 = 0;
-                            shooting2 = true;
-
-                        } else if (!(ColorBay3 == 0)) {
-                            Bay3Boot.setPosition(shoot);
-
-                            ColorBay3 = 0;
-                            shooting2 = true;
-
-                        }
-                    }
-
-                } else if (BooterTimer.seconds() > ((2 * cycle) - cycleDown) && BooterTimer.seconds() < 2 * cycle) {
-                    Bay1Boot.setPosition(ready);
-                    Bay2Boot.setPosition(ready);
-                    Bay3Boot.setPosition(ready);
-
-                } else if (BooterTimer.seconds() < 3 * cycle && BooterTimer.seconds() > 2 * cycle && !shooting3) {
-
-                    if (ColorBay1 == ball3) {
-
-                        Bay1Boot.setPosition(shoot);
-
-                        ColorBay1 = 0;
-                        shooting3 = true;
-
-                    } else if (ColorBay2 == ball3) {
-
-                        Bay2Boot.setPosition(shoot);
-
-                        ColorBay2 = 0;
-                        shooting3 = true;
-
-                    } else if (ColorBay3 == ball3) {
-
-                        Bay3Boot.setPosition(shoot);
-
-                        ColorBay3 = 0;
-                        shooting3 = true;
-
-                    } else {
-                        if (!(ColorBay1 == 0)) {
-                            Bay1Boot.setPosition(shoot);
-
-                            ColorBay1 = 0;
-                            shooting3 = true;
-                        } else if (!(ColorBay2 == 0)) {
-                            Bay2Boot.setPosition(shoot);
-
-                            ColorBay2 = 0;
-                            shooting3 = true;
-
-                        } else if (!(ColorBay3 == 0)) {
-                            Bay3Boot.setPosition(shoot);
-
-                            ColorBay3 = 0;
-                            shooting3 = true;
-                            BooterTimer.reset();
-
-                        }
-                    }
-                }
-                if (BooterTimer.seconds() > 3 * cycle && initialized) {
-                    shooting1 = false;
-                    shooting2 = false;
-                    shooting3 = false;
-                    initialized = false;
-                    SequenceShoot = false;
-                }
-            }
-            class SetpositionforMotor implements Action {
-                DcMotorEx motor;
-                int position;
-                ElapsedTime timer;
-                boolean init = false;
-
-                public SetpositionforMotor(DcMotorEx s, int p) {
-                    this.motor = s;
-                    this.position = p;
-                    this.timer = new ElapsedTime();
-                }
-
-                @Override
-                public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                    if (!init) {
-                        timer.reset();
-                        init = true;
-                    }
-                    motor.setTargetPosition(position);
-                    motor.setPower(1);
-                    motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    return timer.seconds() < .5;
-                }
-            }
-
-
-            telemetry.addData("Bay 3", ColorBay3);
-            telemetry.addData("Bay 2", ColorBay2);
-            telemetry.addData("Bay 1", ColorBay1);
-            telemetry.addData("time", timer.seconds());
-            telemetry.addData("currentX", currentX);
-            telemetry.addData("currentY", currentY);
-            telemetry.addData("currentH", currentH);
-            telemetry.addData("currentPos", currentPos);
-            telemetry.addData("team", team);
-            telemetry.update();
-
-
         }
 
+        distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+        distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+        distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+
+        if (distance1 < 3 && !Boot1 && !shooting1) {
+            NormalizedRGBA colors11 = bay11.getNormalizedColors();
+            NormalizedRGBA colors12 = bay12.getNormalizedColors();
+            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
+            if (avgBlue1 > avgGreen1) {
+                ColorBay1 = 1;
+            } else if (avgGreen1 > avgBlue1) {
+                ColorBay1 = 2;
+            } else {
+                ColorBay1 = 0;
+            }
+        }
+        if (distance2 < 3 && !Boot1 && !shooting1) {
+            NormalizedRGBA colors21 = bay21.getNormalizedColors();
+            NormalizedRGBA colors22 = bay22.getNormalizedColors();
+            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+            if (avgBlue2 > avgGreen2) {
+                ColorBay2 = 1;
+            } else if (avgGreen2 > avgBlue2) {
+                ColorBay2 = 2;//bay 2 is stipud
+            } else {
+                ColorBay2 = 0;
+            }
+        }
+        if (distance3 < 10 && !Boot1 && !shooting1) {
+            NormalizedRGBA colors31 = bay31.getNormalizedColors();
+            NormalizedRGBA colors32 = bay32.getNormalizedColors();
+            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+            if (avgBlue3 > avgGreen3) {
+                ColorBay3 = 1;
+            } else if (avgGreen3 > avgBlue3) {
+                ColorBay3 = 2;
+            } else {
+                ColorBay3 = 0;
+            }
+        }
+        if (gamepad1.dpad_down && runningActions.isEmpty()) {
+            runningActions.add(new SequentialShoot());
+        }
+
+        //ShootPurple
+        if (!shooting1 && !shooting2 && gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
+            if (ColorBay1 == 1) {
+                Bay1Boot.setPosition(shoot);
+                ColorBay1 = 0;
+                BooterTimer.reset();
+                Boot1 = true;
+
+            } else if (ColorBay2 == 1) {
+                Bay2Boot.setPosition(shoot);
+                ColorBay2 = 0;
+                BooterTimer.reset();
+                Boot2 = true;
+
+            } else if (ColorBay3 == 1) {
+                Bay3Boot.setPosition(shoot);
+                ColorBay3 = 0;
+                BooterTimer.reset();
+                Boot3 = true;
+
+            }
+        }
+        //ShootGreen
+        if (!shooting1 && !shooting2 && gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
+            if (ColorBay1 == 2) {
+                Bay1Boot.setPosition(shoot);
+                ColorBay1 = 0;
+                BooterTimer.reset();
+                Boot1 = true;
+
+            } else if (ColorBay2 == 2) {
+                Bay2Boot.setPosition(shoot);
+                ColorBay2 = 0;
+                BooterTimer.reset();
+                Boot2 = true;
+
+            } else if (ColorBay3 == 2) {
+                Bay3Boot.setPosition(shoot);
+                ColorBay3 = 0;
+                BooterTimer.reset();
+                Boot3 = true;
+
+            }
+        }
+        //Reset Boot Arms
+        if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle - cycleDown) && (Boot1 || Boot2 || Boot3)) {
+            Bay1Boot.setPosition(ready);
+            Bay2Boot.setPosition(ready);
+            Bay3Boot.setPosition(ready);
+        } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
+            Boot1 = false;
+            Boot2 = false;
+            Boot3 = false;
+        }
+        //SequencedShot
+
+
+
+
+
+
+
+
+
+
+        class SetpositionforMotor implements Action {
+            DcMotorEx motor;
+            int position;
+            ElapsedTime timer;
+            boolean init = false;
+
+            public SetpositionforMotor(DcMotorEx s, int p) {
+                this.motor = s;
+                this.position = p;
+                this.timer = new ElapsedTime();
+            }
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                if (!init) {
+                    timer.reset();
+                    init = true;
+                }
+                motor.setTargetPosition(position);
+                motor.setPower(1);
+                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                return timer.seconds() < .5;
+            }
+        }
+
+
+        telemetry.addData("Bay 3", ColorBay3);
+        telemetry.addData("Bay 2", ColorBay2);
+        telemetry.addData("Bay 1", ColorBay1);
+        telemetry.addData("time", timer.seconds());
+        telemetry.addData("currentX", currentX);
+        telemetry.addData("currentY", currentY);
+        telemetry.addData("currentH", currentH);
+        telemetry.addData("currentPos", currentPos);
+        telemetry.addData("team", team);
+        telemetry.update();
+
+
+    }
+    // --- NOW put the class HERE, outside the loop ---
+    public class SequentialShoot implements Action {
+        private final ElapsedTime timer = new ElapsedTime();
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                timer.reset();
+                initialized = true;
+            }
+
+            double ben = timer.seconds();
+            double inter = 0.35;
+
+            if (ben < inter) {
+                Bay1Boot.setPosition(0.575);
+            } else {
+                Bay1Boot.setPosition(0.97);
+            }
+
+            if (ben > inter && ben < inter * 2) {
+                Bay2Boot.setPosition(0.575);
+            } else if (ben > inter * 2) {
+                Bay2Boot.setPosition(0.97);
+            }
+
+            if (ben > inter * 2 && ben < inter * 3) {
+                Bay3Boot.setPosition(0.575);
+            } else if (ben > inter * 3) {
+                Bay3Boot.setPosition(0.97);
+            }
+
+            // This returns the boolean to the Action Runner, NOT the loop
+            return ben < (inter * 3.5);
+        }
+    }
     }
