@@ -98,15 +98,16 @@ public class BlueDepot extends LinearOpMode {
 
 //                .stopAndAdd(new SetvelforMotor(outakeL,500))
 //                .stopAndAdd(new SetvelforMotor(outakeR,20))
-                .stopAndAdd(new Setpositionforservo(hood,.75))
                 .afterTime(1,new ColorSense(hardwareMap))
-                .afterTime(1.1,new SetpositionforMotor(turret,-725))
+                .afterTime(1.1,new SetpositionforMotor(turret,-715))
                 .strafeToLinearHeading(new Vector2d(24, -24), Math.toRadians(-45))
                 //.waitSeconds(1.5)
                 .build();
         Action OutakeWheels = drive.actionBuilder(new Pose2d(0,0,0))
-                .stopAndAdd(new SetvelforMotor(outakeL,1700))
-               .stopAndAdd(new SetvelforMotor(outakeR,1700))
+                .stopAndAdd(new SetvelforMotor(outakeL,2000))
+               .stopAndAdd(new SetvelforMotor(outakeR,2000))// if this is too high go back to 1750
+                .stopAndAdd(new Setpositionforservo(hood, 1.0))
+
                 .build();
 
         Action lineUP1 = drive.actionBuilder(new Pose2d(24, -24, -45))
@@ -128,7 +129,7 @@ public class BlueDepot extends LinearOpMode {
 
         Action GoLine2 = drive.actionBuilder(new Pose2d(24, -24, -45))
                 .strafeToLinearHeading(new Vector2d(35,15),Math.toRadians(0))
-                .afterTime(.1,new SetpowerforMotor(intake,0))
+                .stopAndAdd(new SetpowerforMotor(intake,0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .stopAndAdd(new Setpositionforservo(Boot1,.94))
                 .stopAndAdd(new Setpositionforservo(Boot2,.94))
@@ -146,15 +147,15 @@ public class BlueDepot extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(65,20),Math.toRadians(0))
                 .build();
         Action Score2 = drive.actionBuilder(new Pose2d(65,20,0))
-                .afterTime(.5,new ColorSense(hardwareMap))
                 .strafeToLinearHeading(new Vector2d(24,-24),Math.toRadians(-45))
+                .afterTime(.5,new ColorSense(hardwareMap))
                 .build();
         Action GoLIne3 = drive.actionBuilder(new Pose2d(24,-24,-45))
                 .strafeToLinearHeading(new Vector2d(35,40),Math.toRadians(0))
-                .afterTime(.2,new SetpowerforMotor(intake,1))
+                .stopAndAdd(new SetpowerforMotor(intake,1))
                 .build();
         Action Grab3 =drive.actionBuilder(new Pose2d(35,40,0))
-                .afterTime(.2,new SetpowerforMotor(intake,1))
+                .stopAndAdd(new SetpowerforMotor(intake,1))
                 .strafeToLinearHeading(new Vector2d(75,32),Math.toRadians(0),
         new MinVelConstraint(Arrays.asList(
                 new TranslationalVelConstraint(25), //
@@ -163,7 +164,7 @@ public class BlueDepot extends LinearOpMode {
                 .build();
         Action backup2 = drive.actionBuilder(new Pose2d(75,32,0))
                 .strafeToLinearHeading(new Vector2d(50,32),Math.toRadians(0))
-                .afterTime(1,new SetpowerforMotor(intake,0))
+                .stopAndAdd(new SetpowerforMotor(intake,0))
 
                 .build();
         Action Score3 = drive.actionBuilder(new Pose2d(50,32,0))
@@ -217,16 +218,16 @@ public class BlueDepot extends LinearOpMode {
 
                 .build();
 
-//        while (!isStopRequested() && !opModeIsActive()) {
-//            LLResult result = Limelight.getLatestResult();
-//            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
-//                telemetry.addData("AprilTag", fiducial.getFiducialId());
-//                telemetry.addData("Bay 3", ColorBay3);
-//                telemetry.addData("Bay 2", ColorBay2);
-//                telemetry.addData("Bay 1", ColorBay1);
-//                telemetry.update();
-//            }
-//        }
+        while (!isStopRequested() && !opModeIsActive()) {
+            LLResult result = Limelight.getLatestResult();
+            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+                telemetry.addData("AprilTag", fiducial.getFiducialId());
+                telemetry.addData("Bay 3", ColorBay3);
+                telemetry.addData("Bay 2", ColorBay2);
+                telemetry.addData("Bay 1", ColorBay1);
+                telemetry.update();
+            }
+        }
 
         waitForStart();
         try {
@@ -245,9 +246,7 @@ public class BlueDepot extends LinearOpMode {
                     score1,
                     shootNow.shoot(),
                     ServoReset,
-                    IN,
                     GoLine2,
-                    IN,
                     Grab2,
                     backup,
                     color,

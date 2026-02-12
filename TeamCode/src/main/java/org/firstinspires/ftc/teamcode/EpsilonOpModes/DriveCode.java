@@ -45,7 +45,8 @@ import java.util.List;
 
 @Config
 @TeleOp
-public class DriveCode extends OpMode {
+public class
+DriveCode extends OpMode {
     MecanumDrive drive;
     private PIDController TurController;
     private PIDController TurControllerL;
@@ -59,6 +60,9 @@ public class DriveCode extends OpMode {
     double turbo_speed;
 
     private DcMotorEx turret;
+    private Servo kickstand;
+    private Servo kickstand2    ;
+
     private Limelight3A limelight;
     private Servo hood;
     private double DisToGoalX;
@@ -95,7 +99,7 @@ public class DriveCode extends OpMode {
     private List<Action> runningActions = new ArrayList<>();
 
 
-    public double ready = 0.97;
+    public double ready = 0.94;
     private double interval = 0.35;
     public double cycle = .5;
     public double cycleDown = .12;
@@ -140,8 +144,11 @@ public class DriveCode extends OpMode {
         Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
         Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
         Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
+        kickstand = hardwareMap.get(Servo.class, "kickstand");
+        kickstand2 = hardwareMap.get(Servo.class, "kickstand");
         Bay1Boot.setPosition(.94);
-        Bay2Boot.setPosition(.94);Bay3Boot.setPosition(.94);
+        Bay2Boot.setPosition(.94);
+        Bay3Boot.setPosition(.94);
 
         timer = new ElapsedTime();
         BooterTimer = new ElapsedTime();
@@ -151,9 +158,10 @@ public class DriveCode extends OpMode {
         I_tur = 0;
         D_tur = 0.00125;//power given
 
-        P_tur_Lim = .03;
-        I_tur_Lim = 0.0015;
-        D_tur_Lim = .001;
+
+        P_tur_Lim = 0.025;
+        I_tur_Lim = 0.0001;
+        D_tur_Lim = 0.001;
 
         normalSpeed = 0.8;
         turbo_speed = 1;
@@ -162,7 +170,7 @@ public class DriveCode extends OpMode {
 
         outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
         outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
-        outakeL.setDirection(DcMotorSimple.Direction.REVERSE);
+        outakeR.setDirection(DcMotorSimple.Direction.REVERSE);
 
         turret = hardwareMap.get(DcMotorEx.class,"turret");
 
@@ -197,7 +205,6 @@ public class DriveCode extends OpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        pattern="PPG";
         if (pattern.equals("PPG")) {
             ball1 = 1;
             ball2 = 1;
@@ -232,34 +239,19 @@ public class DriveCode extends OpMode {
     @Override
     public void loop() {
         drive.updatePoseEstimate();
-//        if ( bay11 == 1&&gamepad1.dpad_left) {
-//            Bay1Boot.setPosition(.535);
-//            bay11 = 0;
-//            Bay1Boot = true;
-//            timer.reset();
-//        }
-        double distance3 = dist11.getDistance(DistanceUnit.CM);;
-        double distance2 = dist21.getDistance(DistanceUnit.CM);;
-        double distance1 = dist31.getDistance(DistanceUnit.CM);
-        boolean Full = (distance1 < 3) && (distance2 < 3) && (distance3 < 10);
+        double  distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+         double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+        double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
 
-        if (Full) {
-            if (!wasFullLastLoop) {
-                intaketime.reset();
-                wasFullLastLoop = true;// This only runs ONCE when the 3rd ball arrives
-            }
-        } else {
-            wasFullLastLoop = false;
-        }
+        Full = ((distance1 < 3) && (distance2 < 3) && (distance3 < 10));
 
-        // 4. Intake Control
+        // 2. INTAKE CONTROL
         if (gamepad1.right_trigger > 0) {
-            if (Full && intaketime.seconds() >= 0.5) {
+            if (Full) {
                 intake.setPower(0);
-                // Optional: add a rumble so you know it's full
-                gamepad1.rumble(250);
             } else {
                 intake.setPower(1);
+                Sticks(turbo_speed);
             }
         } else if (gamepad1.left_trigger > 0) {
             intake.setPower(-1);
@@ -267,10 +259,14 @@ public class DriveCode extends OpMode {
             intake.setPower(0);
         }
 
-
+        // 3. SHOOTING INPUTS
         if (gamepad1.dpad_up && runningActions.isEmpty()) {
             runningActions.add(shootNow.shoot());
         }
+        if (gamepad1.dpad_down && runningActions.isEmpty()) {
+            runningActions.add(new SequentialShoot());
+        }
+
         TelemetryPacket packet = new TelemetryPacket();
         List<Action> nextActions = new ArrayList<>();
         for (Action action : runningActions) {
@@ -278,66 +274,67 @@ public class DriveCode extends OpMode {
                 nextActions.add(action);
             }
         }
-        if (runningActions.isEmpty()) {
-            // if it done work then put stuff in here
+        if (Full && !wasFullLastLoop) {
+            // Arguments: (leftMotorPower, rightMotorPower, durationMs)
+            gamepad1.rumble(0.4, 0.1, 20);
+        }
+        runningActions = nextActions;
+//        if (gamepad1.options)
+//           kickstand .setPosition(.475);
+//        kickstand2.setPosition(.475);
+
+
+//        if (gamepad1.right_trigger > 0) {
+//
+//            intake.setPower(1);
+//
+//        } else if (gamepad1.left_trigger > 0) {
+//
+//            intake.setPower(-1);
+//
+//        } else {
+//
+//            intake.setPower(0);
+
+        // }
+       //SHOOT POWERS
+        if (gamepad1. square){
+            outakeL.setVelocity(2000);
+            outakeR.setVelocity(2000);
+            hood.setPosition(1);
+        }
+        if (gamepad1.circle){
+            outakeL.setVelocity(2500);
+            outakeR.setVelocity(2500);
+            hood.setPosition(1);
+        }
+        if (gamepad1.a){
+            outakeL.setVelocity(0);
+            outakeR.setVelocity(0);
+            hood.setPosition(.5);
         }
 
-        if (gamepad1.right_trigger > 0) {
-
-            intake.setPower(1);
-
-        } else if (gamepad1.left_trigger > 0) {
-
-            intake.setPower(-1);
-
-        } else {
-
-            intake.setPower(0);
-
-        }
-        if (gamepad1.square) {
-            outakeL.setPower(.55);
-            outakeR.setPower(.55);
-            hood.setPosition(.65);
-        }
-        if (gamepad1.triangle) {
-            outakeR.setPower(.63);
-            outakeL.setPower(.63);
-            hood.setPosition(.7);
-        }
-        if (gamepad1.circle) {
-            outakeL.setPower(.725);
-            outakeR.setPower(.725
-            );
-            hood.setPosition(.9);
-        }
-        if (gamepad1.a) {
-            outakeL.setPower(0);
-            outakeR.setPower(0);
-            hood.setPosition(.54);
-        }
-
-        if (gamepad1.dpad_left) {
-
-            Bay1Boot.setPosition(.575);
-
-            Bay2Boot.setPosition(.97);
-            Bay3Boot.setPosition(.97);
-
-        } else if (gamepad1.dpad_right) {
-
-            Bay2Boot.setPosition(.55);
-
-            Bay1Boot.setPosition(.97);
-            Bay3Boot.setPosition(.97);
-
-        } else if (gamepad1.dpad_down) {
-
-            Bay3Boot.setPosition(.575);
-
-            Bay1Boot.setPosition(.97);
-            Bay2Boot.setPosition(.97);
-        }
+//        if (gamepad1.dpad_left) {
+//
+//            Bay1Boot.setPosition(.575);
+//
+//            Bay2Boot.setPosition(.97);
+//            Bay3Boot.setPosition(.97);
+//
+//        } else if (gamepad1.dpad_right) {
+//
+//            Bay2Boot.setPosition(.55);
+//
+//            Bay1Boot.setPosition(.97);
+//            Bay3Boot.setPosition(.97);
+//
+//        } else if (gamepad1.dpad_down) {
+//
+//            Bay3Boot.setPosition(.575);
+//
+//            Bay1Boot.setPosition(.97);
+//            Bay2Boot.setPosition(.97);
+//        }
 
         if (gamepad1.right_bumper) {
 
@@ -362,73 +359,36 @@ public class DriveCode extends OpMode {
             timer.reset();
 
         }
+            if (team == 1) {
 
 
-        if (team == 1) {
+                if (result.isValid() && limelight.getLatestResult() != null) {
 
-            double DisToGoalX = 72 - currentX;
-            double DisToGoalY = 72 + currentY;
+                    double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
 
-            if (result.isValid() & !(limelight.getLatestResult() == null)) {
+                    double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
 
-                double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
+                    if (currentPosDeg <= 7.5 && pidPower > 0) {
+                        pidPower = 0;
+                    } else if (currentPosDeg >= 172.5 && pidPower < 0) {
+                        pidPower = 0;
+                    }
 
-                if (currentPosDeg <= 7.5 && pidPower > 0) {
+                    turret.setPower(-pidPower);
+                    telemetry.addData("Mode", "Limelight Tracking");
+                    telemetry.addData("Limelight tx", result.getTx());
 
-                    pidPower = 0;
+                } else {
+                    turret.setPower(0);
 
-                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
-
-                    pidPower = 0;
-
+                    telemetry.addData("Mode", "Target Lost - Idle");
                 }
 
 
-
-                turret.setPower(-pidPower);
-                telemetry.addData("DistToGoal", DistanceToGoal);
-
-            } else if (!(result.isValid()) & timer.seconds() > .5) {
-
-                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
-
-                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
-
-                double rawTargetDeg = targetAngle + currentH;
-
-                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
-
-                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
-
-                if (currentTurretAngle <= 7.5 && pidPower < 0) {
-                    pidPower = 0;
-                }
-
-                if (currentTurretAngle >= 172.5 && pidPower > 0) {
-                    pidPower = 0;
-                }
-
-                turret.setPower(pidPower);
-
-                telemetry.addData("Target Angle", targetAngle);
-                telemetry.addData("Current Angle", currentTurretAngle);
-                telemetry.addData("PID Output", pidPower);
-                telemetry.addData("distance", DistanceToGoal);
-                telemetry.addData("powervar", powervar);
-                telemetry.addData("servovar", servovar);
-                telemetry.addData("DistToGoal", DistanceToGoal);
-
-            } else {
-
-                turret.setPower(0);
-
+                telemetry.addData("Turret Angle", (turret.getCurrentPosition() * 0.1339285) + 7.5);
             }
-
-        }
 
         if (team == 2) {
 
@@ -539,9 +499,7 @@ public class DriveCode extends OpMode {
                 ColorBay3 = 0;
             }
         }
-        if (gamepad1.dpad_down && runningActions.isEmpty()) {
-            runningActions.add(new SequentialShoot());
-        }
+
 
         //ShootPurple
         if (!shooting1 && !shooting2 && gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
@@ -600,14 +558,6 @@ public class DriveCode extends OpMode {
         //SequencedShot
 
 
-
-
-
-
-
-
-
-
         class SetpositionforMotor implements Action {
             DcMotorEx motor;
             int position;
@@ -643,11 +593,12 @@ public class DriveCode extends OpMode {
         telemetry.addData("currentH", currentH);
         telemetry.addData("currentPos", currentPos);
         telemetry.addData("team", team);
+        telemetry.addData("pattern", pattern);
+        telemetry.addData("Status", Full ? "FULL - Stopped" : "Intaking");
         telemetry.update();
 
 
     }
-    // --- NOW put the class HERE, outside the loop ---
     public class SequentialShoot implements Action {
         private final ElapsedTime timer = new ElapsedTime();
         private boolean initialized = false;
@@ -660,28 +611,28 @@ public class DriveCode extends OpMode {
             }
 
             double ben = timer.seconds();
-            double inter = 0.35;
+            double inter = .5;
+            double down =.25;
 
-            if (ben < inter) {
-                Bay1Boot.setPosition(0.575);
+            if (ben < down) {
+                Bay1Boot.setPosition(shoot);
             } else {
-                Bay1Boot.setPosition(0.97);
+                Bay1Boot.setPosition(ready);
+            }
+            if (ben > inter && ben < (inter + down)) {
+                Bay2Boot.setPosition(shoot);
+            } else if (ben > inter) {
+                Bay2Boot.setPosition(ready);
             }
 
-            if (ben > inter && ben < inter * 2) {
-                Bay2Boot.setPosition(0.575);
-            } else if (ben > inter * 2) {
-                Bay2Boot.setPosition(0.97);
+            double bay3Start = inter * 2;
+            if (ben > bay3Start && ben < (bay3Start + down)) {
+                Bay3Boot.setPosition(shoot);
+            } else if (ben > bay3Start) {
+                Bay3Boot.setPosition(ready);
             }
-
-            if (ben > inter * 2 && ben < inter * 3) {
-                Bay3Boot.setPosition(0.575);
-            } else if (ben > inter * 3) {
-                Bay3Boot.setPosition(0.97);
-            }
-
-            // This returns the boolean to the Action Runner, NOT the loop
-            return ben < (inter * 3.5);
+            return ben < (inter * 3);
         }
     }
     }
+

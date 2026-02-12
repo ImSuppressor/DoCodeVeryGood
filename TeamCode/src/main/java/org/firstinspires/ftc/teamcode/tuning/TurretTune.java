@@ -6,6 +6,48 @@ import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBa
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
 import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
 
+
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
+
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
+
+import java.util.ArrayList;
+import java.util.List;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -96,8 +138,8 @@ public class TurretTune extends OpMode {
         Pose2ding = new Pose2D(DistanceUnit.INCH,0,0,AngleUnit.DEGREES,180);
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
         pinpoint.setOffsets(82,-146, DistanceUnit.MM);
-        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);
-        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.REVERSED, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         pinpoint.resetPosAndIMU();
         pinpoint.setPosition(Pose2ding);
 
@@ -177,54 +219,6 @@ public class TurretTune extends OpMode {
     @Override
     public void loop() {
         pinpoint.update();
-
-        if (gamepad1.right_trigger > 0) {
-
-            intake.setPower(1);
-
-        } else if (gamepad1.left_trigger > 0) {
-
-            intake.setPower(-1);
-
-        }
-        else {
-
-            intake.setPower(0);
-
-        }
-
-        if (gamepad1.dpad_left) {
-
-            Bay1Boot.setPosition(.575);
-
-            Bay2Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
-
-        }
-        else if (gamepad1.dpad_right) {
-
-            Bay2Boot.setPosition(.55);
-
-            Bay1Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
-
-        }
-        else if (gamepad1.dpad_down) {
-
-            Bay3Boot.setPosition(.575);
-
-            Bay1Boot.setPosition(.95);
-            Bay2Boot.setPosition(.95);
-
-        }
-        else {
-
-            Bay1Boot.setPosition(.95);
-            Bay2Boot.setPosition(.95);
-            Bay3Boot.setPosition(.95);
-
-        }
-
         if (gamepad1.right_bumper) {
 
             Sticks(turbo_speed);
@@ -248,8 +242,6 @@ public class TurretTune extends OpMode {
             timer.reset();
 
         }
-
-
         if (team == 1) {
 
             double DisToGoalX = 72 - currentX;
@@ -358,30 +350,30 @@ public class TurretTune extends OpMode {
                 turret.setPower(-pidPower);
                 telemetry.addData("DistToGoal",DistanceToGoal);
 
-            } else if (!(result.isValid()) & timer.seconds() > .5) {
-
-                double targetAngle = -Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
-
-                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) - 7.5;
-
-                double rawTargetDeg = targetAngle + currentH;
-
-                double clampedTargetDeg = Math.max(-172.5, Math.min(-7.5, rawTargetDeg));
-
-                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
-
-                if (currentTurretAngle >= -7.5 && pidPower < 0) {
-                    pidPower = 0;
-                }
-
-                if (currentTurretAngle <= -172.5 && pidPower > 0) {
-                    pidPower = 0;
-                }
+//            } else if (!(result.isValid()) & timer.seconds() > .2) {
+//
+//                double targetAngle = -Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+//
+//                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) - 7.5;
+//
+//                double rawTargetDeg = targetAngle + currentH;
+//
+//                double clampedTargetDeg = Math.max(-172.5, Math.min(-7.5, rawTargetDeg));
+//
+//                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+//
+//                if (currentTurretAngle >= -7.5 && pidPower < 0) {
+//                    pidPower = 0;
+//                }
+//
+//                if (currentTurretAngle <= -172.5 && pidPower > 0) {
+//                    pidPower = 0;
+//                }
 
                 turret.setPower(pidPower);
 
-                telemetry.addData("Target Angle", targetAngle);
-                telemetry.addData("Current Angle", currentTurretAngle);
+//                telemetry.addData("Target Angle", targetAngle);
+//                telemetry.addData("Current Angle", currentTurretAngle);
                 telemetry.addData("PID Output", pidPower);
                 telemetry.addData("distance", DistanceToGoal);
                 telemetry.addData("powervar", powervar);
@@ -454,7 +446,67 @@ public class TurretTune extends OpMode {
         telemetry.addData("currentPos",currentPos);
         telemetry.update();
 
-        return false;
     }
+//    double DisToGoalX = 72 - currentX;
+//    double DisToGoalY = 72 + currentY;
+//
+//    double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
+//
+//            if (result.isValid() & !(limelight.getLatestResult() == null)) {
+//
+//        double pidPower = TurControllerL.calculate(result.getTx(), 0);
+//
+//        double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
+//
+//        if (currentPosDeg <= 7.5 && pidPower > 0) {
+//
+//            pidPower = 0;
+//
+//        } else if (currentPosDeg >= 172.5 && pidPower < 0) {
+//
+//            pidPower = 0;
+//
+//        }
+//
+//
+//        turret.setPower(-pidPower);
+//        telemetry.addData("DistToGoal", DistanceToGoal);
+//
+//    } else if (!(result.isValid()) & timer.seconds() > .5) {
+//
+//        double targetAngle = Math.toDegrees(Math.atan2(DisToGoalY, DisToGoalX));
+//
+//        double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
+//
+//        double rawTargetDeg = targetAngle + currentH;
+//
+//        double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+//
+//        double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+//
+//        if (currentTurretAngle <= 7.5 && pidPower < 0) {
+//            pidPower = 0;
+//        }
+//
+//        if (currentTurretAngle >= 172.5 && pidPower > 0) {
+//            pidPower = 0;
+//        }
+//
+//        turret.setPower(pidPower);
+//
+//        telemetry.addData("Target Angle", targetAngle);
+//        telemetry.addData("Current Angle", currentTurretAngle);
+//        telemetry.addData("PID Output", pidPower);
+//        telemetry.addData("distance", DistanceToGoal);
+//        telemetry.addData("powervar", powervar);
+//        telemetry.addData("servovar", servovar);
+//        telemetry.addData("DistToGoal", DistanceToGoal);
+//
+//    } else {
+//
+//        turret.setPower(0);
+//
+//    }
 
 }
+

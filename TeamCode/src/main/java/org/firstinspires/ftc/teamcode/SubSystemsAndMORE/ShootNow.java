@@ -104,6 +104,28 @@ public class ShootNow {
 
             }
             double time = time2.seconds();
+            if (pattern.equals("none")){
+                if (time < cycle) {
+                    Bay1Boot.setPosition(shoot);
+                } else {
+                    Bay1Boot.setPosition(ready);
+                }
+
+                if (time > cycle && time < cycle * 2) {
+                    Bay2Boot.setPosition(shoot);
+                } else if (time > cycle * 2) {
+                    Bay2Boot.setPosition(ready);
+                }
+
+                if (time > cycle * 2 && time < cycle * 3) {
+                    Bay3Boot.setPosition(shoot);
+                } else if (time > cycle * 3.5){
+                    Bay3Boot.setPosition(ready);
+                    Bay2Boot.setPosition(ready);
+                    Bay1Boot.setPosition(ready);
+
+                }
+            }
 
                 if (pattern.equals("PPG")) {
 
@@ -376,10 +398,13 @@ public class ShootNow {
                             shooting3 = true;
 
                         }
+
                     }
+
                 }
 
-            return time < 1.25;
+
+            return time < 1.55;
         }
     }
     public Action shoot() {
