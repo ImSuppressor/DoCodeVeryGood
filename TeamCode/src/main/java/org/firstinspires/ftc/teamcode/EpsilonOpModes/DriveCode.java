@@ -61,7 +61,7 @@ DriveCode extends OpMode {
 
     private DcMotorEx turret;
     private Servo kickstand;
-    private Servo kickstand2    ;
+    private Servo kickstand2;
 
     private Limelight3A limelight;
     private Servo hood;
@@ -78,11 +78,11 @@ DriveCode extends OpMode {
     private ElapsedTime timer;
     private ElapsedTime timer2;
     private ElapsedTime BooterTimer;
-    private  Servo Bay1Boot;
-    private  Servo Bay2Boot;
-    private  Servo Bay3Boot;
+    private Servo Bay1Boot;
+    private Servo Bay2Boot;
+    private Servo Bay3Boot;
     private DcMotorEx intake;
-//    private GoBildaPinpointDriver pinpoint;
+    //    private GoBildaPinpointDriver pinpoint;
     private Pose2D Pose2ding;
     private NormalizedColorSensor bay11;
     private NormalizedColorSensor bay12;
@@ -129,7 +129,7 @@ DriveCode extends OpMode {
         bay32 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
         dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
         dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
-       shootNow = new ShootNow(hardwareMap);
+        shootNow = new ShootNow(hardwareMap);
 //        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 //        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
 //       pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
@@ -141,9 +141,9 @@ DriveCode extends OpMode {
         intake.setDirection(DcMotor.Direction.REVERSE);
 
 
-        Bay1Boot = hardwareMap.get(Servo.class,"Boot1");
-        Bay2Boot = hardwareMap.get(Servo.class,"Boot2");
-        Bay3Boot = hardwareMap.get(Servo.class,"Boot3");
+        Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
+        Bay2Boot = hardwareMap.get(Servo.class, "Boot2");
+        Bay3Boot = hardwareMap.get(Servo.class, "Boot3");
         kickstand = hardwareMap.get(Servo.class, "kickstand");
         kickstand2 = hardwareMap.get(Servo.class, "kickstand");
         Bay1Boot.setPosition(.94);
@@ -172,14 +172,14 @@ DriveCode extends OpMode {
         outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
         outakeR.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        turret = hardwareMap.get(DcMotorEx.class,"turret");
+        turret = hardwareMap.get(DcMotorEx.class, "turret");
 
-        limelight = hardwareMap.get(Limelight3A.class,"limelight");
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
-        hood = hardwareMap.get(Servo.class,"Hood");
+        hood = hardwareMap.get(Servo.class, "Hood");
 
         turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-       turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         TurController = new PIDController(P_tur, I_tur, D_tur);
@@ -194,10 +194,10 @@ DriveCode extends OpMode {
         servovar = .5;
         hood.setPosition(servovar);
 
-        fl = hardwareMap.get(DcMotorEx.class,"fl");
-        fr = hardwareMap.get(DcMotorEx.class,"fr");
-        bl = hardwareMap.get(DcMotorEx.class,"bl");
-        br = hardwareMap.get(DcMotorEx.class,"br");
+        fl = hardwareMap.get(DcMotorEx.class, "fl");
+        fr = hardwareMap.get(DcMotorEx.class, "fr");
+        bl = hardwareMap.get(DcMotorEx.class, "bl");
+        br = hardwareMap.get(DcMotorEx.class, "br");
 
         bl.setDirection(DcMotorEx.Direction.REVERSE);
         fl.setDirection(DcMotorEx.Direction.REVERSE);
@@ -223,6 +223,7 @@ DriveCode extends OpMode {
         }
 
     }
+
     /// 165 degrees is turret
     private void Sticks(double speed) {
         // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
@@ -239,8 +240,8 @@ DriveCode extends OpMode {
     @Override
     public void loop() {
         drive.updatePoseEstimate();
-        double  distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
-         double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+        double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+        double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
         double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
 
         Full = ((distance1 < 3) && (distance2 < 3) && (distance3 < 10));
@@ -297,18 +298,18 @@ DriveCode extends OpMode {
 //            intake.setPower(0);
 
         // }
-       //SHOOT POWERS
-        if (gamepad1. square){
+        //SHOOT POWERS
+        if (gamepad1.square) {
             outakeL.setVelocity(2000);
             outakeR.setVelocity(2000);
             hood.setPosition(1);
         }
-        if (gamepad1.circle){
+        if (gamepad1.circle) {
             outakeL.setVelocity(2500);
             outakeR.setVelocity(2500);
             hood.setPosition(1);
         }
-        if (gamepad1.a){
+        if (gamepad1.a) {
             outakeL.setVelocity(0);
             outakeR.setVelocity(0);
             hood.setPosition(.5);
@@ -346,11 +347,11 @@ DriveCode extends OpMode {
 
         }
 
-        Pose2d currentPos = drive.localizer.getPose();
-
-        double currentX = currentPos.position.x;
-        double currentY = currentPos.position.y;
-        double currentH = currentPos.heading.toDouble();
+//        Pose2d currentPos = drive.localizer.getPose();
+//
+//        double currentX = currentPos.position.x;
+//        double currentY = currentPos.position.y;
+//        double currentH = currentPos.heading.toDouble();
 
         LLResult result = limelight.getLatestResult();
 
@@ -359,43 +360,51 @@ DriveCode extends OpMode {
             timer.reset();
 
         }
-            if (team == 1) {
+        if (team == 1) {
 
+            if (result.isValid() && limelight.getLatestResult() != null) {
 
-                if (result.isValid() && limelight.getLatestResult() != null) {
+                double pidPower = TurControllerL.calculate(result.getTx(), 0);
 
-                    double pidPower = TurControllerL.calculate(result.getTx(), 0);
+                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
 
+                if (currentPosDeg <= 7.5 && pidPower > 0) {
 
-                    double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
+                    pidPower = 0;
 
+                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
 
-                    if (currentPosDeg <= 7.5 && pidPower > 0) {
-                        pidPower = 0;
-                    } else if (currentPosDeg >= 172.5 && pidPower < 0) {
-                        pidPower = 0;
-                    }
-
-                    turret.setPower(-pidPower);
-                    telemetry.addData("Mode", "Limelight Tracking");
-                    telemetry.addData("Limelight tx", result.getTx());
-
-                } else {
-                    turret.setPower(0);
-
-                    telemetry.addData("Mode", "Target Lost - Idle");
+                    pidPower = 0;
                 }
 
+                turret.setPower(-pidPower);
 
-                telemetry.addData("Turret Angle", (turret.getCurrentPosition() * 0.1339285) + 7.5);
+                telemetry.addData("Mode", "Limelight Tracking");
+                telemetry.addData("Limelight tx", result.getTx());
+
+            } else if (!result.isValid() && timer.seconds() > .5) {
+
+                turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                turret.setTargetPosition(-635);
+                turret.setPower(1);
+
+            } else {
+
+            turret.setPower(0);
+
+            telemetry.addData("Mode", "Target Lost - Idle");
+
             }
+
+        telemetry.addData("Turret Angle", (turret.getCurrentPosition() * 0.1339285) + 7.5);
+    }
 
         if (team == 2) {
 
-            double DisToGoalX = 72 - currentX;
-            double DisToGoalY = 72 + currentY;
-
-            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
+//            double DisToGoalX = 72 - currentX;
+//            double DisToGoalY = 72 + currentY;
+//
+//            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
 
 
             if (result.isValid() & !(limelight.getLatestResult() == null)) {
@@ -416,37 +425,37 @@ DriveCode extends OpMode {
 
 
                 turret.setPower(-pidPower);
-                telemetry.addData("DistToGoal", DistanceToGoal);
+//                telemetry.addData("DistToGoal", DistanceToGoal);
 
             } else if (!(result.isValid()) & timer.seconds() > .5) {
 
-                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
-
-                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
-
-                double rawTargetDeg = targetAngle + currentH;
-
-                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
-
-                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
-
-                if (currentTurretAngle <= 7.5 && pidPower > 0) {
-                    pidPower = 0;
-                }
-
-                if (currentTurretAngle >= 172.5 && pidPower < 0) {
-                    pidPower = 0;
-                }
-
-                turret.setPower(pidPower);
-
-                telemetry.addData("Target Angle", targetAngle);
-                telemetry.addData("Current Angle", currentTurretAngle);
-                telemetry.addData("PID Output", pidPower);
-                telemetry.addData("distance", DistanceToGoal);
-                telemetry.addData("powervar", powervar);
-                telemetry.addData("servovar", servovar);
-                telemetry.addData("DistToGoal", DistanceToGoal);
+//                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+//
+//                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
+//
+//                double rawTargetDeg = targetAngle + currentH;
+//
+//                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+//
+//                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+//
+//                if (currentTurretAngle <= 7.5 && pidPower > 0) {
+//                    pidPower = 0;
+//                }
+//
+//                if (currentTurretAngle >= 172.5 && pidPower < 0) {
+//                    pidPower = 0;
+//                }
+//
+//                turret.setPower(pidPower);
+//
+//                telemetry.addData("Target Angle", targetAngle);
+//                telemetry.addData("Current Angle", currentTurretAngle);
+//                telemetry.addData("PID Output", pidPower);
+//                telemetry.addData("distance", DistanceToGoal);
+//                telemetry.addData("powervar", powervar);
+//                telemetry.addData("servovar", servovar);
+//                telemetry.addData("DistToGoal", DistanceToGoal);
 
             } else {
 
@@ -584,18 +593,18 @@ DriveCode extends OpMode {
         }
 
 
-        telemetry.addData("Bay 3", ColorBay3);
-        telemetry.addData("Bay 2", ColorBay2);
-        telemetry.addData("Bay 1", ColorBay1);
-        telemetry.addData("time", timer.seconds());
-        telemetry.addData("currentX", currentX);
-        telemetry.addData("currentY", currentY);
-        telemetry.addData("currentH", currentH);
-        telemetry.addData("currentPos", currentPos);
-        telemetry.addData("team", team);
-        telemetry.addData("pattern", pattern);
-        telemetry.addData("Status", Full ? "FULL - Stopped" : "Intaking");
-        telemetry.update();
+//        telemetry.addData("Bay 3", ColorBay3);
+//        telemetry.addData("Bay 2", ColorBay2);
+//        telemetry.addData("Bay 1", ColorBay1);
+//        telemetry.addData("time", timer.seconds());
+//        telemetry.addData("currentX", currentX);
+//        telemetry.addData("currentY", currentY);
+//        telemetry.addData("currentH", currentH);
+//        telemetry.addData("currentPos", currentPos);
+//        telemetry.addData("team", team);
+//        telemetry.addData("pattern", pattern);
+//        telemetry.addData("Status", Full ? "FULL - Stopped" : "Intaking");
+//        telemetry.update();
 
 
     }
