@@ -1,647 +1,716 @@
-package org.firstinspires.ftc.teamcode.EpsilonOpModes;
-
-
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
-import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
-
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.arcrobotics.ftclib.controller.PIDController;
-import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
-
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
-import com.qualcomm.robotcore.hardware.NormalizedRGBA;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
-import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Config
-@TeleOp
-public class
-DriveCode extends OpMode {
-    MecanumDrive drive;
-    private PIDController TurController;
-    private PIDController TurControllerL;
-    double P_tur;
-    double I_tur;
-    double D_tur;
-    double P_tur_Lim;
-    double I_tur_Lim;
-    double D_tur_Lim;
-    double normalSpeed;
-    double turbo_speed;
-
-    private DcMotorEx turret;
-    private Servo kickstand;
-    private Servo kickstand2;
-
-    private Limelight3A limelight;
-    private Servo hood;
-    private double DisToGoalX;
-    private double DisToGoalY;
-    private DcMotorEx outakeL;
-    private DcMotorEx outakeR;
-    public double powervar;
-    public double servovar;
-    private DcMotor fl;
-    private DcMotor fr;
-    private DcMotor bl;
-    private DcMotor br;
-    private ElapsedTime timer;
-    private ElapsedTime timer2;
-    private ElapsedTime BooterTimer;
-    private Servo Bay1Boot;
-    private Servo Bay2Boot;
-    private Servo Bay3Boot;
-    private DcMotorEx intake;
-    //    private GoBildaPinpointDriver pinpoint;
-    private Pose2D Pose2ding;
-    private NormalizedColorSensor bay11;
-    private NormalizedColorSensor bay12;
-    private NormalizedColorSensor bay21;
-    private NormalizedColorSensor bay22;
-    private NormalizedColorSensor bay31;
-    private NormalizedColorSensor bay32;
-    private DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
-    private boolean initialized = false;
-    private boolean shooting1 = false;
-    private boolean shooting2 = false;
-    private boolean shooting3 = false;
-    public double shoot = .5;
-    private List<Action> runningActions = new ArrayList<>();
-
-
-    public double ready = 0.94;
-    private double interval = 0.35;
-    public double cycle = .5;
-    public double cycleDown = .12;
-    public double ball1, ball2, ball3;
-    public boolean Boot1 = false;
-    public boolean Boot2 = false;
-    public boolean Boot3 = false;
-    public boolean SequenceShoot = false;
-    private ShootNow shootNow;
-    private ElapsedTime intaketime = new ElapsedTime();
-    private boolean Full = false;
-    boolean wasFullLastLoop = false;
-
-
-    @Override
-    public void init() {
-        drive = new MecanumDrive(hardwareMap, LastPose);
-        bay11 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
-        bay12 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
-        dist11 = hardwareMap.get(DistanceSensor.class, "Bay1.1");
-        dist12 = hardwareMap.get(DistanceSensor.class, "Bay1.2");
-        bay21 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
-        bay22 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
-        dist21 = hardwareMap.get(DistanceSensor.class, "Bay2.1");
-        dist22 = hardwareMap.get(DistanceSensor.class, "Bay2.2");
-        bay31 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
-        bay32 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
-        dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
-        dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
-        shootNow = new ShootNow(hardwareMap);
-//        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-//        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
-//       pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-//        pinpoint.resetPosAndIMU();
-//        pinpoint.setPosition(Pose2ding);
-
-
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
-        intake.setDirection(DcMotor.Direction.REVERSE);
-
-
-        Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
-        Bay2Boot = hardwareMap.get(Servo.class, "Boot2");
-        Bay3Boot = hardwareMap.get(Servo.class, "Boot3");
-        kickstand = hardwareMap.get(Servo.class, "kickstand");
-        kickstand2 = hardwareMap.get(Servo.class, "kickstand");
-        Bay1Boot.setPosition(.94);
-        Bay2Boot.setPosition(.94);
-        Bay3Boot.setPosition(.94);
-
-        timer = new ElapsedTime();
-        BooterTimer = new ElapsedTime();
-        timer2 = new ElapsedTime();
-        intaketime = new ElapsedTime();
-        P_tur = 0.1;//ticks per degree
-        I_tur = 0;
-        D_tur = 0.00125;//power given
-
-
-        P_tur_Lim = 0.025;
-        I_tur_Lim = 0.0001;
-        D_tur_Lim = 0.001;
-
-        normalSpeed = 0.8;
-        turbo_speed = 1;
-
-//        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
-
-        outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
-        outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
-        outakeR.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        turret = hardwareMap.get(DcMotorEx.class, "turret");
-
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-
-        hood = hardwareMap.get(Servo.class, "Hood");
-
-        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        TurController = new PIDController(P_tur, I_tur, D_tur);
-        TurControllerL = new PIDController(P_tur_Lim, I_tur_Lim, D_tur_Lim);
-
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-
-        limelight.start();
-        limelight.pipelineSwitch(1);
-        limelight.setPollRateHz(50);
-
-        servovar = .5;
-        hood.setPosition(servovar);
-
-        fl = hardwareMap.get(DcMotorEx.class, "fl");
-        fr = hardwareMap.get(DcMotorEx.class, "fr");
-        bl = hardwareMap.get(DcMotorEx.class, "bl");
-        br = hardwareMap.get(DcMotorEx.class, "br");
-
-        bl.setDirection(DcMotorEx.Direction.REVERSE);
-        fl.setDirection(DcMotorEx.Direction.REVERSE);
-        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        if (pattern.equals("PPG")) {
-            ball1 = 1;
-            ball2 = 1;
-            ball3 = 2;
-
-        } else if (pattern.equals("PGP")) {
-            ball1 = 1;
-            ball2 = 2;
-            ball3 = 1;
-
-        } else if (pattern.equals("GPP")) {
-            ball1 = 2;
-            ball2 = 1;
-            ball3 = 1;
-
-        }
-
-    }
-
-    /// 165 degrees is turret
-    private void Sticks(double speed) {
-        // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
-        // We negate this value so that the topmost position corresponds to maximum forward power.
-        fl.setPower(speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
-        fr.setPower(-speed * gamepad1.right_stick_x + (-(speed * gamepad1.left_stick_x) - speed * gamepad1.left_stick_y));
-        // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
-        // We negate this value so that the topmost position corresponds to maximum forward power.
-        bl.setPower(speed * gamepad1.right_stick_x + (-speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
-        br.setPower(-speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
-    }
-
-
-    @Override
-    public void loop() {
-        drive.updatePoseEstimate();
-        double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
-        double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
-        double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
-
-        Full = ((distance1 < 3) && (distance2 < 3) && (distance3 < 10));
-
-        // 2. INTAKE CONTROL
-        if (gamepad1.right_trigger > 0) {
-            if (Full) {
-                intake.setPower(0);
-            } else {
-                intake.setPower(1);
-                Sticks(turbo_speed);
-            }
-        } else if (gamepad1.left_trigger > 0) {
-            intake.setPower(-1);
-        } else {
-            intake.setPower(0);
-        }
-
-        // 3. SHOOTING INPUTS
-        if (gamepad1.dpad_up && runningActions.isEmpty()) {
-            runningActions.add(shootNow.shoot());
-        }
-        if (gamepad1.dpad_down && runningActions.isEmpty()) {
-            runningActions.add(new SequentialShoot());
-        }
-
-        TelemetryPacket packet = new TelemetryPacket();
-        List<Action> nextActions = new ArrayList<>();
-        for (Action action : runningActions) {
-            if (action.run(packet)) {
-                nextActions.add(action);
-            }
-        }
-        if (Full && !wasFullLastLoop) {
-            // Arguments: (leftMotorPower, rightMotorPower, durationMs)
-            gamepad1.rumble(0.4, 0.1, 20);
-        }
-        runningActions = nextActions;
-//        if (gamepad1.options)
-//           kickstand .setPosition(.475);
-//        kickstand2.setPosition(.475);
-
-
+//package org.firstinspires.ftc.teamcode.EpsilonOpModes;
+//
+//
+//import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay1;
+//import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay2;
+//import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.ColorBay3;
+//import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.LastPose;
+//import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.pattern;
+//import static org.firstinspires.ftc.teamcode.SubSystemsAndMORE.GlobalVar.team;
+//import com.qualcomm.hardware.limelightvision.LLResultTypes;
+//import android.app.Notification;
+//
+//import androidx.annotation.NonNull;
+//
+//import com.acmerobotics.dashboard.FtcDashboard;
+//import com.acmerobotics.dashboard.config.Config;
+//import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+//import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+//import com.acmerobotics.roadrunner.Action;
+//import com.acmerobotics.roadrunner.Pose2d;
+//import com.acmerobotics.roadrunner.Vector2d;
+//import com.arcrobotics.ftclib.controller.PIDController;
+//import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
+//import com.qualcomm.hardware.limelightvision.LLResult;
+//import com.qualcomm.hardware.limelightvision.LLResultTypes;
+//import com.qualcomm.hardware.limelightvision.Limelight3A;
+//
+//import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+//import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+//import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+//import com.qualcomm.robotcore.hardware.DcMotor;
+//import com.qualcomm.robotcore.hardware.DcMotorEx;
+//import com.qualcomm.robotcore.hardware.DcMotorSimple;
+//import com.qualcomm.robotcore.hardware.DistanceSensor;
+//import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+//import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+//import com.qualcomm.robotcore.hardware.Servo;
+//import com.qualcomm.robotcore.util.ElapsedTime;
+//
+//import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+//import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+//import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+//import org.firstinspires.ftc.teamcode.RandomBSfromRR.MecanumDrive;
+//import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShootNow;
+//
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//@Config
+//@TeleOp
+//public class
+//DriveCode extends OpMode {
+//    MecanumDrive drive;
+//    private PIDController TurController;
+//    private PIDController TurControllerL;
+//    double P_tur;
+//    double I_tur;
+//    double D_tur;
+////    double P_tur_Lim;
+////    double I_tur_Lim;
+////    double D_tur_Lim;
+//    double normalSpeed;
+//    double turbo_speed;
+//    public static double P_tur_Lim = 0.04;
+//    public static double I_tur_Lim = 0.0001;
+//    public static double D_tur_Lim = 0.075;
+//    public static double K_v = 0.00; // Start very small!
+//    public static int TURRET_LIMIT_LEFT = -1200;
+//    public static int TURRET_LIMIT_RIGHT = 1200;
+//    public static double TURRET_MAX_POWER = 0.45;
+//    private static DcMotorEx turret;
+//    private Servo kickstand;
+//    private Servo kickstand2;
+//
+//    private static Limelight3A limelight;
+//    private Servo hood;
+//    private double DisToGoalX;
+//    private double DisToGoalY;
+//    private DcMotorEx outakeL;
+//    private DcMotorEx outakeR;
+//    public double powervar;
+//    public double servovar;
+//    private DcMotor fl;
+//    private DcMotor fr;
+//    private DcMotor bl;
+//    private DcMotor br;
+//    private ElapsedTime timer;
+//    private ElapsedTime timer2;
+//    private ElapsedTime BooterTimer;
+//    private Servo Bay1Boot;
+//    private Servo Bay2Boot;
+//    private Servo Bay3Boot;
+//    private DcMotorEx intake;
+//    //    private GoBildaPinpointDriver pinpoint;
+//    private Pose2D Pose2ding;
+//    private NormalizedColorSensor bay11;
+//    private NormalizedColorSensor bay12;
+//    private NormalizedColorSensor bay21;
+//    private NormalizedColorSensor bay22;
+//    private NormalizedColorSensor bay31;
+//    private NormalizedColorSensor bay32;
+//    private DistanceSensor dist11, dist12, dist21, dist22, dist31, dist32;
+//    private boolean initialized = false;
+//    private boolean shooting1 = false;
+//    private boolean shooting2 = false;
+//    private boolean shooting3 = false;
+//    public double shoot = .5;
+//    private List<Action> runningActions = new ArrayList<>();
+//
+//
+//    public double ready = 0.94;
+//    private double interval = 0.35;
+//    public double cycle = .5;
+//    public double cycleDown = .12;
+//    public double ball1, ball2, ball3;
+//    public boolean Boot1 = false;
+//    public boolean Boot2 = false;
+//    public boolean Boot3 = false;
+//    public boolean SequenceShoot = false;
+//    private ShootNow shootNow;
+//    private ElapsedTime intaketime = new ElapsedTime();
+//    private boolean Full = false;
+//    boolean wasFullLastLoop = false;
+//    public static int TARGET_ID = 0; // Default/Fallback ID
+//
+//    @Override
+//    public void init() {
+//        drive = new MecanumDrive(hardwareMap, LastPose);
+//        bay11 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.1");
+//        bay12 = hardwareMap.get(NormalizedColorSensor.class, "Bay1.2");
+//        dist11 = hardwareMap.get(DistanceSensor.class, "Bay1.1");
+//        dist12 = hardwareMap.get(DistanceSensor.class, "Bay1.2");
+//        bay21 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.1");
+//        bay22 = hardwareMap.get(NormalizedColorSensor.class, "Bay2.2");
+//        dist21 = hardwareMap.get(DistanceSensor.class, "Bay2.1");
+//        dist22 = hardwareMap.get(DistanceSensor.class, "Bay2.2");
+//        bay31 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.1");
+//        bay32 = hardwareMap.get(NormalizedColorSensor.class, "Bay3.2");
+//        dist31 = hardwareMap.get(DistanceSensor.class, "Bay3.1");
+//        dist32 = hardwareMap.get(DistanceSensor.class, "Bay3.2");
+//        shootNow = new ShootNow(hardwareMap);
+////        pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
+////        pinpoint.setOffsets(82,-146, DistanceUnit.MM);
+////       pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_SWINGARM_POD);        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+////        pinpoint.resetPosAndIMU();
+////        pinpoint.setPosition(Pose2ding);
+//
+//
+//        intake = hardwareMap.get(DcMotorEx.class, "intake");
+//        intake.setDirection(DcMotor.Direction.REVERSE);
+//
+//
+//        Bay1Boot = hardwareMap.get(Servo.class, "Boot1");
+//        Bay2Boot = hardwareMap.get(Servo.class, "Boot2");
+//        Bay3Boot = hardwareMap.get(Servo.class, "Boot3");
+//        kickstand = hardwareMap.get(Servo.class, "kickstand");
+//        kickstand2 = hardwareMap.get(Servo.class, "kickstand");
+//        Bay1Boot.setPosition(.94);
+//        Bay2Boot.setPosition(.94);
+//        Bay3Boot.setPosition(.94);
+//
+//        timer = new ElapsedTime();
+//        BooterTimer = new ElapsedTime();
+//        timer2 = new ElapsedTime();
+//        intaketime = new ElapsedTime();
+////        P_tur = 0.045;//ticks per degree
+////        I_tur = 0.0001;
+////        D_tur = 0.075;//power given
+////
+//        P_tur_Lim = 0.04;
+//        I_tur_Lim = 0.0001;
+//        D_tur_Lim = 0.075;
+//        normalSpeed = 0.8;
+//        turbo_speed = 1;
+//
+////        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+//
+//        outakeL = hardwareMap.get(DcMotorEx.class, "outakeL");
+//        outakeR = hardwareMap.get(DcMotorEx.class, "outakeR");
+//        outakeR.setDirection(DcMotorSimple.Direction.REVERSE);
+//
+//        turret = hardwareMap.get(DcMotorEx.class, "turret");
+//
+//        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+//
+//        hood = hardwareMap.get(Servo.class, "Hood");
+//
+//        turret.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        turret.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        turret.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//
+//
+//        TurControllerL = new PIDController(P_tur_Lim, I_tur_Lim, D_tur_Lim);
+//
+//        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+//
+//        limelight.start();
+//        limelight.pipelineSwitch(1);
+//        limelight.setPollRateHz(50);
+//
+//        servovar = .5;
+//        hood.setPosition(servovar);
+//
+//        fl = hardwareMap.get(DcMotorEx.class, "fl");
+//        fr = hardwareMap.get(DcMotorEx.class, "fr");
+//        bl = hardwareMap.get(DcMotorEx.class, "bl");
+//        br = hardwareMap.get(DcMotorEx.class, "br");
+//
+//        bl.setDirection(DcMotorEx.Direction.REVERSE);
+//        fl.setDirection(DcMotorEx.Direction.REVERSE);
+//        fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        br.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        if (pattern.equals("PPG")) {
+//            ball1 = 1;
+//            ball2 = 1;
+//            ball3 = 2;
+//
+//        } else if (pattern.equals("PGP")) {
+//            ball1 = 1;
+//            ball2 = 2;
+//            ball3 = 1;
+//
+//        } else if (pattern.equals("GPP")) {
+//            ball1 = 2;
+//            ball2 = 1;
+//            ball3 = 1;
+//
+//        }
+//
+//        if (team == 1) { // Blue Alliance
+//            TARGET_ID = 20; // Example: Blue Backdrop or Station
+//        } else if (team == 2) { // Red Alliance
+//            TARGET_ID = 24; // Example: Red Backdrop or Station
+//        }
+//    }
+//
+//    /// 165 degrees is turret
+//    private void Sticks(double speed) {
+//        // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
+//        // We negate this value so that the topmost position corresponds to maximum forward power.
+//        fl.setPower(speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
+//        fr.setPower(-speed * gamepad1.right_stick_x + (-(speed * gamepad1.left_stick_x) - speed * gamepad1.left_stick_y));
+//        // The Y axis of a joystick ranges from -1 in its topmost position to +1 in its bottommost position.
+//        // We negate this value so that the topmost position corresponds to maximum forward power.
+//        bl.setPower(speed * gamepad1.right_stick_x + (-speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
+//        br.setPower(-speed * gamepad1.right_stick_x + (speed * gamepad1.left_stick_x - speed * gamepad1.left_stick_y));
+//    }
+//
+//
+//    @Override
+//    public void loop() {
+//        drive.updatePoseEstimate();
+//
+//
+//// Inside your DriveCode class
+//
+//
+//        // 1. DATA COLLECTION
+//        double distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+//        double distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+//        double distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+//        Full = ((distance1 < 3) && (distance2 < 3) && (distance3 < 10));
+//
+//        // 2. INTAKE & DRIVE SPEED
 //        if (gamepad1.right_trigger > 0) {
-//
-//            intake.setPower(1);
-//
+//            if (Full) intake.setPower(0);
+//            else {
+//                intake.setPower(1);
+//                Sticks(turbo_speed);
+//            }
 //        } else if (gamepad1.left_trigger > 0) {
-//
 //            intake.setPower(-1);
+//        } else {
+//            intake.setPower(0);
+//            Sticks(gamepad1.right_bumper ? turbo_speed : normalSpeed);
+//        }
+//        // 4. FEEDBACK
+//        if (Full && !wasFullLastLoop) {
+//            gamepad1.rumble(0.4, 0.1, 20);
+//        }
+//        wasFullLastLoop = Full;
+//
+//
+//
+//        // --- START OF CLEAN ACTION ENGINE ---
+//        // --- START OF CLEAN ACTION ENGINE ---
+//        List<Action> nextActions = new ArrayList<>();
+//        TelemetryPacket packet = new TelemetryPacket();
+//        boolean manualHome = gamepad1.touchpad || gamepad1.options;
+//
+//// 1. Handle New Input
+//        if (gamepad1.dpad_up && !isShooting()) {
+//            nextActions.add(shootNow.shoot());
+//        }
+//        if (gamepad1.dpad_down && !isRunningSequential()) {
+//            nextActions.add(new SequentialShoot());
+//        }
+//
+//// 2. THE CRITICAL PART: Run the actions!
+//        List<Action> stillRunning = new ArrayList<>();
+//        for (Action action : runningActions) {
+//            if (action.run(packet)) {
+//                stillRunning.add(action);
+//            }
+//        }
+//
+//// 3. Update the master list
+//        runningActions = stillRunning;
+//
+//// --- END OF CLEAN ACTION ENGINE ---
+//        // --- END OF CLEAN ACTION ENGINE ---
+//
+//        //SHOOT POWERS
+//        if (gamepad1.square) {
+//            outakeL.setVelocity(2000);
+//            outakeR.setVelocity(2000);
+//            hood.setPosition(1);
+//        }
+//        if (gamepad1.circle) {
+//            outakeL.setVelocity(2500);
+//            outakeR.setVelocity(2500);
+//            hood.setPosition(1);
+//        }
+//        if (gamepad1.a) {
+//            outakeL.setVelocity(0);
+//            outakeR.setVelocity(0);
+//            hood.setPosition(.5);
+//        }
+//
+////
+//        if (gamepad1.right_bumper) {
+//
+//            Sticks(turbo_speed);
 //
 //        } else {
 //
-//            intake.setPower(0);
-
-        // }
-        //SHOOT POWERS
-        if (gamepad1.square) {
-            outakeL.setVelocity(2000);
-            outakeR.setVelocity(2000);
-            hood.setPosition(1);
-        }
-        if (gamepad1.circle) {
-            outakeL.setVelocity(2500);
-            outakeR.setVelocity(2500);
-            hood.setPosition(1);
-        }
-        if (gamepad1.a) {
-            outakeL.setVelocity(0);
-            outakeR.setVelocity(0);
-            hood.setPosition(.5);
-        }
-
-//        if (gamepad1.dpad_left) {
+//            Sticks(normalSpeed);
 //
-//            Bay1Boot.setPosition(.575);
-//
-//            Bay2Boot.setPosition(.97);
-//            Bay3Boot.setPosition(.97);
-//
-//        } else if (gamepad1.dpad_right) {
-//
-//            Bay2Boot.setPosition(.55);
-//
-//            Bay1Boot.setPosition(.97);
-//            Bay3Boot.setPosition(.97);
-//
-//        } else if (gamepad1.dpad_down) {
-//
-//            Bay3Boot.setPosition(.575);
-//
-//            Bay1Boot.setPosition(.97);
-//            Bay2Boot.setPosition(.97);
 //        }
-
-        if (gamepad1.right_bumper) {
-
-            Sticks(turbo_speed);
-
-        } else {
-
-            Sticks(normalSpeed);
-
-        }
-
-//        Pose2d currentPos = drive.localizer.getPose();
 //
-//        double currentX = currentPos.position.x;
-//        double currentY = currentPos.position.y;
-//        double currentH = currentPos.heading.toDouble();
-
-        LLResult result = limelight.getLatestResult();
-
-        if (result.isValid()) {
-
-            timer.reset();
-
-        }
-        if (team == 1) {
-
-            if (result.isValid() && limelight.getLatestResult() != null) {
-
-                double pidPower = TurControllerL.calculate(result.getTx(), 0);
-
-                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
-
-                if (currentPosDeg <= 7.5 && pidPower > 0) {
-
-                    pidPower = 0;
-
-                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
-
-                    pidPower = 0;
-                }
-
-                turret.setPower(-pidPower);
-
-                telemetry.addData("Mode", "Limelight Tracking");
-                telemetry.addData("Limelight tx", result.getTx());
-
-            } else if (!result.isValid() && timer.seconds() > .5) {
-
-                turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                turret.setTargetPosition(-635);
-                turret.setPower(1);
-
-            } else {
-
-            turret.setPower(0);
-
-            telemetry.addData("Mode", "Target Lost - Idle");
-
-            }
-
-        telemetry.addData("Turret Angle", (turret.getCurrentPosition() * 0.1339285) + 7.5);
-    }
-
-        if (team == 2) {
-
-//            double DisToGoalX = 72 - currentX;
-//            double DisToGoalY = 72 + currentY;
+////        Pose2d currentPos = drive.localizer.getPose();
+////
+////        double currentX = currentPos.position.x;
+////        double currentY = currentPos.position.y;
+////        double currentH = currentPos.heading.toDouble();
 //
-//            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
-
-
-            if (result.isValid() & !(limelight.getLatestResult() == null)) {
-
-                double pidPower = TurControllerL.calculate(result.getTx(), 0);
-
-                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
-
-                if (currentPosDeg <= 7.5 && pidPower > 0) {
-
-                    pidPower = 0;
-
-                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
-
-                    pidPower = 0;
-
-                }
-
-
-                turret.setPower(-pidPower);
-//                telemetry.addData("DistToGoal", DistanceToGoal);
-
-            } else if (!(result.isValid()) & timer.seconds() > .5) {
-
-//                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+////
 //
-//                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
+////        if (team == 1) {
+////
+////            if (result.isValid() && limelight.getLatestResult() != null) {
+////
+////                double pidPower = TurControllerL.calculate(result.getTx(), 0);
+////
+////                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
+////
+////                if (currentPosDeg <= 7.5 && pidPower > 0) {
+////
+////                    pidPower = 0;
+////
+////                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
+////
+////                    pidPower = 0;
+////                }
+////
+////                turret.setPower(-pidPower);
+////
+////                telemetry.addData("Mode", "Limelight Tracking");
+////                telemetry.addData("Limelight tx", result.getTx());
 //
-//                double rawTargetDeg = targetAngle + currentH;
+////            } else if (!result.isValid() && timer.seconds() > .5) {
+////
+////                turret.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////                turret.setTargetPosition(-635);
+////                turret.setPower(1);
 //
-//                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+////            } else {
+////
+////            turret.setPower(0);
+////
+////            telemetry.addData("Mode", "Target Lost - Idle");
+////
+////            }
+////
+////        telemetry.addData("Turret Angle", (turret.getCurrentPosition() * 0.1339285) + 7.5);
+////    }
+////
+////        if (team == 2) {
+////
+//////            double DisToGoalX = 72 - currentX;
+//////            double DisToGoalY = 72 + currentY;
+//////
+//////            double DistanceToGoal = Math.hypot(DisToGoalX, DisToGoalY);
+////
+////
+////            if (result.isValid() & !(limelight.getLatestResult() == null)) {
+////
+////                double pidPower = TurControllerL.calculate(result.getTx(), 0);
+////
+////                double currentPosDeg = (turret.getCurrentPosition() * 0.1339285) + 7.5;
+////
+////                if (currentPosDeg <= 7.5 && pidPower > 0) {
+////
+////                    pidPower = 0;
+////
+////                } else if (currentPosDeg >= 172.5 && pidPower < 0) {
+////
+////                    pidPower = 0;
+////
+////                }
+////
+////
+////                turret.setPower(-pidPower);
+//////                telemetry.addData("DistToGoal", DistanceToGoal);
+////
+////            } else if (!(result.isValid()) & timer.seconds() > .5) {
 //
-//                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+////                double targetAngle = Math.toDegrees(Math.atan2(DisToGoalX, DisToGoalY));
+////
+////                double currentTurretAngle = (turret.getCurrentPosition() * (0.1339285)) + 7.5;
+////
+////                double rawTargetDeg = targetAngle + currentH;
+////
+////                double clampedTargetDeg = Math.max(-7.5, Math.min(-172.5, rawTargetDeg));
+////
+////                double pidPower = TurController.calculate(currentTurretAngle, clampedTargetDeg);
+////
+////                if (currentTurretAngle <= 7.5 && pidPower > 0) {
+////                    pidPower = 0;
+////                }
+////
+////                if (currentTurretAngle >= 172.5 && pidPower < 0) {
+////                    pidPower = 0;
+////                }
+////
+////                turret.setPower(pidPower);
+////
+////                telemetry.addData("Target Angle", targetAngle);
+////                telemetry.addData("Current Angle", currentTurretAngle);
+////                telemetry.addData("PID Output", pidPower);
+////                telemetry.addData("distance", DistanceToGoal);
+////                telemetry.addData("powervar", powervar);
+////                telemetry.addData("servovar", servovar);
+////                telemetry.addData("DistToGoal", DistanceToGoal);
 //
-//                if (currentTurretAngle <= 7.5 && pidPower > 0) {
-//                    pidPower = 0;
+////            } else {
+////
+////                turret.setPower(0);
+////
+////            }
+////
+////        }
+//
+//
+//        distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
+//        distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
+//        distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
+//
+//        if (distance1 < 3 && !Boot1 && !shooting1) {
+//            NormalizedRGBA colors11 = bay11.getNormalizedColors();
+//            NormalizedRGBA colors12 = bay12.getNormalizedColors();
+//            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
+//            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
+//            if (avgBlue1 > avgGreen1) {
+//                ColorBay1 = 1;
+//            } else if (avgGreen1 > avgBlue1) {
+//                ColorBay1 = 2;
+//            } else {
+//                ColorBay1 = 0;
+//            }
+//        }
+//        if (distance2 < 3 && !Boot1 && !shooting1) {
+//            NormalizedRGBA colors21 = bay21.getNormalizedColors();
+//            NormalizedRGBA colors22 = bay22.getNormalizedColors();
+//            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
+//            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
+//            if (avgBlue2 > avgGreen2) {
+//                ColorBay2 = 1;
+//            } else if (avgGreen2 > avgBlue2) {
+//                ColorBay2 = 2;//bay 2 is stipud
+//            } else {
+//                ColorBay2 = 0;
+//            }
+//        }
+//        if (distance3 < 10 && !Boot1 && !shooting1) {
+//            NormalizedRGBA colors31 = bay31.getNormalizedColors();
+//            NormalizedRGBA colors32 = bay32.getNormalizedColors();
+//            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
+//            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
+//            if (avgBlue3 > avgGreen3) {
+//                ColorBay3 = 1;
+//            } else if (avgGreen3 > avgBlue3) {
+//                ColorBay3 = 2;
+//            } else {
+//                ColorBay3 = 0;
+//            }
+//        }
+//
+//
+//        //ShootPurple
+//        if (!shooting1 && !shooting2 && gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
+//            if (ColorBay1 == 1) {
+//                Bay1Boot.setPosition(shoot);
+//                ColorBay1 = 0;
+//                BooterTimer.reset();
+//                Boot1 = true;
+//
+//            } else if (ColorBay2 == 1) {
+//                Bay2Boot.setPosition(shoot);
+//                ColorBay2 = 0;
+//                BooterTimer.reset();
+//                Boot2 = true;
+//
+//            } else if (ColorBay3 == 1) {
+//                Bay3Boot.setPosition(shoot);
+//                ColorBay3 = 0;
+//                BooterTimer.reset();
+//                Boot3 = true;
+//
+//            }
+//        }
+//        //ShootGreen
+//        if (!shooting1 && !shooting2 && gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
+//            if (ColorBay1 == 2) {
+//                Bay1Boot.setPosition(shoot);
+//                ColorBay1 = 0;
+//                BooterTimer.reset();
+//                Boot1 = true;
+//
+//            } else if (ColorBay2 == 2) {
+//                Bay2Boot.setPosition(shoot);
+//                ColorBay2 = 0;
+//                BooterTimer.reset();
+//                Boot2 = true;
+//
+//            } else if (ColorBay3 == 2) {
+//                Bay3Boot.setPosition(shoot);
+//                ColorBay3 = 0;
+//                BooterTimer.reset();
+//                Boot3 = true;
+//
+//            }
+//        }
+//        //Reset Boot Arms
+//        if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle - cycleDown) && (Boot1 || Boot2 || Boot3)) {
+//            Bay1Boot.setPosition(ready);
+//            Bay2Boot.setPosition(ready);
+//            Bay3Boot.setPosition(ready);
+//        } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
+//            Boot1 = false;
+//            Boot2 = false;
+//            Boot3 = false;
+//        }
+//        //SequencedShot
+//
+//
+//        class SetpositionforMotor implements Action {
+//            DcMotorEx motor;
+//            int position;
+//            ElapsedTime timer;
+//            boolean init = false;
+//
+//            public SetpositionforMotor(DcMotorEx s, int p) {
+//                this.motor = s;
+//                this.position = p;
+//                this.timer = new ElapsedTime();
+//            }
+//
+//            @Override
+//            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+//                if (!init) {
+//                    timer.reset();
+//                    init = true;
 //                }
+//                motor.setTargetPosition(position);
+//                motor.setPower(1);
+//                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                return timer.seconds() < .5;
+//            }
+//        }
 //
-//                if (currentTurretAngle >= 172.5 && pidPower < 0) {
-//                    pidPower = 0;
-//                }
 //
-//                turret.setPower(pidPower);
-//
-//                telemetry.addData("Target Angle", targetAngle);
-//                telemetry.addData("Current Angle", currentTurretAngle);
-//                telemetry.addData("PID Output", pidPower);
-//                telemetry.addData("distance", DistanceToGoal);
-//                telemetry.addData("powervar", powervar);
-//                telemetry.addData("servovar", servovar);
-//                telemetry.addData("DistToGoal", DistanceToGoal);
-
-            } else {
-
-                turret.setPower(0);
-
-            }
-
-        }
-
-        distance2 = Math.min(dist21.getDistance(DistanceUnit.CM), dist22.getDistance(DistanceUnit.CM));
-        distance1 = Math.min(dist11.getDistance(DistanceUnit.CM), dist12.getDistance(DistanceUnit.CM));
-        distance3 = Math.min(dist31.getDistance(DistanceUnit.CM), dist32.getDistance(DistanceUnit.CM));
-
-        if (distance1 < 3 && !Boot1 && !shooting1) {
-            NormalizedRGBA colors11 = bay11.getNormalizedColors();
-            NormalizedRGBA colors12 = bay12.getNormalizedColors();
-            double avgBlue1 = (colors11.blue + colors12.blue) / 2.0;
-            double avgGreen1 = (colors11.green + colors12.green) / 2.0;
-            if (avgBlue1 > avgGreen1) {
-                ColorBay1 = 1;
-            } else if (avgGreen1 > avgBlue1) {
-                ColorBay1 = 2;
-            } else {
-                ColorBay1 = 0;
-            }
-        }
-        if (distance2 < 3 && !Boot1 && !shooting1) {
-            NormalizedRGBA colors21 = bay21.getNormalizedColors();
-            NormalizedRGBA colors22 = bay22.getNormalizedColors();
-            double avgBlue2 = (colors21.blue + colors22.blue) / 2.0;
-            double avgGreen2 = (colors21.green + colors22.green) / 2.0;
-            if (avgBlue2 > avgGreen2) {
-                ColorBay2 = 1;
-            } else if (avgGreen2 > avgBlue2) {
-                ColorBay2 = 2;//bay 2 is stipud
-            } else {
-                ColorBay2 = 0;
-            }
-        }
-        if (distance3 < 10 && !Boot1 && !shooting1) {
-            NormalizedRGBA colors31 = bay31.getNormalizedColors();
-            NormalizedRGBA colors32 = bay32.getNormalizedColors();
-            double avgBlue3 = (colors31.blue + colors32.blue) / 2.0;
-            double avgGreen3 = (colors31.green + colors32.green) / 2.0;
-            if (avgBlue3 > avgGreen3) {
-                ColorBay3 = 1;
-            } else if (avgGreen3 > avgBlue3) {
-                ColorBay3 = 2;
-            } else {
-                ColorBay3 = 0;
-            }
-        }
-
-
-        //ShootPurple
-        if (!shooting1 && !shooting2 && gamepad1.left_bumper && !Boot1 && !Boot2 && !Boot3) {
-            if (ColorBay1 == 1) {
-                Bay1Boot.setPosition(shoot);
-                ColorBay1 = 0;
-                BooterTimer.reset();
-                Boot1 = true;
-
-            } else if (ColorBay2 == 1) {
-                Bay2Boot.setPosition(shoot);
-                ColorBay2 = 0;
-                BooterTimer.reset();
-                Boot2 = true;
-
-            } else if (ColorBay3 == 1) {
-                Bay3Boot.setPosition(shoot);
-                ColorBay3 = 0;
-                BooterTimer.reset();
-                Boot3 = true;
-
-            }
-        }
-        //ShootGreen
-        if (!shooting1 && !shooting2 && gamepad1.right_bumper && !Boot1 && !Boot2 && !Boot3) {
-            if (ColorBay1 == 2) {
-                Bay1Boot.setPosition(shoot);
-                ColorBay1 = 0;
-                BooterTimer.reset();
-                Boot1 = true;
-
-            } else if (ColorBay2 == 2) {
-                Bay2Boot.setPosition(shoot);
-                ColorBay2 = 0;
-                BooterTimer.reset();
-                Boot2 = true;
-
-            } else if (ColorBay3 == 2) {
-                Bay3Boot.setPosition(shoot);
-                ColorBay3 = 0;
-                BooterTimer.reset();
-                Boot3 = true;
-
-            }
-        }
-        //Reset Boot Arms
-        if (BooterTimer.seconds() < cycle && BooterTimer.seconds() > (cycle - cycleDown) && (Boot1 || Boot2 || Boot3)) {
-            Bay1Boot.setPosition(ready);
-            Bay2Boot.setPosition(ready);
-            Bay3Boot.setPosition(ready);
-        } else if (BooterTimer.seconds() > cycle && (Boot1 || Boot2 || Boot3)) {
-            Boot1 = false;
-            Boot2 = false;
-            Boot3 = false;
-        }
-        //SequencedShot
-
-
-        class SetpositionforMotor implements Action {
-            DcMotorEx motor;
-            int position;
-            ElapsedTime timer;
-            boolean init = false;
-
-            public SetpositionforMotor(DcMotorEx s, int p) {
-                this.motor = s;
-                this.position = p;
-                this.timer = new ElapsedTime();
-            }
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if (!init) {
-                    timer.reset();
-                    init = true;
-                }
-                motor.setTargetPosition(position);
-                motor.setPower(1);
-                motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                return timer.seconds() < .5;
-            }
-        }
-
-
 //        telemetry.addData("Bay 3", ColorBay3);
 //        telemetry.addData("Bay 2", ColorBay2);
 //        telemetry.addData("Bay 1", ColorBay1);
 //        telemetry.addData("time", timer.seconds());
-//        telemetry.addData("currentX", currentX);
-//        telemetry.addData("currentY", currentY);
-//        telemetry.addData("currentH", currentH);
-//        telemetry.addData("currentPos", currentPos);
+////        telemetry.addData("currentX", currentX);
+////        telemetry.addData("currentY", currentY);
+////        telemetry.addData("currentH", currentH);
+////        telemetry.addData("currentPos", currentPos);
 //        telemetry.addData("team", team);
 //        telemetry.addData("pattern", pattern);
 //        telemetry.addData("Status", Full ? "FULL - Stopped" : "Intaking");
 //        telemetry.update();
-
-
-    }
-    public class SequentialShoot implements Action {
-        private final ElapsedTime timer = new ElapsedTime();
-        private boolean initialized = false;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            if (!initialized) {
-                timer.reset();
-                initialized = true;
-            }
-
-            double ben = timer.seconds();
-            double inter = .5;
-            double down =.25;
-
-            if (ben < down) {
-                Bay1Boot.setPosition(shoot);
-            } else {
-                Bay1Boot.setPosition(ready);
-            }
-            if (ben > inter && ben < (inter + down)) {
-                Bay2Boot.setPosition(shoot);
-            } else if (ben > inter) {
-                Bay2Boot.setPosition(ready);
-            }
-
-            double bay3Start = inter * 2;
-            if (ben > bay3Start && ben < (bay3Start + down)) {
-                Bay3Boot.setPosition(shoot);
-            } else if (ben > bay3Start) {
-                Bay3Boot.setPosition(ready);
-            }
-            return ben < (inter * 3);
-        }
-    }
-    }
-
+//
+//
+//    }
+//    private boolean isRunningSequential() {
+//        for (Action a : runningActions) {
+//            if (a instanceof SequentialShoot) return true;
+//        }
+//        return false;
+//    }
+//    private boolean isShooting() {
+//        // This checks if the ShootNow action is already in the list
+//        // Replace 'ShootNow.ActionType' with the actual class name of the action returned by shootNow.shoot()
+//        for (Action a : runningActions) {
+//            if (a.getClass().getSimpleName().contains("Shoot")) return true;
+//        }
+//        return false;
+//    }
+//    public static class SequentialShoot implements Action {
+//        private final ElapsedTime timer = new ElapsedTime();
+//        private boolean initialized = false;
+//
+//        @Override
+//        public boolean run(@NonNull TelemetryPacket packet) {
+//            if (!initialized) {
+//                timer.reset();
+//                initialized = true;
+//            }
+//
+//            double ben = timer.seconds();
+//            double inter = .5;
+//            double down =.25;
+//
+//            if (ben < down) {
+//                Bay1Boot.setPosition(shoot);
+//            } else {
+//                Bay1Boot.setPosition(ready);
+//            }
+//            if (ben > inter && ben < (inter + down)) {
+//                Bay2Boot.setPosition(shoot);
+//            } else if (ben > inter) {
+//                Bay2Boot.setPosition(ready);
+//            }
+//
+//            double bay3Start = inter * 2;
+//            if (ben > bay3Start && ben < (bay3Start + down)) {
+//                Bay3Boot.setPosition(shoot);
+//            } else if (ben > bay3Start) {
+//                Bay3Boot.setPosition(ready);
+//            }
+//            return ben < (inter * 3);
+//            }
+//
+//
+//        }
+//
+//        public static class TurretTracking implements Action {
+//            private final PIDController controller;
+//            private final DcMotorEx turretMotor;
+//            private final Limelight3A limelightSensor;
+//
+//            // NEW: Dashboard Tunables
+//            public static double kStatic = 0.05; // Minimum power to make the turret move
+//            public static double tolerance = 0.5; // Degrees of tx error to ignore
+//
+//            public TurretTracking(DcMotorEx turret, Limelight3A limelight, double p, double i, double d) {
+//                this.turretMotor = turret;
+//                this.limelightSensor = limelight;
+//                this.controller = new PIDController(p, i, d);
+//            }
+//
+//            @Override
+//            public boolean run(@NonNull TelemetryPacket packet) {
+//                LLResult result = limelightSensor.getLatestResult();
+//
+//                if (result != null && result.isValid()) {
+//                    double error = result.getTx();
+//
+//                    if (Math.abs(error) < tolerance) {
+//                        turretMotor.setPower(0);
+//                        return true;
+//                    }
+//
+//                    double pid = controller.calculate(error, 0);
+//
+//                    // Add static friction compensation (kStatic)
+//                    // This ensures the motor actually moves even with small PID values
+//                    double ff = Math.signum(pid) * kStatic;
+//
+//                    double totalPower = pid + ff;
+//
+//                    // Soft Limits using your specific conversion
+//                    int pos = turretMotor.getCurrentPosition();
+//                    double currentDeg = (pos * 0.1339285) + 7.5;
+//
+//                    // Boundary Safety
+////                if (currentDeg <= 8.0 && totalPower > 0) totalPower = 0;
+////                if (currentDeg >= 172.0 && totalPower < 0) totalPower = 0;
+//
+//                    turretMotor.setPower(Math.max(-0.6, Math.min(0.6, totalPower)));
+//
+//                    packet.put("Turret TX", error);
+//                } else {
+//                    // No target? Slow down or stay put.
+//                    turretMotor.setPower(0);
+//
+//                }
+//                return true;
+//
+//            }
+//        }
+//
+//    }
+//}
+//
+//
+//
+//
+//
+//
+//

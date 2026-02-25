@@ -73,9 +73,9 @@ public final class MecanumDrive {
         public double kA = 0.000065;//0.00005 awing arm
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 75; // Increase this for higher top speed
-        public double minProfileAccel = -45;
-        public double maxProfileAccel = 75; // Increase this for faster "take-off"
+        public double maxWheelVel = 90; // Increase this for higher top speed//90
+        public double minProfileAccel = -90;//-90
+        public double maxProfileAccel = 90; // Increase this for faster "take-off"//90
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI; // shared with path// Increase this for faster turns

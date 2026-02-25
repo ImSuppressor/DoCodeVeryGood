@@ -19,14 +19,12 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.hardware.ams.AMSColorSensor;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.lynx.commands.core.LynxI2cConfigureChannelCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -44,7 +42,7 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.ShooterPID;
 import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 import java.util.Arrays;
-
+@Disabled
 @Autonomous(name="BlueDepot", preselectTeleOp = "LeagueDrive")
 public class BlueDepot extends LinearOpMode {
 
@@ -59,6 +57,8 @@ public class BlueDepot extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57, -49, Math.toRadians(-45)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
+        ShootClose shootClose = new ShootClose(hardwareMap);
+
         TurretPID turretPID = new TurretPID(hardwareMap);
         DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
@@ -115,11 +115,16 @@ public class BlueDepot extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(30,-12),0)
                 .build();
 
-                //.build();
+
         Action intakespike = drive.actionBuilder(new Pose2d(30, -12, 0))
-                .strafeToLinearHeading(new Vector2d(67,-12),0)
-                .stopAndAdd(new SetpowerforMotor(intake,1))
+                .strafeToLinearHeading(new Vector2d(67, -12), Math.toRadians(0),
+                        new MinVelConstraint(Arrays.asList(
+                                new TranslationalVelConstraint(25),
+                                new AngularVelConstraint(Math.PI / 2)
+                        )))
+                .stopAndAdd(new BlueDepot.SetpowerforMotor(intake, 1))
                 .build();
+
 
         Action score1 = drive.actionBuilder(new Pose2d(67, -12, 0))
                 .afterTime(0.25,new SetpositionforMotor(turret,-750))
@@ -139,7 +144,7 @@ public class BlueDepot extends LinearOpMode {
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .strafeToLinearHeading(new Vector2d(75,12.5),Math.toRadians(0),
         new MinVelConstraint(Arrays.asList(
-                new TranslationalVelConstraint(25), //
+                new TranslationalVelConstraint(35), //
                 new AngularVelConstraint(Math.PI / 2) //
         )))
                 .build();
@@ -236,7 +241,7 @@ public class BlueDepot extends LinearOpMode {
                     OutakeWheels,
             new SequentialAction(
                     Scorepre,
-                    shootNow.shoot(),
+                    shootClose.shoot(),
                     ServoReset,
                     lineUP1,
                     ServoReset,
@@ -244,21 +249,21 @@ public class BlueDepot extends LinearOpMode {
                     intakespike,
                     color,
                     score1,
-                    shootNow.shoot(),
+                    shootClose.shoot(),
                     ServoReset,
                     GoLine2,
                     Grab2,
                     backup,
                     color,
                     Score2,
-                    shootNow.shoot(),
+                    shootClose.shoot(),
                     ServoReset2,
                     GoLIne3,
                     IN,
                     Grab3,
                     backup2,
                     Score3,
-                    shootNow.shoot()
+                    shootClose.shoot()
             )));
 
 //            Actions.runBlocking(new SequentialAction(

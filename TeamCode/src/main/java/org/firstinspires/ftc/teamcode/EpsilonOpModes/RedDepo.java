@@ -42,7 +42,7 @@ import org.firstinspires.ftc.teamcode.SubSystemsAndMORE.TurretPID;
 
 import java.util.Arrays;
 
-@Autonomous(name="RedDepo", preselectTeleOp = "DriveCode")
+@Autonomous(name="RedDepo", preselectTeleOp = "IOWA_STATE_CHAMPDRIVE")
 public class RedDepo extends LinearOpMode {
 
     @Override
@@ -55,6 +55,7 @@ public class RedDepo extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(57,49,Math.toRadians(45)));
         ShooterPID shooterPID = new ShooterPID(hardwareMap);
         ShootNow shootNow = new ShootNow(hardwareMap);
+        ShootClose shootClose = new ShootClose(hardwareMap);
         TurretPID turretPID = new TurretPID(hardwareMap);
         DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
@@ -85,91 +86,116 @@ public class RedDepo extends LinearOpMode {
         Limelight.pipelineSwitch(0);
         Limelight.setPollRateHz(50);
         Limelight.start();
+        // Action Scorepre: Y flipped to 49, Heading to 45, Turret to 655
+        // Action Scorepre: Y flipped to 49, Heading to 45, Turret to 655
         Action Scorepre = drive.actionBuilder(new Pose2d(57, 49, Math.toRadians(45)))
-                .afterTime(1, new ColorSense(hardwareMap))
-                // If your turret needs to mirror, flip the sign of the encoder ticks
-                .afterTime(1.1, new SetpositionforMotor(turret, 715))
+                .afterTime(.75, new ColorSense(hardwareMap))
+                .afterTime(1.1, new SetpositionforMotor(turret, 665)) // Flipped Turret
                 .strafeToLinearHeading(new Vector2d(24, 24), Math.toRadians(45))
                 .build();
 
         Action OutakeWheels = drive.actionBuilder(new Pose2d(0, 0, 0))
                 .stopAndAdd(new SetvelforMotor(outakeL, 1750))
                 .stopAndAdd(new SetvelforMotor(outakeR, 1750))
-                .stopAndAdd(new Setpositionforservo(hood, .85))
+                .stopAndAdd(new Setpositionforservo(hood, .9))
                 .build();
 
-        Action lineUP1 = drive.actionBuilder(new Pose2d(24, 24, Math.toRadians(45)))
+        Action lineUP1 = drive.actionBuilder(new Pose2d(24, 24, 45))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
-                .strafeToLinearHeading(new Vector2d(30, 12), 0)
+                .strafeToLinearHeading(new Vector2d(30, 8), 0)
                 .build();
 
-        Action intakespike = drive.actionBuilder(new Pose2d(30, 12, 0))
-                .strafeToLinearHeading(new Vector2d(67, 12), 0)
+        Action intakespike = drive.actionBuilder(new Pose2d(30, 6, 0))
+                .strafeToLinearHeading(new Vector2d(45, 6), Math.toRadians(0),
+                        new MinVelConstraint(Arrays.asList(
+                                new TranslationalVelConstraint(10),
+                                new AngularVelConstraint(Math.PI / 2)
+                        )))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .build();
 
-        Action score1 = drive.actionBuilder(new Pose2d(67, 12, 0))
-                .afterTime(0.25, new SetpositionforMotor(turret, 750))
+        Action score1 = drive.actionBuilder(new Pose2d(67, 6, 0))
+                .afterTime(0.25, new SetpositionforMotor(turret, 700)) // Flipped Turret
                 .afterTime(.75, new ColorSense(hardwareMap))
                 .strafeToLinearHeading(new Vector2d(24, 24), Math.toRadians(45))
                 .build();
 
-        Action GoLine2 = drive.actionBuilder(new Pose2d(24, 24, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(35, -15),Math.toRadians(0)) // Y becomes negative here
+        Action GoLine2 = drive.actionBuilder(new Pose2d(24, 24, 45))
+                .strafeToLinearHeading(new Vector2d(35, -16), Math.toRadians(0))
                 .stopAndAdd(new SetpowerforMotor(intake, 0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
+                .stopAndAdd(new Setpositionforservo(Boot1, .94))
+                .stopAndAdd(new Setpositionforservo(Boot2, .94))
+                .stopAndAdd(new Setpositionforservo(Boot3, .94))
                 .build();
 
-        Action Grab2 = drive.actionBuilder(new Pose2d(35, 12.5, 0))
+        Action Grab2 = drive.actionBuilder(new Pose2d(35, -16, 0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
-                .strafeToLinearHeading(new Vector2d(75, -12.5), 0,
+                .strafeToLinearHeading(new Vector2d(55, -16), Math.toRadians(0),
                         new MinVelConstraint(Arrays.asList(
-                                new TranslationalVelConstraint(25),
+                                new TranslationalVelConstraint(15),
                                 new AngularVelConstraint(Math.PI / 2)
                         )))
+                .strafeToLinearHeading(new Vector2d(45, -16), 0)
+                .stopAndAdd(new SetpowerforMotor(intake, 0))
+                .strafeToLinearHeading(new Vector2d(71, 2), 0)
+                .afterTime(.75, new ColorSense(hardwareMap))
+
                 .build();
 
-        Action backup = drive.actionBuilder(new Pose2d(75, 12.5, 0))
-                .strafeToLinearHeading(new Vector2d(65, -20), 0)
-                .build();
+        Action backupDUmp = drive.actionBuilder(new Pose2d(71, -0, 0))
+                .strafeToLinearHeading(new Vector2d(35, -5), Math.toRadians(0))
+               .build();
 
-        Action Score2 = drive.actionBuilder(new Pose2d(65, 20, 0))
-                .afterTime(.5, new ColorSense(hardwareMap))
+        Action Score2 = drive.actionBuilder(new Pose2d(35, -5, 0))
+                .afterTime(0.25, new SetpositionforMotor(turret, 715)) // Flipped Turret
                 .strafeToLinearHeading(new Vector2d(24, 24), Math.toRadians(45))
                 .build();
 
-        Action GoLIne3 = drive.actionBuilder(new Pose2d(24, 24, Math.toRadians(45)))
-                .strafeToLinearHeading(new Vector2d(35, -40), 0)
+        Action GoLIne3 = drive.actionBuilder(new Pose2d(24, 24, 45))
+                .strafeToLinearHeading(new Vector2d(32, -37), Math.toRadians(0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
                 .build();
 
-        Action Grab3 = drive.actionBuilder(new Pose2d(35, -40, 0))
+        Action Grab3 = drive.actionBuilder(new Pose2d(35, -37, 0))
                 .stopAndAdd(new SetpowerforMotor(intake, 1))
-                .strafeToLinearHeading(new Vector2d(75, -32), 0,
+                .strafeToLinearHeading(new Vector2d(50, -37), Math.toRadians(0),
                         new MinVelConstraint(Arrays.asList(
-                                new TranslationalVelConstraint(25),
+                                new TranslationalVelConstraint(10),
                                 new AngularVelConstraint(Math.PI / 2)
                         )))
+                .stopAndAdd(new SetpowerforMotor(intake, 0))
+
                 .build();
 
-        Action backup2 = drive.actionBuilder(new Pose2d(75, -32, 0))
-                .strafeToLinearHeading(new Vector2d(50, -32), 0)
+        Action backup2 = drive.actionBuilder(new Pose2d(75, -37, 0))
+                .strafeToLinearHeading(new Vector2d(40, -38), Math.toRadians(0))
+                .build();
+
+        Action Score3 = drive.actionBuilder(new Pose2d(40, -37, 0))
+                .afterTime(.75, new ColorSense(hardwareMap))
+                .afterTime(0.25, new SetpositionforMotor(turret, 750)) // Flipped Turret
+                .strafeToLinearHeading(new Vector2d(24, 26), Math.toRadians(45))
                 .stopAndAdd(new SetpowerforMotor(intake, 0))
                 .build();
 
-        Action Score3 = drive.actionBuilder(new Pose2d(50, -32, 0))
-                .strafeToLinearHeading(new Vector2d(24, 24), Math.toRadians(45))
-                .afterTime(1.1, new ColorSense(hardwareMap))
-                .stopAndAdd(new SetpowerforMotor(intake, 0))
+        Action PAARRK = drive.actionBuilder(new Pose2d(24, 24, 45))
+                .afterTime(1.5, new SetpowerforMotor(intake, 0))
+                .afterTime(0.25, new SetpositionforMotor(turret, 635)) // Flipped Turret
+                .strafeToLinearHeading(new Vector2d(24, 30), Math.toRadians(45)) // -180 is effectively 180
                 .build();
 
 
-
-
-        Action IN = drive.actionBuilder(new Pose2d(24, -24, -45))
-                .stopAndAdd(new RedDepo.SetpowerforMotor(intake,1))
-                .build();
-
+        while (!isStopRequested() && !opModeIsActive()) {
+            LLResult result = Limelight.getLatestResult();
+            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
+                telemetry.addData("AprilTag", fiducial.getFiducialId());
+                telemetry.addData("Bay 3", ColorBay3);
+                telemetry.addData("Bay 2", ColorBay2);
+                telemetry.addData("Bay 1", ColorBay1);
+                telemetry.update();
+            }
+        }
         Action ServoReset = drive.actionBuilder(new Pose2d(-64, -7, 0))
                 .stopAndAdd(new RedDepo.SetpowerforMotor(intake,0))
                 .stopAndAdd(new RedDepo.Setpositionforservo(Boot1,.94))
@@ -182,114 +208,44 @@ public class RedDepo extends LinearOpMode {
                 .stopAndAdd(new RedDepo.Setpositionforservo(Boot2,.94))
                 .stopAndAdd(new RedDepo.Setpositionforservo(Boot3,.94))
                 .build();
+        Action wait = drive.actionBuilder(new Pose2d(-64, -7, 0))
+                        .waitSeconds(2)
+                                .build();
 
-        Action color = drive.actionBuilder(new Pose2d(-64, -7, 0))
-                .afterTime(.25,new RedDepo.ColorSense(hardwareMap))
-                        .build();
-//        while (!isStopRequested() && !opModeIsActive()) {
-//            LLResult result = Limelight.getLatestResult();
-//            for (LLResultTypes.FiducialResult fiducial : result.getFiducialResults()) {
-//                telemetry.addData("AprilTag", fiducial.getFiducialId());
-//                telemetry.addData("Bay 3", ColorBay3);
-//                telemetry.addData("Bay 2", ColorBay2);
-//                telemetry.addData("Bay 1", ColorBay1);
-//                telemetry.update();
-//            }
-//        }
+
 
         waitForStart();
         //TODO: Run auto
         try {
             //TODO: Run auto
             Actions.runBlocking(new ParallelAction(
-                    OutakeWheels,
+                    OutakeWheels, // Runs in background
                     new SequentialAction(
                             Scorepre,
                             shootNow.shoot(),
-                            ServoReset,
-                            lineUP1,
-                            ServoReset,
-                            IN,
-                            intakespike,
-                            color,
-                            score1,
-                            shootNow.shoot(),
-                            ServoReset,
+                            Scorepre,
                             GoLine2,
                             Grab2,
-                            backup,
-                            color,
+                            //backup,
+                            //dump,
+                            backupDUmp,
                             Score2,
                             shootNow.shoot(),
-                            ServoReset2,
+                            ServoReset,
                             GoLIne3,
-                            IN,
                             Grab3,
                             backup2,
                             Score3,
+                            shootNow.shoot(),
+                            ServoReset2,
+                            lineUP1,
+                            intakespike,
+                            score1,
                             shootNow.shoot()
-                    )));
+                            ,PAARRK
+                    )
+            ));
 
-//            Actions.runBlocking(new SequentialAction(
-//              Scorepre,
-//                shootNow.shoot()
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                ServoReset
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                    failsafe_thang
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                lineUP1
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                ServoReset
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                ServoReset
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//
-//                IN,
-//                intakespike
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//               score1
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                shootNow.shoot(),failsafe_thang
-//            ));
-//
-//            Actions.runBlocking(new SequentialAction(
-//                ServoReset
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//
-//                IN,
-//               GoLine2
-//            ));
-//
-//            Actions.runBlocking(new SequentialAction(
-//                 IN,
-//                Grab2
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                backup
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                Score2
-//            ));
-//            Actions.runBlocking(new SequentialAction(
-//                shootNow.shoot(),
-//                failsafe_thang
-//
-//            ));
-//        Actions.runBlocking(new SequentialAction(
-//               PAARRK
-//
-//        ));
-//        )
 
         } finally {
             drive.updatePoseEstimate();
